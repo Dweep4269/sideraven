@@ -30,6 +30,17 @@ class SidebarKeyboardTest {
     }
 
     @Test
+    fun `THEN Ctrl+L opens the current tab URL editor like tapping the address bar`() {
+        assertEquals(SidebarIntent.OpenSearch(newTab = false), key(KeyEvent.KEYCODE_L))
+        assertEquals(SidebarIntent.OpenSearch(newTab = false), key(KeyEvent.KEYCODE_L, essentials = 0))
+        assertNull(key(KeyEvent.KEYCODE_L, ctrl = false))
+        assertNull(key(KeyEvent.KEYCODE_L, shift = true))
+        assertNull(key(KeyEvent.KEYCODE_L, essentials = -1))
+        assertNull(SidebarKeyboard.intentFor(KeyEvent.KEYCODE_L, ctrl = true, shift = false, alt = true, meta = false, essentialsShown = 0))
+        assertNull(SidebarKeyboard.intentFor(KeyEvent.KEYCODE_L, ctrl = true, shift = false, alt = false, meta = true, essentialsShown = 0))
+    }
+
+    @Test
     fun `THEN Ctrl+1 to Ctrl+9 select the matching Essential only when it exists`() {
         assertEquals(SidebarIntent.SelectEssentialAt(0), key(KeyEvent.KEYCODE_1))
         assertEquals(SidebarIntent.SelectEssentialAt(2), key(KeyEvent.KEYCODE_3))

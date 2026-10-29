@@ -24,7 +24,7 @@ object SidebarKeyboard {
 
     /**
      * Maps a key press to a Sidebar intent: Ctrl+Shift+S cycles Sidebar Modes; Ctrl+1…9 selects
-     * Essentials 1–9; Ctrl+Alt+Left/Right moves to the previous/next Space (Ctrl+Shift+arrows stay
+     * Essentials 1–9; Ctrl+L edits the current URL; Ctrl+Alt+Left/Right moves to the previous/next Space (Ctrl+Shift+arrows stay
      * with text fields, where they select words). Anything else (and Essentials that don't
      * exist) is left to Fenix.
      */
@@ -47,6 +47,8 @@ object SidebarKeyboard {
         }
         return when {
             shift && keyCode == KeyEvent.KEYCODE_S -> SidebarIntent.KeyboardToggleMode
+            // Use the same editor as tapping the Sidebar's address bar.
+            !shift && keyCode == KeyEvent.KEYCODE_L -> SidebarIntent.OpenSearch(newTab = false)
             // Ctrl+T follows the New Tab Behaviour, like the Sidebar's New Tab button.
             !shift && keyCode == KeyEvent.KEYCODE_T -> SidebarIntent.NewTab
             !shift && keyCode in KeyEvent.KEYCODE_1..KeyEvent.KEYCODE_9 -> {
