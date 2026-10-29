@@ -22,12 +22,27 @@ import mozilla.components.support.ktx.android.content.getStatusBarColor
 import mozilla.components.support.ktx.android.view.createWindowInsetsController
 import mozilla.components.support.ktx.android.view.setNavigationBarColorCompat
 import mozilla.components.support.ktx.android.view.setStatusBarColorCompat
+import mozilla.components.support.ktx.android.view.setSystemBarsBackground
 import org.mozilla.fenix.HomeActivity
 import org.mozilla.fenix.R
 import org.mozilla.fenix.browser.browsingmode.BrowsingMode
 import org.mozilla.fenix.customtabs.ExternalAppBrowserActivity
 
 abstract class ThemeManager {
+
+    // SIDERAVEN-HOOK: the system bars continue the page frame's top and bottom edges.
+    private var frameColors: Pair<Int, Int>? = null
+
+    fun setFrameColors(activity: Activity, colors: Pair<Int, Int>?) {
+        if (frameColors != null && colors == null) {
+            activity.window.setSystemBarsBackground(
+                statusBarColor = activity.getStatusBarColor(),
+                navigationBarColor = activity.getColorFromAttr(materialR.attr.colorSurface),
+            )
+        }
+        frameColors = colors
+        applyStatusBarTheme(activity)
+    }
 
     abstract var currentTheme: BrowsingMode
 
@@ -48,6 +63,10 @@ abstract class ThemeManager {
     fun applyStatusBarTheme(activity: Activity) = applyStatusBarTheme(activity.window, activity)
 
     private fun applyStatusBarTheme(window: Window, context: Context) {
+        frameColors?.let { (top, bottom) ->
+            window.setSystemBarsBackground(statusBarColor = top, navigationBarColor = bottom, horizontalInsetsColor = top)
+            return
+        }
         when (currentTheme) {
             BrowsingMode.Normal -> {
                 when (context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) {

@@ -677,6 +677,9 @@ private fun SidebarRoot(
         val frameTop = (tint?.top ?: surface).toArgb()
         val frameBottom = (tint?.bottom ?: surface).toArgb()
         LaunchedEffect(state.framesContent, frameTop, frameBottom) { onFrameChanged(state.framesContent, frameTop, frameBottom) }
+        LaunchedEffect(state.isVisible, frameTop, frameBottom) {
+            activity.themeManager.setFrameColors(activity, (frameTop to frameBottom).takeIf { state.isVisible })
+        }
         // Fenix's toolbar takes the Sidebar's colour while the Sidebar shows (the top of a Space theme's gradient).
         LaunchedEffect(state.isVisible, frameTop) { SidebarGate.sidebarSurface.value = frameTop.takeIf { state.isVisible } }
         CompositionLocalProvider(

@@ -70,6 +70,13 @@ class StatusBarColorManager(
         wallpaperScope = null
 
         when {
+            // SIDERAVEN-HOOK: a Fenix tab-strip gradient must not cover the page frame's color.
+            pt.dweep.sideraven.SidebarGate.hostsSidebar(activity) &&
+                pt.dweep.sideraven.SidebarGate.showsSidebar(activity) &&
+                (fragment is BrowserFragment || fragment is HomeFragment) -> {
+                tabStripStatusBarView.hide()
+            }
+
             // Don't show the gradient if tab strip is not enabled or private mode is enabled.
             !settings.isTabStripEnabled || themeManager.currentTheme.isPrivate -> {
                 tabStripStatusBarView.hide()
