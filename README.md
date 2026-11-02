@@ -127,6 +127,8 @@ Prefer Firefox's own tab tray on your phone? Turn off **Use the sidebar on phone
 <td width="50%" valign="top">
 
 #### Tabs
+- `Ctrl+Tab` switches to the next open tab; `Ctrl+Shift+Tab` switches to the previous one, wrapping within the current Space and browsing mode.
+- `Alt+Left` and `Alt+Right` go back and forward in the current tab's history.
 - Swipe a tab toward the screen edge to close it.
 - Drag tabs to reorder them, or onto Essentials to pin them.
 - Unload tabs you aren't using to free memory. They reload when you open them.

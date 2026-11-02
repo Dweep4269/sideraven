@@ -1355,6 +1355,8 @@ open class HomeActivity : LocaleAwareAppCompatActivity(), NavHostActivity, Crash
     }
 
     override fun dispatchKeyEvent(event: KeyEvent): Boolean {
+        // SIDERAVEN-HOOK: Ctrl+Tab / Ctrl+Shift+Tab cycle tabs; Alt+Left/Right navigate history.
+        if (pt.dweep.sideraven.BrowserKeyboard.handle(this, event)) return true
         // SIDERAVEN-HOOK: Sidebar keyboard shortcuts (Ctrl+Shift+S, Ctrl+1..9, Ctrl+Alt+Left/Right)
         if (pt.dweep.sideraven.SidebarKeyboard.handle(event)) return true
         // The KEYCODE_MENU event is handled here instead of onKeyDown or onKeyUp because
