@@ -56,6 +56,8 @@ class ThreadPenaltyDeathWithIgnoresListener(
             containsInstrumentedHooksClass(violation) ||
             isSamsungIdsController(violation) ||
             isXiaomiMultiLangHelperViolation(violation) ||
+            // SIDERAVEN-HOOK: HyperOS scheduler reads its own permission file during a frame.
+            pt.dweep.sideraven.isXiaomiSchedulerDiskRead(violation, manufacturerChecker.isXiaomi()) ||
             isFinishAttachApplication(violation) ||
             containsInMemoryDexClassLoader(violation) ||
             isInflatingPlatformPreference(violation)

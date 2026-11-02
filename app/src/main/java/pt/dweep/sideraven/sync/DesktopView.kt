@@ -23,6 +23,8 @@ data class DesktopSpace(
 data class DesktopTab(
     val url: String,
     val title: String,
+    val id: String? = null,
+    val isSending: Boolean = false,
 )
 
 /**
@@ -42,7 +44,7 @@ data class DesktopView(
             .put(
                 "tabs",
                 JSONObject().apply {
-                    tabs.forEach { (space, list) -> put(space, JSONArray(list.map { JSONObject().put("url", it.url).put("title", it.title) })) }
+                    tabs.forEach { (space, list) -> put(space, JSONArray(list.map { JSONObject().put("url", it.url).put("title", it.title).put("id", it.id ?: JSONObject.NULL) })) }
                 },
             )
             .toString()
@@ -64,7 +66,7 @@ data class DesktopView(
                         val order = children[space].orEmpty()
                         records
                             .sortedBy { record -> order.rank(record.tabId) }
-                            .map { DesktopTab(it.url, it.title?.takeIf { title -> title.isNotBlank() } ?: it.url) }
+                            .map { DesktopTab(it.url, it.title?.takeIf { title -> title.isNotBlank() } ?: it.url, id = it.tabId) }
                     }
             return DesktopView(spaces, tabs)
         }
@@ -79,10 +81,34 @@ data class DesktopView(
                 },
                 tabs.keys().asSequence().associateWith { space ->
                     val list = tabs.optJSONArray(space) ?: JSONArray()
-                    (0 until list.length()).mapNotNull { list.optJSONObject(it) }.map { DesktopTab(it.optString("url"), it.optString("title")) }
+                    (0 until list.length()).mapNotNull { list.optJSONObject(it) }.map {
+                        DesktopTab(it.optString("url"), it.optString("title"), id = ZenWire.string(it, "id"))
+                    }
                 },
             )
         }
+    }
+}
+
+/** Shown immediately, including while a send is waiting for the current sync's mutex. */
+data class DesktopSendPreview(
+    val requestId: String,
+    val spaceId: String,
+    val url: String,
+    val title: String,
+    val recordId: String? = null,
+)
+
+/** Pending rows stay first until fully acknowledged; partial server records cannot duplicate them. */
+fun DesktopView.withPendingSends(sending: List<DesktopSendPreview>): Map<String, List<DesktopTab>> {
+    val pendingBySpace = sending.groupBy { it.spaceId }
+    return (tabs.keys + pendingBySpace.keys).associateWith { space ->
+        val confirmed = tabs[space].orEmpty()
+        val pending = pendingBySpace[space].orEmpty()
+            .distinctBy { it.recordId ?: it.requestId }
+            .map { DesktopTab(it.url, it.title, id = it.recordId, isSending = true) }
+        val pendingIds = pending.mapNotNull { it.id }.toSet()
+        pending + confirmed.filterNot { it.id != null && it.id in pendingIds }
     }
 }
 

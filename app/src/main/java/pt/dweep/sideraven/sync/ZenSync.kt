@@ -59,7 +59,69 @@ class ZenSync(
     private val desktop: DesktopViewStore = InMemoryDesktopViewStore(),
     private val followAddress: (tabId: String, oldUrl: String, newUrl: String) -> Unit = { _, _, _ -> },
     private val icons: pt.dweep.sideraven.IconStore? = null,
+    private val sends: DesktopSendQueue = InMemoryDesktopSendQueue(),
 ) {
+    private var activeSendOwner: String? = null
+
+    /** Persist a one-time copy. Caller must exclude private tabs and serialize with [sync]. */
+    suspend fun queueDesktopTab(spaceId: String, url: String, title: String): String {
+        if (!canSendTo(spaceId) || !desktopSendableUrl(url)) throw SyncError.Protocol("desktop send unavailable")
+        val credentials = account.credentials() ?: throw SyncError.Auth("signed out")
+        val owner = desktopSendOwner(credentials)
+        activeSendOwner = owner
+        return sends.enqueue(owner, spaceId, url, title)
+    }
+
+    private fun canSendTo(spaceId: String): Boolean = settings.settings.value.let { options ->
+        options.enabled && options.firstSyncDone && options.syncSpaces && spaceId !in options.desktopOnly &&
+            spaces.data.spaces.any { it.id == spaceId && !it.isLocal }
+    }
+
+    fun isDesktopSendPending(id: String): Boolean = sends.pending.any { it.id == id }
+
+    /** Read off the main thread; only expose this account's eligible pending copies. */
+    fun pendingDesktopSends(): List<DesktopSend> = sends.pending.filter { it.owner == activeSendOwner && canSendTo(it.spaceId) }
+
+    /** Prioritize this copy over unrelated Space/pin merging, without waiting for a sync timer. */
+    suspend fun sendDesktopTabNow(id: String): SyncOutcome {
+        val credentials = account.credentials() ?: throw SyncError.Auth("signed out")
+        val owner = desktopSendOwner(credentials)
+        activeSendOwner = owner
+        val item = sends.pending.firstOrNull { it.id == id && it.owner == owner && canSendTo(it.spaceId) }
+            ?: return SyncOutcome.Synced
+        // A newly created Space has to reach desktop before a tab can be added to it.
+        if (spaces.data.spaces.firstOrNull { it.id == item.spaceId }?.extra == null) return sync()
+        val connection = ZenConnection.open(credentials, transport)
+        if ((connection.engineVersion() ?: 0) > ZenConnection.SUPPORTED_ENGINE_VERSION) return SyncOutcome.ReadOnly
+        sendPending(connection, owner, onlyId = id)
+        return SyncOutcome.Synced
+    }
+
+    private fun sendPending(connection: ZenConnection, owner: String, onlyId: String? = null) {
+        val pending = sends.pending.filter { it.owner == owner && canSendTo(it.spaceId) && (onlyId == null || it.id == onlyId) }
+        if (pending.isEmpty()) return
+        if (!connection.normalTabsEnabled()) throw SyncError.Protocol("enable zen.spaces-sync.normal-tabs on desktop to send tabs")
+        var failure: Exception? = null
+        val completed = mutableSetOf<String>()
+        pending.forEach { item ->
+            // A Space switched off or removed while offline must not block other destinations.
+            // Retain its copy locally in case the user shares that Space again.
+            if (!canSendTo(item.spaceId)) return@forEach
+            try {
+                DesktopTabSender.upload(connection, item) { canSendTo(item.spaceId) }
+                completed += item.id
+            } catch (e: SyncError) {
+                failure = failure ?: e
+            } catch (e: java.io.IOException) {
+                failure = failure ?: e
+            }
+        }
+        read(connection)
+        // Keep previews durable until the confirmed snapshot is available to replace them.
+        if (completed.isNotEmpty()) sends.save(sends.pending.filterNot { it.id in completed })
+        failure?.let { throw it }
+    }
+
     private suspend fun connect(): ZenConnection {
         val credentials = account.credentials() ?: throw SyncError.Auth("signed out")
         return ZenConnection.open(credentials, transport)
@@ -261,11 +323,17 @@ class ZenSync(
         val options = settings.settings.value
         if (!options.enabled || !options.firstSyncDone) return SyncOutcome.Synced
         slimStoredItems()
-        val connection = connect()
+        val credentials = account.credentials() ?: throw SyncError.Auth("signed out")
+        activeSendOwner = desktopSendOwner(credentials)
+        val connection = ZenConnection.open(credentials, transport)
         // A newer Zen data version: keep reading what Sideraven understands, never write.
         val readOnly = (connection.engineVersion() ?: 0) > ZenConnection.SUPPORTED_ENGINE_VERSION
         repeat(2) { attempt ->
-            if (syncOnce(connection, options, readOnly)) return if (readOnly) SyncOutcome.ReadOnly else SyncOutcome.Synced
+            if (syncOnce(connection, options, readOnly)) {
+                if (readOnly) return SyncOutcome.ReadOnly
+                sendPending(connection, desktopSendOwner(credentials))
+                return SyncOutcome.Synced
+            }
             if (attempt == 1) throw SyncError.Protocol("conflict")
         }
         return SyncOutcome.Synced
@@ -549,6 +617,7 @@ class ZenSync(
                     fromTabletName = context.getString(org.mozilla.fenix.R.string.sideraven_zen_from_tablet),
                     desktop = PreferencesDesktopViewStore.get(context),
                     icons = pt.dweep.sideraven.IconStore.get(context),
+                    sends = PreferencesDesktopSendQueue.get(context),
                     followAddress = { tabId, old, new ->
                         val components = context.components
                         // Tab work belongs on the main thread; the sync runs in the background.

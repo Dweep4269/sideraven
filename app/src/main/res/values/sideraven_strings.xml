@@ -370,6 +370,11 @@
     <string name="sideraven_zen_automatic_summary">When the app opens, every 5 minutes, and after you change something</string>
     <!-- Desktop Tabs: the header of desktop's open tabs at the end of the Tab List; %d is how many. -->
     <string name="sideraven_desktop_tabs_header">On desktop (%d)</string>
+    <string name="sideraven_send_to_desktop">Send to desktop</string>
+    <string name="sideraven_send_to_desktop_loading">Sending to desktop</string>
+    <string name="sideraven_send_to_desktop_uploaded">Uploaded. Zen will open the copy when desktop next syncs.</string>
+    <string name="sideraven_send_to_desktop_queued">Copy queued for retry. Check Zen Sync and enable zen.spaces-sync.normal-tabs on desktop.</string>
+    <string name="sideraven_send_to_desktop_unavailable">Could not queue this tab. Check Zen Sync and use a shared Space.</string>
     <string name="sideraven_zen_desktop_tabs_off">Desktop isn\'t sharing open tabs</string>
     <string name="sideraven_zen_desktop_tabs_off_summary">To see them here, turn on zen.spaces-sync.normal-tabs in Zen’s about:config</string>
 

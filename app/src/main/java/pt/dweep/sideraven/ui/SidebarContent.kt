@@ -31,6 +31,7 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.draw.alpha
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.TooltipAnchorPosition
 import androidx.compose.material3.TooltipBox
@@ -266,6 +267,7 @@ private fun DesktopTabRow(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val sendingLabel = stringResource(R.string.sideraven_send_to_desktop_loading)
     Row(
         modifier =
             modifier
@@ -287,11 +289,20 @@ private fun DesktopTabRow(
         Spacer(Modifier.width(12.dp))
         Text(
             text = tab.title,
+            modifier = Modifier.weight(1f),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )
+        if (tab.isSending) {
+            Spacer(Modifier.width(8.dp))
+            CircularProgressIndicator(
+                modifier = Modifier.size(16.dp).testTag(SidebarTestTag.DESKTOP_TAB_SENDING)
+                    .semantics { contentDescription = sendingLabel },
+                strokeWidth = 2.dp,
+            )
+        }
     }
 }
 
@@ -478,6 +489,7 @@ object SidebarTestTag {
     const val INACTIVE_HEADER = "sidebar.inactiveHeader"
     const val INACTIVE_CLOSE_ALL = "sidebar.inactiveCloseAll"
     const val DESKTOP_TABS_HEADER = "sidebar.desktopTabsHeader"
+    const val DESKTOP_TAB_SENDING = "sidebar.desktopTabSending"
 }
 
 /**
@@ -1372,6 +1384,17 @@ private fun SidebarPanel(
         }
         val moveTargets = state.spaces.filterNot { it.isCurrent }
         val tabMenuExtras: @Composable (String, () -> Unit) -> Unit = { tabId, dismiss ->
+            if (state.desktopSendingOn && !state.isPrivate && state.currentSpace?.isLocal == false &&
+                state.allTabs.firstOrNull { it.id == tabId }?.let { pt.dweep.sideraven.sync.desktopSendableUrl(it.url) } == true
+            ) {
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.sideraven_send_to_desktop)) },
+                    onClick = {
+                        dismiss()
+                        onIntent(SidebarIntent.SendToDesktop(tabId))
+                    },
+                )
+            }
             // Unload: not for the tab on screen, nor one already asleep.
             state.allTabs.firstOrNull { it.id == tabId }?.takeUnless { it.isSelected || it.sleeping }?.let {
                 DropdownMenuItem(

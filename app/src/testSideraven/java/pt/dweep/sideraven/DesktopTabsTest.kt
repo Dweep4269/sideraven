@@ -79,4 +79,38 @@ class DesktopTabsTest {
 
         assertEquals(listOf(true), expanded)
     }
+
+    @Test
+    fun `sending a phone tab passes a copy without closing or navigating it`() {
+        val sent = mutableListOf<List<String>>()
+        val closed = mutableListOf<String>()
+        val sender = SidebarIntentHandler(
+            selectTab = { selected += it }, openNewTab = {}, closeTab = { closed += it },
+            sendToDesktop = { space, url, title -> sent += listOf(space, url, title) },
+        )
+        store.dispatch(TabListAction.AddTabAction(createTab("https://phone.example", id = "phone")))
+        val ui = state().copy(zenSyncOn = true, desktopSendingOn = true)
+
+        sender.handle(SidebarIntent.SendToDesktop("phone"), ui)
+
+        assertEquals(listOf(listOf(spaces.data.current.id, "https://phone.example", "https://phone.example")), sent)
+        assertEquals(listOf("phone"), store.state.tabs.map { it.id })
+        assertEquals(emptyList<String>(), closed)
+        assertEquals(emptyList<String>(), selected)
+    }
+
+    @Test
+    fun `private and Local Space tabs cannot be sent even through a stale intent`() {
+        val sent = mutableListOf<String>()
+        val sender = SidebarIntentHandler(
+            selectTab = {}, openNewTab = {}, sendToDesktop = { _, url, _ -> sent += url },
+        )
+        store.dispatch(TabListAction.AddTabAction(createTab("https://phone.example", id = "phone")))
+        val ui = state().copy(zenSyncOn = true, desktopSendingOn = true)
+        sender.handle(SidebarIntent.SendToDesktop("phone"), ui.copy(isPrivate = true))
+        sender.handle(SidebarIntent.SendToDesktop("phone"), ui.copy(desktopSendingOn = false))
+        spaces.setLocal(spaces.data.current.id, true)
+        sender.handle(SidebarIntent.SendToDesktop("phone"), state().copy(zenSyncOn = true, desktopSendingOn = true))
+        assertEquals(emptyList<String>(), sent)
+    }
 }

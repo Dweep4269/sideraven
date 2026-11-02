@@ -75,6 +75,7 @@ Zen Sync keeps your Spaces, Essentials, pinned tabs and folders the same on Side
 - **Keep some Spaces local.** Mark a Space **Don't sync this space** and it stays on this device only.
 - **Pick what syncs.** Spaces with their pinned tabs and folders, Essentials, and Space colours each have their own switch.
 - **See your desktop tabs.** The tabs open in a Space on your computer show at the end of that Space as **On desktop**. Tap one to open it here. Nothing changes on the computer.
+- **Send a copy to desktop.** Long-press a web tab in a shared Space and choose **Send to desktop**. A copy appears immediately at the top of **On desktop**, with a loading indicator while it uploads. Sending triggers an immediate sync and keeps the phone tab open. Zen receives the copy in the same Space when desktop next syncs; failed uploads stay queued for retry.
 - **Syncs by itself.** When the app opens, every 5 minutes while it's open, and after you change something. Or turn that off and tap **Sync now**.
 
 To set it up:
@@ -83,7 +84,7 @@ To set it up:
 2. In Sideraven, sign in to the same Firefox account from the top of **Settings**.
 3. Turn on Zen Sync in **Settings > Sideraven > Zen Sync** and choose how the first sync goes.
 
-To see desktop tabs, also set `zen.spaces-sync.normal-tabs` to `true` in Zen's `about:config`.
+To see desktop tabs or send copies to desktop, also set `zen.spaces-sync.normal-tabs` to `true` in Zen's `about:config`.
 
 > [!NOTE]
 > Zen Sync is Sideraven's own feature, not an official Zen one. If Zen changes how it stores Spaces, Sideraven stops writing to them until it catches up. It keeps reading, so nothing is lost.

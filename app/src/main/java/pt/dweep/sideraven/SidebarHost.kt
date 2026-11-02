@@ -4,6 +4,8 @@
 
 package pt.dweep.sideraven
 
+import pt.dweep.sideraven.sync.withPendingSends
+
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.Lifecycle
 import android.content.res.Configuration
@@ -113,6 +115,7 @@ internal data class SidebarInputs(
     val animateModeChanges: Boolean = true,
     val syncProblem: Boolean = false,
     val zenSyncOn: Boolean = false,
+    val desktopSendingOn: Boolean = false,
 )
 
 /** The Sidebar's state, recomputed when the tabs, the selection or any [inputs] change. */
@@ -151,7 +154,7 @@ internal fun rememberSidebarUiState(
                 desktopTabs = desktopTabs,
                 desktopTabsExpanded = desktopTabsExpanded,
                 desktopTabIcons = desktopTabIcons,
-            ).copy(animateModeChanges = animateModeChanges, syncProblem = syncProblem, zenSyncOn = zenSyncOn, look = look)
+            ).copy(animateModeChanges = animateModeChanges, syncProblem = syncProblem, zenSyncOn = zenSyncOn, desktopSendingOn = desktopSendingOn, look = look)
         }
     }
 
@@ -298,6 +301,7 @@ private fun SidebarRoot(
     // Zen Sync: once at start, a few seconds after each change, and alongside Fenix's sync.
     val zenRunner = remember(activity) { pt.dweep.sideraven.sync.ZenSyncRunners.get(activity) }
     val zenStatus by zenRunner.status.collectAsState()
+    val desktopSends by zenRunner.sending.collectAsState()
     val zenSettings by remember(activity) { pt.dweep.sideraven.sync.PreferencesZenSyncSettingsStore.get(activity) }.settings.collectAsState()
     // In front: sync now and every few minutes (Sync automatically); the start is covered too.
     DisposableEffect(zenRunner) {
@@ -412,9 +416,10 @@ private fun SidebarRoot(
                 sleepingTabIds = sleepingTabIds,
                 pinnedLinks = pinnedLinks,
                 pinnedIcons = pinnedIcons.toMap(),
-                desktopTabs = if (zenSettings.enabled && zenSettings.syncSpaces) desktopView.tabs else emptyMap(),
+                desktopTabs = if (zenSettings.enabled && zenSettings.syncSpaces) desktopView.withPendingSends(desktopSends) else emptyMap(),
                 desktopTabsExpanded = desktopTabsExpanded,
                 desktopTabIcons = desktopTabIcons.toMap(),
+                desktopSendingOn = zenSettings.enabled && zenSettings.firstSyncDone && zenSettings.syncSpaces,
                 look =
                     SidebarLook(
                         tabRows = tabRows,
@@ -522,6 +527,17 @@ private fun SidebarRoot(
                 setAnimateModeChanges = { animateModeChanges = it },
                 setInactiveExpanded = modeStore.inactiveExpanded::set,
                 setDesktopTabsExpanded = modeStore.desktopTabsExpanded::set,
+                sendToDesktop = { spaceId, url, title ->
+                    modeStore.desktopTabsExpanded.set(true)
+                    zenRunner.sendToDesktop(spaceId, url, title) { result ->
+                        val message = when (result) {
+                            pt.dweep.sideraven.sync.DesktopSendResult.Uploaded -> R.string.sideraven_send_to_desktop_uploaded
+                            pt.dweep.sideraven.sync.DesktopSendResult.Queued -> R.string.sideraven_send_to_desktop_queued
+                            pt.dweep.sideraven.sync.DesktopSendResult.Unavailable -> R.string.sideraven_send_to_desktop_unavailable
+                        }
+                        Toast.makeText(activity, message, Toast.LENGTH_LONG).show()
+                    }
+                },
                 setFlapPosition = modeStore.flapPosition::set,
                 setArranging = { arranging = it },
                 setArrangedShare = { section, share -> modeStore.arrange(section, currentLandscape, share) },
