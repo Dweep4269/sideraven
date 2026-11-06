@@ -130,6 +130,27 @@ object SidebarIcons {
         loaded: Bitmap?,
     ): Bitmap? = tabIcon ?: stored ?: loaded
 
+    /**
+     * Whether a pin's tab, now at [tabUrl], is still on the pin's site, so its icon is the pin's: at
+     * [pinUrl] itself, on the first page the tab loaded ([atFirstPage]: where a redirect landed, as
+     * gmail.com lands on mail.google.com), or anywhere on the same site ([siteOf] gives a host's
+     * registrable domain).
+     */
+    suspend fun onPinSite(
+        pinUrl: String,
+        tabUrl: String,
+        atFirstPage: Boolean,
+        siteOf: suspend (host: String) -> String?,
+    ): Boolean {
+        if (tabUrl == pinUrl) return true
+        val tabHost = runCatching { java.net.URI(tabUrl).host }.getOrNull() ?: return false
+        if (atFirstPage) return true
+        val pinHost = runCatching { java.net.URI(pinUrl).host }.getOrNull() ?: return false
+        if (tabHost == pinHost) return true
+        val site = siteOf(pinHost) ?: return false
+        return site == siteOf(tabHost)
+    }
+
     /** A loader result that is a real favicon, not one generated from the address's letter. */
     fun realOrNull(icon: Icon): Bitmap? = icon.bitmap.takeUnless { icon.source == Icon.Source.GENERATOR }
 }

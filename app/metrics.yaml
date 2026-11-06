@@ -2343,6 +2343,107 @@ onboarding:
     send_in_pings:
       - onboarding
       - events
+  completion_state_migration_started:
+    type: event
+    description: |
+      Recorded only when an existing user's stored onboarding state needs a one-time migration.
+      The event fires before any changes are made, so its extras capture the original state.
+
+      Continuous onboarding introduced follow-up prompts on days 2, 3, 5 and 7 in
+      Firefox 155 (2026-09-01). Earlier users may have incomplete stored state, causing prompts to
+      appear long after installation. The migration marks initial onboarding and all follow-up
+      stages complete.
+
+      This event does not confirm that the migration finished or persisted to disk. Compare its
+      count with completion_state_migration_completed to see how often the migration is interrupted
+      before it completes. Multiple started events from the same client indicate that an earlier
+      migration did not persist.
+
+      The event is sent only in the events ping, not the onboarding ping, because it is not a user
+      interaction with onboarding.
+
+      How this data relates to the cohorts in the linked document:
+      - Cohorts 1.a and 1.b (no initial completion date): migration_reason is unset_timestamp
+        and progress_predates_cutoff is false.
+      - Cohort 2 (onboarded with the feature off): migration_reason is predates_rollout and
+        progress_predates_cutoff is false.
+      - Users who had the feature early (Nightly, Beta, or the Release experiment) with prompts
+        still remaining: migration_reason is predates_rollout and progress_predates_cutoff is true.
+      - Cohort 3 (onboarded with the feature on, from version 155) records no event.
+
+      Details: https://searchfox.org/firefox-main/source/mobile/android/fenix/app/src/main/java/org/mozilla/fenix/onboarding/Onboarding-state-migration-and-reconciliation.md
+    extra_keys:
+      migration_reason:
+        type: string
+        description: |
+          unset_timestamp: No record of when the user finished initial onboarding, either because
+          they completed onboarding before version 150 (2026-04-21) or bypassed onboarding
+          completely. The two states cannot be distinguished.
+
+          predates_rollout: The user finished initial onboarding before version 155 shipped
+          (2026-09-01) and has not completed the day 7 prompt. This covers users who onboarded
+          with the feature off, and users who had it on early (Nightly from version 151, Beta from
+          version 155, or the Release experiment) with prompts still remaining. Use
+          progress_predates_cutoff to tell them apart.
+
+          Users who onboarded on or after version 155, or who have already completed the day 7
+          prompt, are not migrated and do not record this event.
+      last_completed_stage:
+        type: quantity
+        description: |
+          The last of the day 2, 3, 5 and 7 prompts the user had already completed, as 2, 3, 5 or
+          7. Prompts complete in strict day order, so this also implies every earlier prompt was
+          completed. Omitted when no prompt had been completed.
+      progress_predates_cutoff:
+        type: boolean
+        description: |
+          Whether the user completed any of the day 2 to day 7 prompts before version 155 shipped
+          (2026-09-01). Prompts are only shown while the feature is on, so this is only possible
+          for users who had it early: Nightly from version 151, Beta from version 155, or the
+          Release experiment. False for users who onboarded with the feature off, since any prompts
+          they completed came after updating to 155. Always false when last_completed_stage is
+          omitted.
+    bugs:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=2072667
+    data_reviews:
+      - https://phabricator.services.mozilla.com/D328105
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - android-probes@mozilla.com
+    expires: 170
+    metadata:
+      tags:
+        - Onboarding
+    send_in_pings:
+      - events
+  completion_state_migration_completed:
+    type: event
+    description: |
+      Recorded immediately after the migration described by completion_state_migration_started
+      has backfilled the onboarding state.
+
+      Comparing the number of clients recording this event with the number recording
+      completion_state_migration_started shows how often the migration is interrupted between
+      capturing the state and completing. This event does not confirm that the writes persisted to
+      disk.
+
+      The event is sent only in the events ping, not the onboarding ping, because it is not a user
+      interaction with onboarding.
+    bugs:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=2072667
+    data_reviews:
+      - https://phabricator.services.mozilla.com/D328105
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - android-probes@mozilla.com
+    expires: 170
+    metadata:
+      tags:
+        - Onboarding
+    send_in_pings:
+      - events
 
 terms_of_use:
   impression:
@@ -3983,6 +4084,25 @@ metrics:
     metadata:
       tags:
         - Experiments
+  is_android_automotive:
+    type: boolean
+    lifetime: application
+    description: |
+      True if the device reports the `android.hardware.type.automotive`
+      system feature, i.e. the app is running on Android Automotive OS
+      (a car's built-in infotainment system). This is not set for
+      Android Auto, where a phone projects apps onto the car's display.
+    send_in_pings:
+      - metrics
+    bugs:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=2076859
+    data_reviews:
+      - https://phabricator.services.mozilla.com/D330041
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - android-probes@mozilla.com
+    expires: never
   tab_group_creation_mode:
     type: labeled_counter
     description: |
@@ -3991,12 +4111,15 @@ metrics:
       - drag_and_drop
       - menu
       - fab
+      - browser_menu
     bugs:
       - https://bugzilla.mozilla.org/show_bug.cgi?id=2029221
       - https://bugzilla.mozilla.org/show_bug.cgi?id=2047039
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=2061543
     data_reviews:
       - https://bugzilla.mozilla.org/show_bug.cgi?id=2029221
       - https://bugzilla.mozilla.org/show_bug.cgi?id=2047039
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=2061543
     data_sensitivity:
       - interaction
     notification_emails:
@@ -4749,8 +4872,8 @@ preferences:
     type: string
     lifetime: application
     description: |
-      The theme the user has enabled. "light," "dark," "system," or "battery"
-      default: "system" for API 28+, else "light"
+      The theme the user has enabled. "light," "dark," "oled," "system," or
+      "battery" default: "system" for API 28+, else "light"
     send_in_pings:
       - metrics
     bugs:
@@ -6567,9 +6690,7 @@ history:
       time_group:
         type: string
         description: |
-          What time group does the history item belongs to.
-          Possible values: [Today], [Yesterday], [ThisWeek], [ThisMonth],
-          [Older].
+          The exact date of the history item in ISO 8601 format (YYYY-MM-DD).
       is_private:
         type: boolean
         description: |
@@ -7368,6 +7489,37 @@ tabs_tray:
       - android-probes@mozilla.com
     expires: never
 
+  tab_group_ungrouped:
+    type: event
+    description: |
+      Fired when a user confirms ungrouping a tab group, which deletes the
+      group but keeps its tabs.
+    bugs:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=2064425
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=2064425
+    data_sensitivity:
+      - interaction
+    notification_emails:
+      - android-probes@mozilla.com
+    expires: never
+
+  ungroup_confirmation_disabled:
+    type: event
+    description: |
+      Fired when a user checks "Don't ask again" in the ungroup confirmation
+      dialog. Only fires for the interaction in which the user opts out, not for
+      later ungroup actions that skip the dialog as a result.
+    bugs:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=2064425
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=2064425
+    data_sensitivity:
+      - interaction
+    notification_emails:
+      - android-probes@mozilla.com
+    expires: never
+
   tab_group_closed:
     type: event
     description: |
@@ -7376,6 +7528,37 @@ tabs_tray:
       - https://bugzilla.mozilla.org/show_bug.cgi?id=2029226
     data_reviews:
       - https://bugzilla.mozilla.org/show_bug.cgi?id=2029226
+    data_sensitivity:
+      - interaction
+    notification_emails:
+      - android-probes@mozilla.com
+    expires: never
+
+  tab_group_onboarding_shown:
+    type: event
+    description: |
+      Fired each time the tab group onboarding card is scrolled into view in the
+      tabs tray, including repeat impressions within a session.
+    bugs:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=2069464
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=2069464
+    data_sensitivity:
+      - interaction
+    notification_emails:
+      - android-probes@mozilla.com
+    expires: never
+
+  tab_group_onboarding_dismissed:
+    type: event
+    description: |
+      Fired when a user dismisses the tab group onboarding card in the tabs
+      tray with its close button. Does NOT fire when the card is auto dismissed
+      for users who already have a tab group.
+    bugs:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=2069464
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=2069464
     data_sensitivity:
       - interaction
     notification_emails:
@@ -8479,6 +8662,170 @@ tracking_protection:
       - https://phabricator.services.mozilla.com/D304862
     data_sensitivity:
       - interaction
+    notification_emails:
+      - android-probes@mozilla.com
+    expires: never
+    metadata:
+      tags:
+        - TrackingProtection
+  privacy_report_notification_sent:
+    type: event
+    description: |
+      The weekly privacy report notification was sent to the user. Only recorded when the user
+      allows app notifications.
+    bugs:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=2065488
+    data_reviews:
+      - https://phabricator.services.mozilla.com/D323756
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - android-probes@mozilla.com
+    expires: never
+    send_in_pings:
+      - events
+      - privacy-report-notification
+    metadata:
+      tags:
+        - TrackingProtection
+  privacy_report_notification_dismissed:
+    type: event
+    description: |
+      A user dismissed the weekly privacy report notification without tapping
+      it.
+    bugs:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=2065488
+    data_reviews:
+      - https://phabricator.services.mozilla.com/D323756
+    data_sensitivity:
+      - interaction
+    notification_emails:
+      - android-probes@mozilla.com
+    expires: never
+    send_in_pings:
+      - events
+      - privacy-report-notification
+    metadata:
+      tags:
+        - TrackingProtection
+  privacy_report_notification_not_sent:
+    type: event
+    description: |
+      The weekly privacy report notification worker ran but did not result in a notification.
+      The `reason` extra records the reason it was not sent.
+    extra_keys:
+      reason:
+        description: |
+          The reason for why the notification was prevented from being sent. Possible values are:
+          `tracking_protection_disabled`, `app_notifications_disabled`, `channel_disabled` and
+          `channel_missing` which indicates an unexpected state caused by a programmer error.
+        type: string
+    bugs:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=2065488
+    data_reviews:
+      - https://phabricator.services.mozilla.com/D323764
+      - https://phabricator.services.mozilla.com/D323768
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - android-probes@mozilla.com
+    expires: never
+    send_in_pings:
+      - events
+      - privacy-report-notification
+    metadata:
+      tags:
+        - TrackingProtection
+  privacy_report_notification_availability:
+    type: string
+    lifetime: application
+    description: |
+      Whether the weekly privacy report notification can currently be sent
+      and if not, which notification setting stops it. Possible values
+      are: `available`, `app_notifications_disabled`, `channel_disabled`,
+      and `channel_missing`. `channel_missing` indicates an unexpected state
+      caused by a programmer error.
+    bugs:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=2065488
+    data_reviews:
+      - https://phabricator.services.mozilla.com/D323764
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - android-probes@mozilla.com
+    expires: never
+    metadata:
+      tags:
+        - TrackingProtection
+  privacy_report_notification_worker_ran:
+    type: event
+    description: |
+      The background worker for the weekly privacy report notification ran.
+    bugs:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=2065488
+    data_reviews:
+      - https://phabricator.services.mozilla.com/D323768
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - android-probes@mozilla.com
+    expires: never
+    send_in_pings:
+      - events
+      - privacy-report-notification
+    metadata:
+      tags:
+        - TrackingProtection
+  privacy_report_notification_worker_scheduled:
+    type: boolean
+    lifetime: user
+    description: |
+      Whether the worker for the weekly privacy report notification is currently scheduled.
+    bugs:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=2065488
+    data_reviews:
+      - https://phabricator.services.mozilla.com/D323768
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - android-probes@mozilla.com
+    expires: never
+    metadata:
+      tags:
+        - TrackingProtection
+  privacy_report_notification_worker_run_count:
+    type: counter
+    lifetime: user
+    description: |
+      How many times the worker for the weekly privacy report notification has run
+      since it was first scheduled, including the runs that did not end in a notification.
+    bugs:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=2065488
+    data_reviews:
+      - https://phabricator.services.mozilla.com/D323768
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - android-probes@mozilla.com
+    expires: never
+    send_in_pings:
+      - privacy-report-notification
+    metadata:
+      tags:
+        - TrackingProtection
+  privacy_report_notification_scheduled_at:
+    type: datetime
+    lifetime: user
+    time_unit: day
+    description: |
+      The most recent day on which the app confirmed that the worker for the weekly privacy
+      report notification is scheduled.
+    bugs:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=2065488
+    data_reviews:
+      - https://phabricator.services.mozilla.com/D323768
+    data_sensitivity:
+      - technical
     notification_emails:
       - android-probes@mozilla.com
     expires: never
@@ -10070,6 +10417,28 @@ app_theme:
       - https://github.com/mozilla-mobile/fenix/pull/21316#issuecomment-944615938
       - https://github.com/mozilla-mobile/fenix/pull/27295
       - https://github.com/mozilla-mobile/firefox-android/pull/4039
+    data_sensitivity:
+      - interaction
+    notification_emails:
+      - android-probes@mozilla.com
+    expires: never
+    metadata:
+      tags:
+        - Themes
+  oled_theme_selected:
+    type: event
+    description: |
+      A user selected the Darkest ("OLED") theme
+    extra_keys:
+      source:
+        type: string
+        description: |
+          The source from where the Darkest theme was selected. The source can be
+          'SETTINGS'
+    bugs:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=2067019
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=2067019
     data_sensitivity:
       - interaction
     notification_emails:
@@ -13961,6 +14330,21 @@ fx_suggest:
     send_in_pings:
       - fx-suggest-api
     unit: integer
+  suggestion_id:
+    type: uuid
+    description: |
+      The suggestion ID from MARS/Merino
+    bugs:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=2070953
+    data_reviews:
+      - https://phabricator.services.mozilla.com/D325460
+    data_sensitivity:
+      - interaction
+    notification_emails:
+      - android-probes@mozilla.com
+    expires: never
+    send_in_pings:
+      - fx-suggest
 debug_drawer:
   debug_drawer_enabled:
     type: boolean
@@ -14942,6 +15326,40 @@ broken_site_report.tab_info.antitracking:
       - https://bugzilla.mozilla.org/show_bug.cgi?id=1925088
     data_reviews:
       - https://phabricator.services.mozilla.com/D230555
+    notification_emails:
+      - twisniewski@mozilla.com
+      - webcompat-reporting-tool-telemetry@mozilla.com
+    send_in_pings:
+      - broken-site-report
+  btp_purge_history:
+    type: object
+    structure:
+      type: array
+      items:
+        type: object
+        properties:
+          purgedHost:
+            type: string
+          initialHost:
+            type: string
+          finalHost:
+            type: string
+          bounceHosts:
+            type: array
+            items:
+              type: string
+    expires: never
+    data_sensitivity:
+      - web_activity
+    description: >
+      List of recently purged bounce chain entries where the reported site
+      appears in the chain (as the purged site, initial host, final host,
+      or a bounce host). Each entry contains the purged host and the
+      bounce chain context (initial host, final host, bounce hosts).
+    bugs:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=2019300
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=2019300
     notification_emails:
       - twisniewski@mozilla.com
       - webcompat-reporting-tool-telemetry@mozilla.com
@@ -16804,6 +17222,130 @@ vpn:
     notification_emails:
       - android-probes@mozilla.com
     expires: never
+  location_update_error:
+    type: event
+    description:
+      Triggered when updating the list of available locations fails.
+    extra_keys:
+      error_code:
+        description:
+          The class name of the error associated with the failure, if available.
+        type: string
+    bugs:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=2059858
+    data_reviews:
+      - https://phabricator.services.mozilla.com/D319380
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - android-probes@mozilla.com
+    expires: never
+  location_selector_tapped:
+    type: event
+    description:
+      Triggered when the user taps the location row in VPN settings.
+    bugs:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=2049043
+    data_reviews:
+      - https://phabricator.services.mozilla.com/D326740
+    data_sensitivity:
+      - interaction
+    notification_emails:
+      - android-probes@mozilla.com
+    expires: never
+    metadata:
+      tags:
+        - Settings
+  location_changed:
+    type: event
+    description:
+      Triggered when a location is selected, restored, or reverted after a
+      failed switch.
+    extra_keys:
+      to:
+        description: >
+          The newly selected country code, or "recommended" for the automatic
+          location.
+        type: string
+      operation:
+        description: >
+          "user_action" when the user tapped a location in the location list, "restore" when a
+          saved location was applied at startup, "reset" when the previous location was put back
+          after a failed switch.
+        type: string
+      proxy_state:
+        description: >
+          Proxy state when the change happened. One of "uninitialized", "idle", "activating",
+          "active", "data_limit_reached", "connection_error".
+        type: string
+    bugs:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=2049043
+    data_reviews:
+      - https://phabricator.services.mozilla.com/D326740
+    data_sensitivity:
+      - interaction
+      - technical
+    notification_emails:
+      - android-probes@mozilla.com
+    expires: never
+    metadata:
+      tags:
+        - Settings
+  location_reset:
+    type: event
+    description:
+      Triggered when a selection in effect is removed from a refreshed country list, or when a
+      saved selection is unavailable before it is applied.
+    extra_keys:
+      location:
+        description:
+          The country code of the selection that could not be honoured.
+        type: string
+      reason:
+        description: >
+          "missing" if the country left the list, "unavailable" if it is listed but not selectable.
+        type: string
+      operation:
+        description: >
+          "refresh" if a selection in effect vanished from a refreshed list, or "restore" if a
+          saved selection was unavailable before it was applied.
+        type: string
+      list_size:
+        description:
+          How many countries the refreshed list contained.
+        type: quantity
+      available_count:
+        description:
+          How many of those countries were selectable.
+        type: quantity
+      service_state:
+        description: >
+          Service state when the reset was recorded. One of "uninitialized", "unavailable",
+          "unauthenticated", "opted_out", "ready".
+        type: string
+      proxy_state:
+        description: >
+          Proxy state when the reset was recorded. One of "uninitialized", "idle", "activating",
+          "active", "data_limit_reached", "connection_error".
+        type: string
+      account_state:
+        description: >
+          Account status when the reset was recorded. One of "uninitialized", "warming_up",
+          "no_account", "needs_authentication", "requesting_authentication", "needs_authorization",
+          "requesting_authorization", "awaiting_authentication", "awaiting_authorization",
+          "awaiting_enrollment", "auth_failed", "authenticated", "enrolled_and_entitled",
+          "try_again".
+        type: string
+    bugs:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=2049043
+    data_reviews:
+      - https://phabricator.services.mozilla.com/D326740
+    data_sensitivity:
+      - interaction
+      - technical
+    notification_emails:
+      - android-probes@mozilla.com
+    expires: never
   trust_panel_try_it_tapped:
     type: event
     description:
@@ -16982,6 +17524,50 @@ pdf_viewer:
     data_sensitivity:
       - interaction
     expires: never
+  sign_dialog_add_completed:
+    type: event
+    description: |
+      A signature the user typed in the PDF viewer's "add a signature" dialog was
+      passed to the PDF viewer successfully.
+    extra_keys:
+      signature_type:
+        description: |
+          How the signature was created. Possible values are: `typed`.
+        type: string
+    bugs:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=2069504
+    data_reviews:
+      - https://phabricator.services.mozilla.com/D325530
+    notification_emails:
+      - android-probes@mozilla.com
+    data_sensitivity:
+      - interaction
+    expires: never
+  sign_dialog_add_failure:
+    type: event
+    description: |
+      A signature the user typed in the PDF viewer's "add a signature" dialog could
+      not be passed to the PDF viewer, so it was not placed on the document. An unexpected
+      error occured.
+    extra_keys:
+      signature_type:
+        description: |
+          How the signature was created. Possible values are: `typed`.
+        type: string
+      reason:
+        description: |
+          Why the signature could not be handed to the PDF viewer. Possible values
+          are: `no_engine_session` and `engine_error`.
+        type: string
+    bugs:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=2069504
+    data_reviews:
+      - https://phabricator.services.mozilla.com/D325530
+    notification_emails:
+      - android-probes@mozilla.com
+    data_sensitivity:
+      - technical
+    expires: never
   sign_dialog_close_tapped:
     type: event
     description: |
@@ -17001,3 +17587,261 @@ pdf_viewer:
     data_sensitivity:
       - interaction
     expires: never
+
+browser_engine:
+  full_page_capture_attempted:
+    type: counter
+    description: |
+      Increments on every EngineView.captureFullPage() call, emitted from
+      GeckoEngineView in engine-gecko. Serves as the denominator for the
+      full-page screenshot failure rate.
+    bugs:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=2057685
+    data_reviews:
+      - https://phabricator.services.mozilla.com/D327498
+    notification_emails:
+      - android-probes@mozilla.com
+    data_sensitivity:
+      - technical
+    expires: never
+  full_page_capture_result:
+    type: labeled_counter
+    description: |
+      Outcome of each full-page screenshot capture. `succeeded` = the engine
+      returned a bitmap; `failed` = the capture was rejected or returned no
+      bitmap. Combined with full_page_capture_attempted this gives the
+      full-page screenshot failure rate.
+    labels:
+      - succeeded
+      - failed
+    bugs:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=2057685
+    data_reviews:
+      - https://phabricator.services.mozilla.com/D327498
+    notification_emails:
+      - android-probes@mozilla.com
+    data_sensitivity:
+      - technical
+    expires: never
+
+browser_thumbnails:
+  capture_attempted:
+    type: labeled_counter
+    description: |
+      Increments on every BrowserThumbnails.requestScreenshot() call,
+      labeled by the trigger that fired it. Total gives the per-session
+      capture rate; the label breakdown shows where the pressure originates
+      so regressions can be attributed to a specific trigger source.
+    labels:
+      - load_completed
+      - tab_counter_click
+      - swipe_to_switch_tabs
+      - tab_backgrounded
+      - external_request
+    bugs:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=2067066
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=2067066
+    notification_emails:
+      - android-probes@mozilla.com
+    data_sensitivity:
+      - technical
+    expires: never
+    metadata:
+      tags:
+        - Tabs
+  capture_result:
+    type: labeled_counter
+    description: |
+      Outcome of each capture attempt that reached the request path.
+      `succeeded` = engine returned a bitmap and the ContentAction.UpdateThumbnailAction
+      was dispatched. `null_bitmap` = engine returned no bitmap (typically the
+      compositor detach race). `low_memory` = the isLowOnMemory() gate skipped
+      the request before it reached the engine.
+    labels:
+      - succeeded
+      - null_bitmap
+      - low_memory
+    bugs:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=2067066
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=2067066
+    notification_emails:
+      - android-probes@mozilla.com
+    data_sensitivity:
+      - technical
+    expires: never
+    metadata:
+      tags:
+        - Tabs
+  capture_duration:
+    type: timing_distribution
+    time_unit: millisecond
+    description: |
+      Wall-clock time from EngineView.captureThumbnail(...) call to its
+      onFinish callback. Includes engine compositor readback but not the
+      subsequent disk write. Long tails typically indicate the compositor
+      is struggling or the surface is mid-teardown.
+    bugs:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=2067066
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=2067066
+    notification_emails:
+      - android-probes@mozilla.com
+    data_sensitivity:
+      - technical
+    expires: never
+    metadata:
+      tags:
+        - Tabs
+  disk_write_duration:
+    type: timing_distribution
+    time_unit: millisecond
+    description: |
+      Wall-clock time from ThumbnailsMiddleware dispatching a
+      ThumbnailStorage.saveThumbnail(...) job to that job's completion.
+      Includes any queue-wait on ThumbnailStorage's worker pool plus the
+      actual disk write. Reveals disk pressure and I/O queue length.
+    bugs:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=2067066
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=2067066
+    notification_emails:
+      - android-probes@mozilla.com
+    data_sensitivity:
+      - technical
+    expires: never
+    metadata:
+      tags:
+        - Tabs
+
+tab_reload_cover:
+  shown:
+    type: counter
+    description: |
+      Number of times the tab reload cover was actually placed over the
+      engine view (a cached thumbnail was found and the cover ImageView
+      flipped to VISIBLE). Baseline for the feature's engagement, and
+      a cross-check against `exited` event count — a gap would indicate
+      the process died while a cover was up.
+    bugs:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=2066678
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=2066678
+    notification_emails:
+      - android-probes@mozilla.com
+    data_sensitivity:
+      - interaction
+    expires: never
+    metadata:
+      tags:
+        - Tabs
+  exited:
+    type: event
+    description: |
+      Emitted once each time a tab reload cover was torn down after
+      being shown. Carries the exit-path reason and the wall-clock
+      duration in one signal, so slicing duration by reason is a
+      single group-by query. Event count should equal the `shown`
+      counter (any gap indicates the process died mid-cover). Query
+      patterns: `COUNT(*) GROUP BY extras.hide_reason` for the exit-
+      path breakdown; `APPROX_QUANTILES(CAST(extras.visible_duration_ms
+      AS INT64), 100) GROUP BY extras.hide_reason` for per-reason
+      p50/p95.
+    extra_keys:
+      hide_reason:
+        description: |
+          Terminal exit path for the cover. One of: `fcp` (natural
+          reveal after FCP + post-FCP hold), `safety_timeout` (pre-FCP
+          safety fired without an FCP), `stopped` (fragment lifecycle
+          tore down), `user_dismissed` (user tapped before FCP fired —
+          gave up on a still-loading page; low duration here means the
+          cover isn't providing value), `user_dismissed_after_fcp`
+          (user tapped during the post-FCP hold — page is effectively
+          live and they skipped the fade; low duration here means the
+          hold is too long), `offline` (device had no validated internet
+          connection at reveal time; the paint is likely an error page
+          or cached content, so the "live page" toast is suppressed).
+        type: string
+      visible_duration_ms:
+        description: |
+          Wall-clock milliseconds the cover was on screen, from the
+          moment the ImageView flipped to VISIBLE to the moment the
+          exit path ran.
+        type: quantity
+    bugs:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=2066678
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=2066678
+    notification_emails:
+      - android-probes@mozilla.com
+    data_sensitivity:
+      - interaction
+    expires: never
+    metadata:
+      tags:
+        - Tabs
+
+power_saving_mode:
+  active_at_startup:
+    type: boolean
+    lifetime: application
+    description: |
+      Whether the device had the OS power saving (battery saver) mode active
+      when Firefox started. Read once during startup, so it is sent in every
+      metrics ping for that run.
+    send_in_pings:
+      - metrics
+    bugs:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=2068693
+    data_reviews:
+      - https://phabricator.services.mozilla.com/D323021
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - android-probes@mozilla.com
+    expires: never
+    metadata:
+      tags:
+        - Battery
+  changed:
+    type: event
+    description: |
+      The OS power saving (battery saver) mode was turned on or off while
+      Firefox was running. Also recorded when Firefox returns to the foreground
+      and finds the mode differs from the last observed value.
+    extra_keys:
+      enabled:
+        type: boolean
+        description: Whether power saving mode is now enabled.
+    bugs:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=2068693
+    data_reviews:
+      - https://phabricator.services.mozilla.com/D323021
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - android-probes@mozilla.com
+    expires: never
+    metadata:
+      tags:
+        - Battery
+  reader_view_forced:
+    type: event
+    description: |
+      Power Saving Mode was active and the page loaded in the selected tab
+      could be displayed in reader view, so reader view was turned on for it
+      with a dark color scheme. Not recorded when the user turns reader view on
+      themselves.
+    bugs:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=2069110
+    data_reviews:
+      - https://phabricator.services.mozilla.com/D325964
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - android-probes@mozilla.com
+    expires: never
+    metadata:
+      tags:
+        - Battery

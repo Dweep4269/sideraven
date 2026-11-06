@@ -18,7 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import mozilla.components.compose.base.theme.acornPrivateColorScheme
 import org.mozilla.fenix.theme.FirefoxTheme
-import org.mozilla.fenix.theme.Theme
+import mozilla.components.compose.base.theme.Theme
 
 /*
  * Zen Visual Language tokens. Restrained strategy: neutrals plus one accent,

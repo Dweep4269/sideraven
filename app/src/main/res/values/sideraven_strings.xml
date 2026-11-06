@@ -34,6 +34,12 @@
     <string name="sideraven_group_tab_list">Tab list</string>
     <!-- Tab List Direction: the Tab List grows down from the top, or up from the bottom by the address bar. -->
     <string name="sideraven_settings_tab_list_direction">Tabs start from</string>
+    <string name="sideraven_settings_spaces_shown">Spaces shown as</string>
+    <string name="sideraven_settings_spaces_shown_summary">The Header shows the current Space\'s name above its pinned tabs; swipe it to change Space.</string>
+    <string name="sideraven_spaces_header">Header</string>
+    <string name="sideraven_spaces_icon_row">Icon row</string>
+    <string name="sideraven_previous_space">Previous Space</string>
+    <string name="sideraven_next_space">Next Space</string>
     <string name="sideraven_tab_list_top_down">Top</string>
     <string name="sideraven_tab_list_bottom_up">Bottom</string>
     <string name="sideraven_tab_list_bottom_up_summary">Newest tabs by the address bar, within thumb reach</string>
@@ -57,10 +63,10 @@
     <string name="sideraven_full_screen_both_summary">Swipe in from the top or bottom edge to see the bars for a moment</string>
     <string name="sideraven_settings_space_themes">Space themes</string>
     <string name="sideraven_settings_space_themes_summary">Tint the sidebar with each space’s colours, as Zen does</string>
-    <string name="sideraven_settings_pure_black">Pure black</string>
-    <string name="sideraven_settings_pure_black_summary">A black dark theme for OLED screens. Space colours stay as accents.</string>
     <string name="sideraven_settings_address_swipe_new_tab">Swipe up for a new tab</string>
     <string name="sideraven_settings_address_swipe_tabs">Swipe sideways to switch tabs</string>
+    <string name="sideraven_settings_toolbar_tab_buttons">Tab counter and New tab in the toolbar</string>
+    <string name="sideraven_settings_toolbar_tab_buttons_summary">Keep Firefox’s tab counter and New tab button in the toolbar, as well as in the Sidebar</string>
     <!-- Browsing Mode Switch in Sidebar Controls. -->
     <string name="sideraven_switch_to_private">Private browsing</string>
     <string name="sideraven_switch_to_normal">Leave private browsing</string>
@@ -154,7 +160,6 @@
     <string name="sideraven_spaces">Spaces</string>
     <!-- Pinned Tabs: Tab Context Menu entry, refusals, and accessibility state. -->
     <string name="sideraven_pin_space">Pin to space</string>
-    <string name="sideraven_space_pins_full">This space has %d pinned tabs, the most it can hold. Unpin one first.</string>
     <string name="sideraven_space_pin_private">Private tabs can’t be pinned</string>
     <string name="sideraven_space_pin_already">Already pinned in this space</string>
     <string name="sideraven_pinned_tab">Pinned</string>
@@ -167,7 +172,18 @@
     <!-- Unload: close a pin's tab to free memory, keeping the pin (it reopens where it was). -->
     <string name="sideraven_unload">Unload</string>
     <!-- A Space's menu: Unload every Pinned Tab in it. -->
-    <string name="sideraven_unload_all">Unload all</string>
+    <string name="sideraven_unload_all">Unload space</string>
+    <string name="sideraven_close_unpinned">Close unpinned tabs</string>
+    <string name="sideraven_fold_pinned">Fold pinned tabs</string>
+    <string name="sideraven_unfold_pinned">Unfold pinned tabs</string>
+    <plurals name="sideraven_pinned_count">
+        <item quantity="one">1 pinned</item>
+        <item quantity="other">%d pinned</item>
+    </plurals>
+    <plurals name="sideraven_closed_tabs">
+        <item quantity="one">Closed 1 tab</item>
+        <item quantity="other">Closed %d tabs</item>
+    </plurals>
     <!-- Rename an Essential or Pinned Tab; an empty name goes back to the page title. -->
     <string name="sideraven_rename">Rename</string>
     <string name="sideraven_rename_hint">Leave empty to use the page title</string>
@@ -259,6 +275,12 @@
     <string name="sideraven_search_open_home">Open home page</string>
     <!-- Settings: what New Tab opens. -->
     <string name="sideraven_settings_new_tab">New tab opens</string>
+    <string name="sideraven_settings_sleep_timer">Put unused tabs to sleep after</string>
+    <string name="sideraven_sleep_off">Never</string>
+    <string name="sideraven_sleep_15m">15 minutes</string>
+    <string name="sideraven_sleep_30m">30 minutes</string>
+    <string name="sideraven_sleep_1h">1 hour</string>
+    <string name="sideraven_sleep_6h">6 hours</string>
     <string name="sideraven_new_tab_search">Search</string>
     <string name="sideraven_new_tab_home">Home page</string>
     <string name="sideraven_new_tab_blank">Blank page</string>

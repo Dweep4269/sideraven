@@ -151,16 +151,8 @@
     Header text on the homescreen for continuing to browse the most recent browser tab
   -->
   <string name="recent_tabs_header_2">Continuar</string>
-  <!--
-    Recent Tabs
-
-    Header text for jumping back into the recent tab in the home screen
-  -->
-  <string name="recent_tabs_header">Voltar direto para</string>
   <!-- Button text for showing all the tabs in the tabs tray -->
   <string name="recent_tabs_show_all">Mostrar tudo</string>
-  <!-- Content description for the button which navigates the user to show all recent tabs in the tabs tray. -->
-  <string name="recent_tabs_show_all_content_description_2">Botão de exibir todas as abas recentes</string>
   <!-- Text for button in synced tab card that opens synced tabs tray -->
   <string name="recent_tabs_see_all_synced_tabs_button_text">Ver todas as abas sincronizadas</string>
   <!-- Accessibility description for device icon used for recent synced tab -->
@@ -281,6 +273,10 @@
   <string name="browser_main_menu_content_description_navigation_header">Navegação</string>
   <!-- Content description (not visible, for screen readers etc.) for bottom sheet handlebar custom tab menu. -->
   <string name="browser_custom_tab_menu_handlebar_content_description">Fechar menu de personalização de abas</string>
+  <!-- URL bar indicator shown on a cached version of the website, when the tab is reloading, but the content is not live yet -->
+  <string name="browser_toolbar_cached_page_indicator">Em cache</string>
+  <!-- Message shown when a cached website has finished reloading and the tab is now showing the live version of the page -->
+  <string name="browser_toolbar_live_page_toast">Página atual</string>
   <!-- Browser menu label that bookmarks the currently visited page -->
   <string name="browser_menu_bookmark_this_page_2">Adicionar aos favoritos</string>
   <!-- Browser menu label that navigates to the edit bookmark screen for the current bookmarked page -->
@@ -295,8 +291,12 @@
   <string name="browser_menu_summarize_page">Resumir página</string>
   <!-- Browser menu badge text for summarization feature -->
   <string name="browser_menu_summarize_page_badge">Novidade</string>
+  <!-- Browser menu badge text for new, highlighted feature -->
+  <string name="browser_menu_page_badge_text">Novidade</string>
   <!-- Browser menu label for navigating to the Web Compat Reporter feature, which provides users the ability to send bug reports for broken sites. -->
   <string name="browser_menu_webcompat_reporter_2">Relatar site com problemas</string>
+  <!-- Browser menu label for adding a tab to a tab group -->
+  <string name="browser_menu_add_to_tab_group">Adicionar a grupo</string>
   <!-- Browser menu label that is displayed when the current page has been translated by the translation feature. -->
   <string name="browser_menu_translated">Traduzido</string>
   <!-- Browser menu label for the print feature -->
@@ -348,7 +348,7 @@
 
     Toolbar title for the Page summaries settings fragment
   -->
-  <string name="preferences_page_summaries">Resumos de páginas</string>
+  <string name="preferences_page_summaries">Resumo de páginas</string>
   <!--
     AI Controls settings
 
@@ -777,7 +777,7 @@
   <!-- Preference title for using the screen lock to hide tabs in private browsing -->
   <string name="preferences_pbm_lock_screen_title">Usar o bloqueio de tela para ocultar abas na navegação privativa</string>
   <!-- Informs the user how to access the tabs when "Use screen lock to hide tabs in private browsing" is enabled -->
-  <string name="preferences_pbm_lock_screen_summary_3">Veja abas com desbloqueio de impressão digital, PIN ou reconhecimento facial. Ativar isso também impede captura e compartilhamento de tela.</string>
+  <string name="preferences_pbm_lock_screen_summary_3">Ver abas com desbloqueio de impressão digital, PIN ou reconhecimento facial. Ativar isto também impede captura e compartilhamento de tela.</string>
   <!-- Description of the preference to enable "HTTPS-Only" mode. -->
   <string name="preferences_https_only_summary">Tentar se conectar com sites usando automaticamente o protocolo de criptografia HTTPS para maior segurança.</string>
   <!-- Summary of https only preference if https only is set to off -->
@@ -806,6 +806,8 @@
   <string name="preferences_override_sync_tokenserver">Servidor personalizado de sincronização</string>
   <!-- Preference category for account information -->
   <string name="preferences_category_account">Conta</string>
+  <!-- Preference category for sync controls. Sync can be translated, it's just short for ”Synchronization” in English. -->
+  <string name="preferences_category_sync_controls">Sincronização</string>
   <!-- Preference for changing where the AddressBar is positioned -->
   <string name="preferences_toolbar_2">Local da barra de endereços</string>
   <!-- Preference for changing toolbar layout -->
@@ -862,6 +864,8 @@
   <string name="preferences_search_synced_tabs">Pesquisar em abas sincronizadas</string>
   <!-- Preference for account settings -->
   <string name="preferences_account_settings">Configurações da conta</string>
+  <!-- Preference for account and sync settings -->
+  <string name="preferences_account_and_sync_settings">Conta e sincronização</string>
   <!-- Preference for enabling url autocomplete -->
   <string name="preferences_enable_autocomplete_urls">Completar endereços automaticamente</string>
   <!-- Preference title for switch preference to show sponsored Firefox Suggest search suggestions -->
@@ -909,6 +913,8 @@
   <string name="preference_downloads_folder_permission_lost" tools:ignore="UnusedResources">Você não tem permissão para usar esta pasta. Tente escolher outra.</string>
   <!-- Preference title for choosing an app to handle downloads -->
   <string name="preferences_choose_app_for_downloads">Gerenciar downloads com outro aplicativo</string>
+  <!-- Message shown when no app is available to let the user pick a download folder. -->
+  <string name="preferences_downloads_no_folder_picker_available">Não foi possível abrir o seletor de pastas neste dispositivo.</string>
   <!-- Preference category for deleting or removing downloads -->
   <string name="preferences_category_delete_or_remove_downloads">Excluir ou remover downloads</string>
   <string name="preferences_downloads_delete_from_device">Excluir do dispositivo</string>
@@ -984,8 +990,6 @@
   <string name="customize_toggle_privacy_report">Relatório de privacidade</string>
   <!-- Title for a customize home screen section. Continue is a section that displays the most recent browser tab, so users can continue browsing where they left off. -->
   <string name="customize_toggle_continue">Continuar</string>
-  <!-- Header text for jumping back into the recent tab in customize the home screen -->
-  <string name="customize_toggle_jump_back_in">Voltar direto para</string>
   <!-- Title for the customize home screen section with bookmarks. -->
   <string name="customize_toggle_bookmarks">Favoritos</string>
   <!--
@@ -1141,6 +1145,12 @@
   <string name="preferences_sync_now">Sincronizar agora</string>
   <!-- Preference category for sync -->
   <string name="preferences_sync_category">Escolha o que sincronizar</string>
+  <!-- Preference category for sync controls -->
+  <string name="preferences_category_sync">Dados sincronizados</string>
+  <!-- Summary for the sync preference category. -->
+  <string name="preferences_sync_category_summary">Gerencie o que é sincronizado em todos os seus dispositivos conectados</string>
+  <!-- Summary for the sync preference category, when user has disabled all synchronisation items. -->
+  <string name="preferences_sync_category_no_engine_selected_summary">Você não está sincronizando nada. Escolha o que manter sincronizado entre seus dispositivos.</string>
   <!-- Preference for syncing history -->
   <string name="preferences_sync_history">Histórico</string>
   <!-- Preference for syncing bookmarks -->
@@ -1153,6 +1163,10 @@
   <string name="preferences_sign_out">Desconectar</string>
   <!-- Preference displays and allows changing current FxA device name -->
   <string name="preferences_sync_device_name">Nome do dispositivo</string>
+  <!-- Preference category for Device name -->
+  <string name="preferences_device_name_category">Nome do dispositivo</string>
+  <!-- Label for the Preference that displays and allows changing current device name on Mozilla Account -->
+  <string name="preferences_sync_change_device_name">Alterar nome do dispositivo</string>
   <!-- Text shown when user enters empty device name -->
   <string name="empty_device_name_error">O nome do dispositivo não pode estar vazio.</string>
   <!-- Label indicating that sync is in progress -->
@@ -1272,8 +1286,6 @@
   <string name="preference_simple_toolbar">Simples</string>
   <!-- Preference for using expanded toolbar -->
   <string name="preference_expanded_toolbar">Expandida</string>
-  <!-- Preference description indicating the toolbar location preference is disabled when the tab strip is enabled -->
-  <string name="preference_toolbar_pref_disabled_explanation">A barra de endereços deve estar no alto quando a barra de abas é exibida.</string>
   <!-- New tab shortcut in toolbar customization -->
   <string name="toolbar_customize_shortcut_new_tab">Abrir nova aba</string>
   <!-- Share shortcut in toolbar customization -->
@@ -1317,6 +1329,12 @@
     Preferences for showing tab strip
   -->
   <string name="preference_tab_strip_show">Mostrar barra de abas</string>
+  <!-- Preference for tab bar placement (top or bottom of the screen) -->
+  <string name="preference_tab_strip_location_header">Posição da barra de abas</string>
+  <!-- Preference for using top tab strip -->
+  <string name="preference_top_tab_strip">No alto</string>
+  <!-- Preference for using bottom tab strip -->
+  <string name="preference_bottom_tab_strip">Embaixo</string>
   <!--
     Gestures Preferences
 
@@ -1349,6 +1367,8 @@
   <string name="library_desktop_bookmarks_unfiled">Outros favoritos</string>
   <!-- Option in Library to open History page -->
   <string name="library_history">Histórico</string>
+  <!-- Content description (not visible, for screen readers etc.) for the check mark that replaces a site's icon in History and Recently closed tabs when the item is selected -->
+  <string name="library_item_selected_content_description">Selecionado</string>
   <!-- Settings Page Title -->
   <string name="settings_title">Configurações</string>
   <!-- Content description (not visible, for screen readers etc.): "Close button for library settings" -->
@@ -1399,8 +1419,8 @@
     Title of preference for tabs management
   -->
   <string name="preferences_tabs">Abas</string>
-  <!-- Title of preference that allows a user to specify the tab view -->
-  <string name="preferences_tab_view">Visão de abas</string>
+  <!-- Title of preference that allows a user to specify the tab layout -->
+  <string name="preferences_tab_layout">Layout de abas</string>
   <!-- Option for a list tab view -->
   <string name="tab_view_list">Lista</string>
   <!-- Option for a grid tab view -->
@@ -1419,6 +1439,8 @@
   <string name="preference_auto_close_tabs" tools:ignore="UnusedResources">Fechar abas abertas automaticamente</string>
   <!-- Content description (not visible, for screen readers etc.): Close tab button -->
   <string name="tab_manager_close_tabs">Fechar</string>
+  <!-- Content description for the media playback indicator in the tabs tray. -->
+  <string name="tab_indicator_media_playing">Reproduzindo mídia</string>
   <!--
     Opening screen
 
@@ -1446,15 +1468,19 @@
   <!-- Summary for homepage preference indicating opening the homepage when re-opening the app after four hours of inactivity -->
   <string name="opening_screen_after_four_hours_of_inactivity_summary">Abrir na página inicial após quatro horas sem atividade</string>
   <!--
-    Inactive tabs
+    Tab organization
 
-    Category header of a preference that allows a user to enable or disable the inactive tabs feature
+    Category header for the preferences that control how tabs are organized
   -->
-  <string name="preferences_inactive_tabs">Mover abas antigas para inativas</string>
-  <!-- Title of inactive tabs preference -->
+  <string name="preferences_tab_organization">Organização de abas</string>
+  <!-- Title of the preference that allows a user to enable or disable the inactive tabs feature -->
+  <string name="preferences_inactive_tabs_toggle_title">Abas inativas</string>
+  <!-- Summary of the preference that allows a user to enable or disable the inactive tabs feature. -->
   <string name="preferences_inactive_tabs_title">Mover abas que você não usa há duas semanas para a seção de inativas</string>
-  <!-- Title for the preference to enable or disable the tab groups feature -->
-  <string name="preferences_tab_groups_feature">Ativar grupos de abas</string>
+  <!-- Title of the preference that allows a user to enable or disable the tab groups feature -->
+  <string name="preferences_tab_groups_title">Grupos de abas</string>
+  <!-- Summary of the preference that allows a user to enable or disable the tab groups feature -->
+  <string name="preferences_tab_groups_description">Organize suas abas em grupos que você pode nomear e salvar.</string>
   <!--
     Privacy report
 
@@ -1484,7 +1510,7 @@
   -->
   <string name="remote_improvements_title">Permitir melhorias remotas</string>
   <!-- Description for remote improvements. Note: The word "Firefox" should NOT be translated -->
-  <string name="remote_improvements_description" tools:ignore="BrandUsage">O Firefox \u0020melhora funcionalidades, desempenho e estabilidade a cada atualização. Alterações são aplicadas remotamente.</string>
+  <string name="remote_improvements_description" tools:ignore="BrandUsage">O Firefox melhora funcionalidades, desempenho e estabilidade a cada atualização. Alterações são aplicadas remotamente.</string>
   <!-- Learn more link for remote improvements, links to an article for more information about rollouts. -->
   <string name="remote_improvements_learn_more">Saiba mais</string>
   <!-- Title for remote improvements preference in Advanced settings -->
@@ -1670,6 +1696,11 @@
   <string name="close_tab_and_delete_group_confirmation_dialog_cancel">Cancelar</string>
   <!-- Content description for the three dot button next to a tab group" -->
   <string name="tab_group_three_dot_button_content_description">Mais opções</string>
+  <!--
+    Content description for the Expand button on the contracted menu for a tab group:
+    when tapped, tabs are displayed in an expanded grid or list view, taking up the full screen.
+  -->
+  <string name="tab_groups_strip_expand_group_content_description">Expandir para mostrar abas em tela inteira</string>
   <!-- Text shown on the edit button for a tab group on the three dot menu -->
   <string name="tab_group_three_dot_menu_edit">Editar</string>
   <!-- Text shown on the ungroup button for a tab group on the three dot menu -->
@@ -1737,16 +1768,6 @@
     %1$d is the number of bookmarks selected
   -->
   <string name="history_multi_select_title">%1$d selecionados</string>
-  <!-- Text for the header that groups the history for today -->
-  <string name="history_today">Hoje</string>
-  <!-- Text for the header that groups the history for yesterday -->
-  <string name="history_yesterday">Ontem</string>
-  <!-- Text for the header that groups the history the past 7 days -->
-  <string name="history_7_days">Últimos 7 dias</string>
-  <!-- Text for the header that groups the history the past 30 days -->
-  <string name="history_30_days">Últimos 30 dias</string>
-  <!-- Text for the header that groups the history older than the last month -->
-  <string name="history_older">Mais antigos</string>
   <!-- Text shown when no history exists -->
   <string name="history_empty_message">Nenhum histórico aqui</string>
   <!--
@@ -2004,7 +2025,7 @@
   <!-- Broken site reason text for site is slow -->
   <string name="webcompat_reporter_reason_slow2">O site está lento</string>
   <!-- Broken site reason text for video isn’t playing or loading -->
-  <string name="webcompat_reporter_reason_media2">O vídeo não está sendo carregado ou \u0020reproduzido</string>
+  <string name="webcompat_reporter_reason_media2">O vídeo não está sendo carregado ou reproduzido</string>
   <!-- Broken site reason text for missing content -->
   <string name="webcompat_reporter_reason_content2">Falta conteúdo</string>
   <!-- Broken site reason text for can’t sign in or register -->
@@ -2375,12 +2396,12 @@
   <string name="sync_sign_in">Entrar na conta para sincronizar</string>
   <!-- An option from the share dialog to send link to all other sync devices -->
   <string name="sync_send_to_all">Enviar para todos os dispositivos</string>
-  <!-- Text displayed when no other sync devices are available for link sharing -->
-  <string name="sync_no_devices_available">Nenhum dispositivo disponível</string>
-  <!-- Text displayed when no other sync devices are available for link sharing. -->
-  <string name="sync_no_devices_available_description">Todos os dispositivos conectados e sincronizados com esta conta aparecem aqui.</string>
   <!-- An option from the share dialog to reconnect to sync -->
   <string name="sync_reconnect">Reconectar para sincronizar</string>
+  <!-- Label for the button in the share dialog that sends the tab to the selected sync devices -->
+  <string name="sync_send_to_selected_devices">Enviar</string>
+  <!-- Content description announced when a device is selected in the share dialog -->
+  <string name="send_to_devices_device_selected_content_description">Selecionado</string>
   <!-- Text displayed when sync is offline and cannot be accessed -->
   <string name="sync_offline">Offline</string>
   <!-- An option to connect additional devices -->
@@ -2413,10 +2434,14 @@
   <string name="sync_send_tab_empty_state_title">Nenhum dispositivo conectado</string>
   <!-- Send tab to synced devices: Empty state message - Displayed when the user has no synced devices -->
   <string name="sync_send_tab_empty_state_description" tools:ignore="BrandUsage">Para enviar uma aba, entre no Firefox em pelo menos um outro dispositivo.</string>
+  <!-- Send tab to synced devices: Empty state link - Displayed when the user has no synced devices -->
+  <string name="sync_send_tab_empty_state_link">Saiba como conectar um dispositivo</string>
   <!-- Send tab to synced devices: Connectivity Error title -->
   <string name="sync_send_tab_error_connection_title">Verifique sua conexão com a internet</string>
   <!-- Send tab to synced devices: Connectivity Error message - Suggested user action after internet connection has been established -->
   <string name="sync_send_tab_error_connection_text">Depois tente enviar a aba novamente.</string>
+  <!-- Send tab to synced devices: Connectivity Error button - When tapped, refreshes the list of connected devices. -->
+  <string name="sync_send_tab_error_connection_button">Tentar novamente</string>
   <!--
     Notifications
 
@@ -2538,7 +2563,7 @@
   <!-- Title for the Delete browsing data on quit preference -->
   <string name="preferences_delete_browsing_data_on_quit">Limpar dados de navegação ao sair</string>
   <!-- Summary for the Delete browsing data on quit preference. "Quit" translation should match delete_browsing_data_on_quit_action translation. -->
-  <string name="preference_summary_delete_browsing_data_on_quit_2">Excluir automaticamente os dados de navegação selecionados abaixo ao tocar em \"Sair\" no menu principal</string>
+  <string name="preference_summary_delete_browsing_data_on_quit_2">Excluir automaticamente os dados de navegação selecionados abaixo ao tocar em “Sair” no menu principal</string>
   <!-- Title text of a delete browsing data dialog. -->
   <string name="delete_history_prompt_title">Intervalo de tempo a excluir</string>
   <!-- Body text of a delete browsing data dialog. -->
@@ -2599,6 +2624,12 @@
   <string name="sign_in_create_account_text" tools:ignore="BrandUsage"><![CDATA[Ainda não tem conta? <u>Crie</u> para sincronizar o Firefox entre dispositivos.]]></string>
   <!-- Text shown in confirmation dialog to sign out of account. %s is the name of the app (for example "Firefox"). -->
   <string name="sign_out_confirmation_message_2">O %s deixará de sincronizar com sua conta, mas não excluirá seus dados de navegação neste dispositivo.</string>
+  <!-- Title of the confirmation dialog shown when the user signs out of their account -->
+  <string name="sign_out_dialog_title">Sair da sua conta?</string>
+  <!-- Body of the confirmation dialog shown when the user signs out of their account -->
+  <string name="sign_out_dialog_message">Os dados sincronizados permanecem salvos na sua conta.</string>
+  <!-- Text for the primary action button of the confirmation dialog shown when the user signs out of their account -->
+  <string name="sign_out_dialog_confirm_button">Sair</string>
   <!-- Option to continue signing out of account shown in confirmation dialog to sign out of account -->
   <string name="sign_out_disconnect">Desconectar</string>
   <!-- Option to cancel signing out shown in confirmation dialog to sign out of account -->
@@ -2667,7 +2698,7 @@
   <!-- Preference for enhanced tracking protection for the custom protection settings -->
   <string name="preference_enhanced_tracking_protection_custom">Personalizado</string>
   <!-- Preference description for enhanced tracking protection for the strict protection settings -->
-  <string name="preference_enhanced_tracking_protection_custom_description_2">Escolha que rastreadores e scripts bloquear.</string>
+  <string name="preference_enhanced_tracking_protection_custom_description_2">Escolher quais rastreadores e scripts bloquear.</string>
   <!-- Accessibility text for the Strict protection information icon -->
   <string name="preference_enhanced_tracking_protection_custom_info_button">O que é bloqueado pela proteção personalizada contra rastreamento</string>
   <!--
@@ -2681,9 +2712,9 @@
   <!-- Option for enhanced tracking protection for the custom protection settings for cookies -->
   <string name="preference_enhanced_tracking_protection_custom_cookies_2">Cookies de sites não visitados</string>
   <!-- Option for enhanced tracking protection for the custom protection settings for cookies -->
-  <string name="preference_enhanced_tracking_protection_custom_cookies_3">Todos os cookies de terceiros (pode atrapalhar alguns sites)</string>
+  <string name="preference_enhanced_tracking_protection_custom_cookies_3">Bloquear todos os cookies de terceiros (pode atrapalhar alguns sites)</string>
   <!-- Option for enhanced tracking protection for the custom protection settings for cookies -->
-  <string name="preference_enhanced_tracking_protection_custom_cookies_4">Todos os cookies (atrapalha vários sites)</string>
+  <string name="preference_enhanced_tracking_protection_custom_cookies_4">Bloquear todos os cookies (atrapalha vários sites)</string>
   <!-- Option for enhanced tracking protection for the custom protection settings for cookies -->
   <string name="preference_enhanced_tracking_protection_custom_cookies_5">Isolar cookies entre sites</string>
   <!-- Preference for Global Privacy Control for the custom privacy settings for Global Privacy Control. '&amp;' is replaced with the ampersand symbol: & -->
@@ -3000,7 +3031,7 @@
   <!-- Title for the Suggest Email Masks toggle -->
   <string name="preferences_email_masks_suggest_title">Sugerir máscaras de email</string>
   <!-- Summary for the Suggest Email Masks toggle. -->
-  <string name="preferences_email_masks_suggest_summary">Oculte seu email real para proteger sua caixa de entrada de spam. Alguns sites não oferecem suporte a máscaras de email.</string>
+  <string name="preferences_email_masks_suggest_summary">Ocultar email real para proteger a caixa de entrada contra spam. Alguns sites não oferecem suporte a máscaras de email.</string>
   <!-- Text that links to additional information about the Email Masks -->
   <string name="preferences_email_masks_suggest_learn_more">Saiba mais</string>
   <!-- Title for the Manage Email Masks links to Firefox Relay dashboard -->
@@ -3018,14 +3049,14 @@
   <!-- Label for the BETA badge for the browser VPN entry in the settings list -->
   <string name="preferences_ip_protection_beta_badge_label">BETA</string>
   <!-- Title for the browser VPN settings screen (displayed in the app bar) -->
-  <string name="ip_protection_title">VPN</string>
+  <string name="ip_protection_settings_title">VPN integrada</string>
   <!-- Label for the browser VPN toggle on the settings screen -->
   <string name="ip_protection_toggle_label">VPN</string>
   <!-- Content description for the browser VPN settings screen top bar back button -->
   <string name="ip_protection_navigate_back_button_content_description">Voltar</string>
   <!-- Headline for the browser VPN promo card. %s is the name of the app (for example "Firefox"). -->
   <string name="ip_protection_promo_headline">VPN integrada no %s</string>
-  <!-- Body text for the browser VPN promo card . %s is a learn more link using ip_protection_learn_more as text. -->
+  <!-- Body text for the browser VPN settings header, shown when no promo is running. %s is a learn more link using ip_protection_learn_more as text. -->
   <string name="ip_protection_promo_body_2">Navegue com proteção extra, ocultando sua localização, mesmo em redes públicas de WiFi. %s</string>
   <!-- Link text that opens additional information about the browser VPN -->
   <string name="ip_protection_learn_more">Saiba mais</string>
@@ -3057,9 +3088,7 @@
   <!-- Badge label shown in the menu item when the browser VPN has an error -->
   <string name="ip_protection_menu_error">Erro</string>
   <!-- Badge label shown in the VPN menu item when the user is eligible for the feature but needs to authenticate / authorize to enable it -->
-  <string name="ip_protection_menu_try_vpn_cta">Experimente gratuitamente</string>
-  <!-- Badge label shown in the menu item when the user is eligible to use the browser VPN but should authenticate or authorize it first. -->
-  <string name="ip_protection_menu_auth_required">Experimentar</string>
+  <string name="ip_protection_menu_try_vpn_cta">Experimente de graça</string>
   <!-- Content description for the chevron button that opens the browser VPN settings screen -->
   <string name="ip_protection_navigate_settings">Abrir configurações de VPN</string>
   <!--
@@ -3114,7 +3143,7 @@
   -->
   <string name="ip_protection_data_limit_reached_snackbar">Usado %1$d GB de dados de VPN. O acesso será renovado no próximo mês.</string>
   <!-- Snackbar (in-app pop-up notification) action button text that takes the user to the VPN settings screen. -->
-  <string name="ip_protection_data_limit_reached_snackbar_action">Configurações</string>
+  <string name="ip_protection_open_settings_snackbar_action">Configurações</string>
   <!-- Description shown on the browser VPN settings screen prompting the user to turn the VPN on. -->
   <string name="ip_protection_settings_description" tools:ignore="UnusedResources">Ative a VPN para tornar sua navegação mais privativa e mais difícil de rastrear.</string>
   <!-- Title shown on the browser VPN settings screen for location selection section. -->
@@ -3392,7 +3421,7 @@
   <!-- This is the hint text that is shown inline on the hostname field of the create new login page. 'https://www.example.com' intentionally hardcoded here -->
   <string name="add_login_hostname_hint_text">https://www.example.com</string>
   <!-- This is an error message shown below the hostname field of the add login page when a hostname does not contain http or https. -->
-  <string name="add_login_hostname_invalid_text_3">O endereço web deve conter \"https://\" ou \"http://\"</string>
+  <string name="add_login_hostname_invalid_text_3">O endereço web deve conter “https://” ou “http://”</string>
   <!-- This is an error message shown below the hostname field of the add login page when a hostname is invalid. -->
   <string name="add_login_hostname_invalid_text_2">Nome de servidor válido é obrigatório</string>
   <!--
@@ -3937,7 +3966,7 @@
   <!-- Text for the connection security panel when the site is not secure. -->
   <string name="connection_security_panel_not_secure">Conexão não segura</string>
   <!-- Text for the connection security panel when accessed from local PDF. -->
-  <string name="connection_security_panel_local_pdf">Esta página está armazenada em seu dispositivo.</string>
+  <string name="connection_security_panel_local_pdf">Esta página está armazenada em seu dispositivo</string>
   <!--
     Text for the connection security panel to indicate who the certificate was verified by.
     %s is a placeholder for the name of the certificate authority that issued the certificate.
@@ -4488,6 +4517,16 @@
   <string name="lens_camera_mode_qr">Leitor de código QR</string>
   <!-- Toast shown when the user picks an image from the gallery in QR mode but no QR code is found in it -->
   <string name="lens_camera_qr_no_code_found">Nenhum código QR encontrado na imagem</string>
+  <!-- Status shown under an image picked from the gallery while it is being sent to Google Lens for a visual search -->
+  <string name="lens_camera_loading_status">Pesquisa em andamento</string>
+  <!-- Button shown under an image picked from the gallery while it is being sent to Google Lens. Tapping it stops the search and returns to the camera. -->
+  <string name="lens_camera_loading_cancel_button">Cancelar</string>
+  <!-- Snackbar message shown when an image picked from the gallery could not be opened or read, so it was never sent to Google Lens. Shown after returning to the camera. -->
+  <string name="lens_camera_image_load_failed">Não foi possível carregar esta imagem. Tente outra.</string>
+  <!-- Snackbar message shown when an image picked from the gallery could not be searched because of a network problem or an error from Google Lens. Shown after returning to the camera, next to the lens_camera_upload_failed_retry_button action. -->
+  <string name="lens_camera_upload_failed">Não foi possível obter resultados do Google Lens</string>
+  <!-- Action in the snackbar shown when an image picked from the gallery could not be searched with Google Lens. Tapping it searches the same image again. -->
+  <string name="lens_camera_upload_failed_retry_button">Tentar novamente</string>
   <!-- Title of the bottom sheet shown the first time the user opens the Google Lens camera screen -->
   <string name="lens_opt_out_title">Encontrar com Google Lens</string>
   <!-- Description of the bottom sheet shown the first time the user opens the Google Lens camera screen -->
@@ -4568,4 +4607,14 @@
   <string name="pdf_tools_signature_clear_button">Limpar</string>
   <!-- The text for the button that adds the signature the user has typed to the PDF. -->
   <string name="pdf_tools_signature_add_button">Adicionar</string>
+  <!--
+    Listen to page
+
+    Content description for the reader mode panel: a group of buttons floating over the content
+  -->
+  <string name="reader_mode_panel_content_description">Opções do modo leitura</string>
+  <!-- Content description for the button in reader mode panel that turns on the read aloud feature (playback of content begins when button is pressed) -->
+  <string name="reader_mode_panel_listen_content_description">Ler em voz alta</string>
+  <!-- Content description for media player displayed in Reader Mode when the Listen to Page (Read Aloud) feature is selected -->
+  <string name="reader_mode_panel_media_player_content_description">Reprodutor de mídia</string>
 </resources>

@@ -4,14 +4,23 @@
 
 package org.mozilla.fenix.ui.efficiency.selectors
 
+import mozilla.components.compose.browser.toolbar.R as composeBrowserToolbarR
+import mozilla.components.compose.browser.toolbar.concept.BrowserToolbarTestTags.ADDRESSBAR_URL_BOX
 import mozilla.components.feature.customtabs.R as customtabsR
 import org.mozilla.fenix.R
 import org.mozilla.fenix.helpers.DataGenerationHelper.getStringResource
 import org.mozilla.fenix.helpers.TestHelper.appName
+import org.mozilla.fenix.ui.efficiency.helpers.PageReadinessProfiles
 import org.mozilla.fenix.ui.efficiency.helpers.Selector
+import org.mozilla.fenix.ui.efficiency.helpers.SelectorContainer
+import org.mozilla.fenix.ui.efficiency.helpers.SelectorGroup
 import org.mozilla.fenix.ui.efficiency.helpers.SelectorStrategy
 
-object CustomTabsSelectors {
+object CustomTabsSelectors : SelectorContainer {
+    enum class Group : SelectorGroup {
+        CUSTOM_TAB_TOOLBAR,
+        CUSTOM_TAB_MAIN_MENU_ITEMS,
+    }
 
     // Custom tabs run in their own activity; all locators are device-level (UIAutomator) so they resolve
     // regardless of which activity is foreground.
@@ -21,7 +30,6 @@ object CustomTabsSelectors {
             strategy = SelectorStrategy.UIAUTOMATOR_WITH_DESCRIPTION_CONTAINS,
             value = getStringResource(R.string.content_description_menu),
             description = "Custom tabs main menu button",
-            groups = listOf("requiredForPage"),
         )
 
     val CLOSE_BUTTON =
@@ -29,7 +37,8 @@ object CustomTabsSelectors {
             strategy = SelectorStrategy.UIAUTOMATOR_WITH_DESCRIPTION_CONTAINS,
             value = getStringResource(customtabsR.string.mozac_feature_customtabs_exit_button),
             description = "Custom tabs close button",
-            groups = listOf("customTabToolbar"),
+            groups = setOf(Group.CUSTOM_TAB_TOOLBAR),
+            readiness = PageReadinessProfiles.IDENTITY_ANCHOR,
         )
 
     val SITE_INFO_BUTTON =
@@ -37,7 +46,7 @@ object CustomTabsSelectors {
             strategy = SelectorStrategy.UIAUTOMATOR_WITH_DESCRIPTION_CONTAINS,
             value = "Site information",
             description = "Custom tab site information button (opens the unified trust panel)",
-            groups = listOf("customTabToolbar"),
+            groups = setOf(Group.CUSTOM_TAB_TOOLBAR),
         )
 
     // Main-menu items (visible after opening the custom-tab menu)
@@ -46,7 +55,7 @@ object CustomTabsSelectors {
             strategy = SelectorStrategy.UIAUTOMATOR_WITH_TEXT_CONTAINS,
             value = getStringResource(R.string.browser_menu_back),
             description = "Custom tab menu: Back",
-            groups = listOf("customTabMainMenuItems"),
+            groups = setOf(Group.CUSTOM_TAB_MAIN_MENU_ITEMS),
         )
 
     val MENU_FORWARD =
@@ -54,7 +63,7 @@ object CustomTabsSelectors {
             strategy = SelectorStrategy.UIAUTOMATOR_WITH_TEXT_CONTAINS,
             value = getStringResource(R.string.browser_menu_forward),
             description = "Custom tab menu: Forward",
-            groups = listOf("customTabMainMenuItems"),
+            groups = setOf(Group.CUSTOM_TAB_MAIN_MENU_ITEMS),
         )
 
     val MENU_REFRESH =
@@ -62,7 +71,7 @@ object CustomTabsSelectors {
             strategy = SelectorStrategy.UIAUTOMATOR_WITH_TEXT_CONTAINS,
             value = getStringResource(R.string.browser_menu_refresh),
             description = "Custom tab menu: Refresh",
-            groups = listOf("customTabMainMenuItems"),
+            groups = setOf(Group.CUSTOM_TAB_MAIN_MENU_ITEMS),
         )
 
     val MENU_SHARE =
@@ -70,7 +79,7 @@ object CustomTabsSelectors {
             strategy = SelectorStrategy.UIAUTOMATOR_WITH_TEXT_CONTAINS,
             value = getStringResource(R.string.browser_menu_share),
             description = "Custom tab menu: Share",
-            groups = listOf("customTabMainMenuItems"),
+            groups = setOf(Group.CUSTOM_TAB_MAIN_MENU_ITEMS),
         )
 
     val MENU_OPEN_IN_APP =
@@ -78,7 +87,7 @@ object CustomTabsSelectors {
             strategy = SelectorStrategy.UIAUTOMATOR_WITH_DESCRIPTION_CONTAINS,
             value = "Open in $appName",
             description = "Custom tab menu: Open in app",
-            groups = listOf("customTabMainMenuItems"),
+            groups = setOf(Group.CUSTOM_TAB_MAIN_MENU_ITEMS),
         )
 
     val MENU_FIND_IN_PAGE =
@@ -86,7 +95,7 @@ object CustomTabsSelectors {
             strategy = SelectorStrategy.UIAUTOMATOR_WITH_DESCRIPTION_CONTAINS,
             value = getStringResource(R.string.browser_menu_find_in_page),
             description = "Custom tab menu: Find in page",
-            groups = listOf("customTabMainMenuItems"),
+            groups = setOf(Group.CUSTOM_TAB_MAIN_MENU_ITEMS),
         )
 
     val MENU_DESKTOP_SITE =
@@ -94,7 +103,7 @@ object CustomTabsSelectors {
             strategy = SelectorStrategy.UIAUTOMATOR_WITH_DESCRIPTION_CONTAINS,
             value = getStringResource(R.string.browser_menu_desktop_site),
             description = "Custom tab menu: Desktop site",
-            groups = listOf("customTabMainMenuItems"),
+            groups = setOf(Group.CUSTOM_TAB_MAIN_MENU_ITEMS),
         )
 
     val MENU_POWERED_BY =
@@ -102,7 +111,7 @@ object CustomTabsSelectors {
             strategy = SelectorStrategy.UIAUTOMATOR_WITH_TEXT_CONTAINS,
             value = "Powered by $appName",
             description = "Custom tab menu: Powered-by branding",
-            groups = listOf("customTabMainMenuItems"),
+            groups = setOf(Group.CUSTOM_TAB_MAIN_MENU_ITEMS),
         )
 
     // Compose twin of MENU_BACK, required for long-press. mozLongClick dispatches on the resolved
@@ -115,7 +124,6 @@ object CustomTabsSelectors {
             strategy = SelectorStrategy.COMPOSE_BY_TEXT,
             value = getStringResource(R.string.browser_menu_back),
             description = "Custom tab menu: Back (Compose, for long-press)",
-            groups = listOf(),
         )
 
     @Suppress("FunctionName")
@@ -124,23 +132,35 @@ object CustomTabsSelectors {
             strategy = SelectorStrategy.UIAUTOMATOR_WITH_TEXT_CONTAINS,
             value = label,
             description = "Custom tab menu: custom item '$label'",
-            groups = listOf(),
         )
 
-    val all =
-        listOf(
-            MAIN_MENU_BUTTON,
-            CLOSE_BUTTON,
-            SITE_INFO_BUTTON,
-            MENU_BACK,
-            MENU_BACK_COMPOSE,
-            MENU_FORWARD,
-            MENU_REFRESH,
-            MENU_SHARE,
-            MENU_OPEN_IN_APP,
-            MENU_FIND_IN_PAGE,
-            MENU_DESKTOP_SITE,
-            MENU_POWERED_BY,
-            MENU_CUSTOM_ITEM(),
+    // The custom-tab toolbar renders the URL (or its host) as a Compose text node. Matched as a substring so
+    // the caller can assert on the host or any leading portion, mirroring the legacy verifyCustomTabUrl.
+    @Suppress("FunctionName")
+    fun TOOLBAR_URL(url: String = "") =
+        Selector(
+            strategy = SelectorStrategy.COMPOSE_BY_TEXT_SUBSTRING,
+            value = url,
+            description = "Custom tab toolbar URL '$url'",
+            groups = setOf(Group.CUSTOM_TAB_TOOLBAR),
+        )
+
+    // The toolbar URL box itself (Compose). Long-pressing it raises the copy/paste contextual menu. Matched
+    // on the first node of the tag, mirroring the legacy robot's onAllNodes(hasTestTag(...)).onFirst().
+    val TOOLBAR_URL_BOX =
+        Selector(
+            strategy = SelectorStrategy.COMPOSE_ON_ALL_NODES_BY_TAG_ON_FIRST,
+            value = ADDRESSBAR_URL_BOX,
+            description = "Custom tab toolbar URL box",
+            groups = setOf(Group.CUSTOM_TAB_TOOLBAR),
+        )
+
+    // "Copy" on the toolbar URL long-press contextual menu (Compose). Keyed off the string resource so it
+    // survives localization; the legacy robot hardcoded the English "Copy".
+    val LONG_PRESS_COPY =
+        Selector(
+            strategy = SelectorStrategy.COMPOSE_BY_TEXT,
+            value = getStringResource(composeBrowserToolbarR.string.mozac_browser_toolbar_long_press_popup_copy),
+            description = "Custom tab toolbar long-press menu: Copy",
         )
 }

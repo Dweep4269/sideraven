@@ -46,6 +46,32 @@ class ToolbarButtonsTest {
     }
 
     @Test
+    fun `GIVEN Tab counter and New tab in the toolbar THEN beside a Sidebar both show, and the counter is the real one`() {
+        assertTrue(SidebarGate.showsTabCounter(SidebarTier.Tablet, SidebarMode.Persistent, flapEnabled = false, tabButtons = true))
+        assertTrue(SidebarGate.showsTabCounter(SidebarTier.Tablet, SidebarMode.Collapsed, flapEnabled = true, tabButtons = true))
+        assertFalse(SidebarGate.hidesShortcut(SidebarTier.Tablet, isNewTab = true, tabButtons = true))
+        assertFalse(SidebarGate.showsSidebarButton(SidebarTier.Tablet, tabButtons = true))
+        assertTrue(SidebarGate.showsSidebarButton(SidebarTier.Tablet, tabButtons = false))
+        assertFalse(SidebarGate.showsSidebarButton(SidebarTier.None, tabButtons = false))
+    }
+
+    @Test
+    fun `THEN the Tab counter and New tab switch is off by default and shows only with the Sidebar and toolbar layout`() {
+        val context = androidx.test.core.app.ApplicationProvider.getApplicationContext<android.content.Context>()
+        val store = InMemorySidebarModeStore()
+        store.addressBarLayout.set(AddressBarLayout.Sidebar)
+        val screen = androidx.preference.PreferenceManager(context).createPreferenceScreen(context)
+        val switch = pt.dweep.sideraven.settings.SidebarPreferences.bindToolbarTabButtons(context, screen, store)
+
+        assertFalse(store.toolbarTabButtons.value)
+        assertFalse(switch.isVisible)
+
+        pt.dweep.sideraven.settings.SidebarPreferences.bindLayout(context, screen, store) { switch.isVisible = it == AddressBarLayout.Top }
+            .choose(AddressBarLayout.Top)
+        assertTrue(switch.isVisible)
+    }
+
+    @Test
     fun `GIVEN a Sidebar shown THEN the toolbar takes its surface colour, and otherwise keeps Fenix's`() {
         val fenix = lightColorScheme(surface = Color.White)
         var surface = Color.Unspecified

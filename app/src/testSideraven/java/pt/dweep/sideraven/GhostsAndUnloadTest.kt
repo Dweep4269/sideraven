@@ -57,7 +57,7 @@ class GhostsAndUnloadTest {
             sleepTabs = ::sleep,
             unloadSpace = { spaceId ->
                 val selected = store.state.selectedTabId
-                sleep(spaces.data.pinnedIn(spaceId).mapNotNull { spaces.pinnedLinks.value[it.id] }.filter { it != selected })
+                sleep(spaces.data.tabsIn(spaceId, store.state.tabs, essentials.linkedTabs.value.values.toSet()).filter { it != selected })
             },
         )
 
@@ -134,17 +134,20 @@ class GhostsAndUnloadTest {
     }
 
     @Test
-    fun `WHEN Unload all is chosen for a Space THEN its Pinned Tabs sleep, and no tab closes`() {
+    fun `WHEN Unload space is chosen THEN every tab of the Space sleeps but the one on screen, Essentials stay awake, and no tab closes`() {
         add("news", select = true)
         add("mail")
         add("docs")
+        add("blog")
+        add("music")
         handler.handle(SidebarIntent.PinToSpace("mail"), state())
         handler.handle(SidebarIntent.PinToSpace("docs"), state())
+        handler.handle(SidebarIntent.PinTab("music"), state())
 
         handler.handle(SidebarIntent.UnloadSpace(spaces.data.current.id), state())
 
-        assertEquals(setOf("mail", "docs"), slept.toSet())
-        assertEquals(setOf("news", "mail", "docs"), store.state.tabs.map { it.id }.toSet())
+        assertEquals(setOf("mail", "docs", "blog"), slept.toSet())
+        assertEquals(setOf("news", "mail", "docs", "blog", "music"), store.state.tabs.map { it.id }.toSet())
         assertTrue(state().pinned.none { it.isGhost })
     }
 
@@ -160,5 +163,21 @@ class GhostsAndUnloadTest {
         val essential = state().essentials.single()
         assertFalse(essential.isGhost)
         assertTrue(essential.sleeping)
+    }
+
+    @Test
+    fun `THEN a Space's unpinned tabs are its Tab List, not its Pinned Tabs' tabs nor Essential Tabs, and the Space menu knows how many`() {
+        add("news", select = true)
+        add("mail")
+        add("blog")
+        add("music")
+        handler.handle(SidebarIntent.PinToSpace("mail"), state())
+        handler.handle(SidebarIntent.PinTab("music"), state())
+
+        val space = spaces.data.current.id
+        val unpinned = spaces.data.unpinnedTabsIn(space, store.state.tabs, essentials.linkedTabs.value.values.toSet(), spaces.pinnedLinks.value.values.toSet())
+
+        assertEquals(setOf("news", "blog"), unpinned.toSet())
+        assertEquals(2, state().spaces.single { it.id == space }.unpinnedCount)
     }
 }

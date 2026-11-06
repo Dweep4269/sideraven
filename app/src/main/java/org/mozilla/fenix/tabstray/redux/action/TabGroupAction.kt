@@ -67,6 +67,32 @@ sealed interface TabGroupAction : TabsTrayAction {
     data class DeleteConfirmed(val group: TabsTrayItem.TabGroup) : TabGroupAction, TabsStorageAction
 
     /**
+     * Fired when the user clicks ungroup on a Tab Group. Resolved into either [UngroupConfirmationRequested] or
+     * [UngroupConfirmed] depending on whether the confirmation dialog is being skipped.
+     *
+     * @property group The [TabsTrayItem.TabGroup] to be ungrouped.
+     */
+    data class UngroupRequested(val group: TabsTrayItem.TabGroup) : TabGroupAction, TabManagerUiStateStorageAction
+
+    /**
+     * Fired when the ungroup confirmation dialog should be shown for a Tab Group.
+     *
+     * @property group The [TabsTrayItem.TabGroup] to be ungrouped.
+     */
+    data class UngroupConfirmationRequested(val group: TabsTrayItem.TabGroup) : TabGroupAction
+
+    /**
+     * Fired when the user confirms they want to ungroup a Tab Group.
+     *
+     * @property group The [TabsTrayItem.TabGroup] to be ungrouped.
+     * @property dontAskAgain Whether the user asked to suppress this confirmation in the future.
+     */
+    data class UngroupConfirmed(
+        val group: TabsTrayItem.TabGroup,
+        val dontAskAgain: Boolean,
+    ) : TabGroupAction, TabManagerUiStateStorageAction, TabsStorageAction
+
+    /**
      * Invoked when the user changes the tab group theme.
      *
      * @property theme The theme of the tab group the user has selected.
@@ -89,12 +115,19 @@ sealed interface TabGroupAction : TabsTrayAction {
     data class SelectedTabsAddedToGroup(val groupId: String) : TabGroupAction, TabsStorageAction
 
     /**
+     * Fired when the user performs an action to add a single item to a new Tab Group, such as from the menu.
+     *
+     * @property tabId The ID of the tab.
+     */
+    data class TabAddedToNewTabGroup(val tabId: String) : TabGroupAction, TabsStorageAction
+
+    /**
      * Fired when the user performs an action to add a single item to an existing Tab Group, such as a drag and drop.
      *
      * @property tabId The ID of the tab.
      * @property groupId The ID of the group the tab is being added into.
      */
-    data class TabAddedToGroup(val tabId: String, val groupId: String) : TabGroupAction, TabsStorageAction
+    data class TabAddedToExistingTabGroup(val tabId: String, val groupId: String) : TabGroupAction, TabsStorageAction
 
     /**
      * Invoked when the user clicks to edit a tab group.
@@ -151,4 +184,10 @@ sealed interface TabGroupAction : TabsTrayAction {
 
     /** Invoked when a new group's animation is played. */
     data object NewGroupAnimationFinished : TabGroupAction
+
+    /** Invoked when the user dismisses the Collections to Tab Groups migration card. */
+    data object CollectionsMigrationCardDismissed : TabGroupAction
+
+    /** Invoked when back navigation is requested. */
+    data object NavigateBackInvoked : TabGroupAction
 }

@@ -6,18 +6,35 @@ package org.mozilla.fenix.ui.efficiency.selectors
 
 import org.mozilla.fenix.R
 import org.mozilla.fenix.helpers.DataGenerationHelper.getStringResource
+import org.mozilla.fenix.settings.logins.ui.LoginsTestingTags.EDIT_LOGIN_PASSWORD_TEXT_FIELD
 import org.mozilla.fenix.settings.logins.ui.LoginsTestingTags.LOGIN_DETAILS_PASSWORD_TEXT_FIELD
+import org.mozilla.fenix.settings.logins.ui.LoginsTestingTags.SAVED_LOGINS_LIST
+import org.mozilla.fenix.ui.efficiency.helpers.PageReadinessProfiles
 import org.mozilla.fenix.ui.efficiency.helpers.Selector
+import org.mozilla.fenix.ui.efficiency.helpers.SelectorContainer
+import org.mozilla.fenix.ui.efficiency.helpers.SelectorGroup
 import org.mozilla.fenix.ui.efficiency.helpers.SelectorStrategy
 
-object SettingsSavedPasswordsSelectors {
+object SettingsSavedPasswordsSelectors : SelectorContainer {
+    enum class Group : SelectorGroup {
+        LOGINS_SECURITY_DIALOG,
+        EMPTY_SAVED_PASSWORDS_LIST,
+        LOGIN_DETAILS,
+    }
+
+    val SAVED_PASSWORDS_TOOLBAR_TITLE =
+        Selector(
+            strategy = SelectorStrategy.COMPOSE_BY_TEXT,
+            value = getStringResource(R.string.preferences_passwords_saved_logins_2),
+            description = "Saved passwords toolbar title",
+            readiness = PageReadinessProfiles.IDENTITY_ANCHOR,
+        )
 
     val GO_BACK_BUTTON =
         Selector(
             strategy = SelectorStrategy.COMPOSE_BY_CONTENT_DESCRIPTION,
             value = getStringResource(R.string.logins_navigate_back_button_content_description),
             description = "Go back toolbar button",
-            groups = listOf("requiredForPage"),
         )
 
     val LOGINS_SECURITY_DIALOG_TITLE =
@@ -25,15 +42,22 @@ object SettingsSavedPasswordsSelectors {
             strategy = SelectorStrategy.UIAUTOMATOR_WITH_TEXT_CONTAINS,
             value = getStringResource(R.string.logins_warning_dialog_title_2),
             description = "Logins security dialog title",
-            groups = listOf("loginsSecurityDialog"),
+            groups = setOf(Group.LOGINS_SECURITY_DIALOG),
         )
 
     val LOGINS_SECURITY_DIALOG_LATER_BUTTON =
         Selector(
-            strategy = SelectorStrategy.ESPRESSO_BY_TEXT,
-            value = getStringResource(R.string.logins_warning_dialog_later),
+            strategy = SelectorStrategy.UIAUTOMATOR2_BY_RAW_RES,
+            value = "android:id/button2",
             description = "Logins security dialog later button",
-            groups = listOf("loginsSecurityDialog"),
+            groups = setOf(Group.LOGINS_SECURITY_DIALOG),
+        )
+
+    val SAVED_PASSWORDS_LIST =
+        Selector(
+            strategy = SelectorStrategy.COMPOSE_BY_TAG,
+            value = SAVED_LOGINS_LIST,
+            description = "Saved passwords list",
         )
 
     val EMPTY_SAVED_PASSWORDS_LIST_DESCRIPTION =
@@ -41,7 +65,7 @@ object SettingsSavedPasswordsSelectors {
             strategy = SelectorStrategy.COMPOSE_BY_TEXT,
             value = getStringResource(R.string.preferences_passwords_saved_logins_description_empty_text_2),
             description = "Save Passwords Toggle",
-            groups = listOf("emptySavedPasswordsList"),
+            groups = setOf(Group.EMPTY_SAVED_PASSWORDS_LIST),
         )
 
     val EMPTY_SAVED_PASSWORDS_LIST_LEARN_MORE_ABOUT_SYNC =
@@ -49,7 +73,7 @@ object SettingsSavedPasswordsSelectors {
             strategy = SelectorStrategy.COMPOSE_BY_CONTENT_DESCRIPTION,
             value = "Learn more about sync Links available",
             description = "Save Passwords Toggle",
-            groups = listOf("emptySavedPasswordsList"),
+            groups = setOf(Group.EMPTY_SAVED_PASSWORDS_LIST),
         )
 
     val EMPTY_SAVED_PASSWORDS_LIST_ADD_PASSWORD_BUTTON =
@@ -57,7 +81,7 @@ object SettingsSavedPasswordsSelectors {
             strategy = SelectorStrategy.COMPOSE_BY_TEXT,
             value = getStringResource(R.string.preferences_logins_add_login_2),
             description = "Add password button",
-            groups = listOf("requiredForPage", "emptySavedPasswordsList"),
+            groups = setOf(Group.EMPTY_SAVED_PASSWORDS_LIST),
         )
 
     val REVEAL_PASSWORD_BUTTON =
@@ -65,7 +89,48 @@ object SettingsSavedPasswordsSelectors {
             strategy = SelectorStrategy.COMPOSE_BY_CONTENT_DESCRIPTION,
             value = getStringResource(R.string.saved_login_reveal_password),
             description = "Reveal password button",
-            groups = listOf("loginDetails"),
+            groups = setOf(Group.LOGIN_DETAILS),
+        )
+
+    val LOGIN_DETAILS_MENU_BUTTON =
+        Selector(
+            strategy = SelectorStrategy.COMPOSE_BY_CONTENT_DESCRIPTION,
+            value = getStringResource(R.string.login_detail_menu_button_content_description),
+            description = "Login details three dot menu button",
+            groups = setOf(Group.LOGIN_DETAILS),
+        )
+
+    val EDIT_LOGIN_MENU_OPTION =
+        Selector(
+            strategy = SelectorStrategy.COMPOSE_BY_TEXT,
+            value = getStringResource(R.string.login_detail_menu_edit_button),
+            description = "Edit login menu option",
+            groups = setOf(Group.LOGIN_DETAILS),
+        )
+
+    val EDIT_LOGIN_PASSWORD_FIELD =
+        Selector(
+            strategy = SelectorStrategy.COMPOSE_BY_TAG,
+            value = EDIT_LOGIN_PASSWORD_TEXT_FIELD,
+            description = "Edit login password text field",
+            groups = setOf(Group.LOGIN_DETAILS),
+        )
+
+    val SAVE_EDITED_LOGIN_BUTTON =
+        Selector(
+            strategy = SelectorStrategy.COMPOSE_BY_CONTENT_DESCRIPTION,
+            value = getStringResource(R.string.edit_login_button_content_description),
+            description = "Save edited login toolbar button",
+            groups = setOf(Group.LOGIN_DETAILS),
+        )
+
+    @Suppress("FunctionName")
+    fun EDIT_LOGIN_PASSWORD(password: String = "") =
+        Selector(
+            strategy = SelectorStrategy.COMPOSE_BY_TAG_AND_TEXT,
+            value = EDIT_LOGIN_PASSWORD_TEXT_FIELD,
+            secondaryValue = password,
+            description = "Edit login password field with value '$password'",
         )
 
     @Suppress("FunctionName")
@@ -74,7 +139,6 @@ object SettingsSavedPasswordsSelectors {
             strategy = SelectorStrategy.COMPOSE_BY_TEXT,
             value = username,
             description = "Saved login entry '$username'",
-            groups = listOf(),
         )
 
     @Suppress("FunctionName")
@@ -84,19 +148,5 @@ object SettingsSavedPasswordsSelectors {
             value = LOGIN_DETAILS_PASSWORD_TEXT_FIELD,
             secondaryValue = password,
             description = "Login details password field with value '$password'",
-            groups = listOf(),
-        )
-
-    val all =
-        listOf(
-            EMPTY_SAVED_PASSWORDS_LIST_ADD_PASSWORD_BUTTON,
-            EMPTY_SAVED_PASSWORDS_LIST_DESCRIPTION,
-            EMPTY_SAVED_PASSWORDS_LIST_LEARN_MORE_ABOUT_SYNC,
-            GO_BACK_BUTTON,
-            LOGIN_DETAILS_PASSWORD(),
-            LOGINS_SECURITY_DIALOG_LATER_BUTTON,
-            LOGINS_SECURITY_DIALOG_TITLE,
-            REVEAL_PASSWORD_BUTTON,
-            SAVED_LOGIN_ENTRY(),
         )
 }

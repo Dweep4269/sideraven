@@ -248,6 +248,7 @@ internal class AdjustMetricsServiceTest {
             isUserMolocoAttributed = false,
             isUserRakutenAttributed = false,
             isUserSkyflagAttributed = false,
+            isUserQuoraAttributed = false,
             controller = thirdPartySharingController,
         )
 
@@ -265,6 +266,7 @@ internal class AdjustMetricsServiceTest {
             isUserMolocoAttributed = false,
             isUserRakutenAttributed = false,
             isUserSkyflagAttributed = false,
+            isUserQuoraAttributed = false,
             controller = thirdPartySharingController,
         )
 
@@ -282,6 +284,7 @@ internal class AdjustMetricsServiceTest {
             isUserMolocoAttributed = false,
             isUserRakutenAttributed = false,
             isUserSkyflagAttributed = false,
+            isUserQuoraAttributed = false,
             controller = thirdPartySharingController,
         )
 
@@ -299,6 +302,7 @@ internal class AdjustMetricsServiceTest {
             isUserMolocoAttributed = false,
             isUserRakutenAttributed = false,
             isUserSkyflagAttributed = false,
+            isUserQuoraAttributed = false,
             controller = thirdPartySharingController,
         )
 
@@ -316,6 +320,7 @@ internal class AdjustMetricsServiceTest {
             isUserMolocoAttributed = false,
             isUserRakutenAttributed = false,
             isUserSkyflagAttributed = false,
+            isUserQuoraAttributed = false,
             controller = thirdPartySharingController,
         )
 
@@ -333,6 +338,7 @@ internal class AdjustMetricsServiceTest {
             isUserMolocoAttributed = true,
             isUserRakutenAttributed = false,
             isUserSkyflagAttributed = false,
+            isUserQuoraAttributed = false,
             controller = thirdPartySharingController,
         )
 
@@ -350,6 +356,7 @@ internal class AdjustMetricsServiceTest {
             isUserMolocoAttributed = false,
             isUserRakutenAttributed = true,
             isUserSkyflagAttributed = false,
+            isUserQuoraAttributed = false,
             controller = thirdPartySharingController,
         )
 
@@ -357,7 +364,7 @@ internal class AdjustMetricsServiceTest {
     }
 
     @Test
-    fun `WHEN the distribution is DEFAULT AND the user is Skyflag attributed THEN all sharing is disabled and no partner is enabled`() {
+    fun `WHEN the distribution is DEFAULT AND the user is Skyflag attributed THEN sharing is enabled for dynamic callbacks`() {
         AdjustMetricsService.applyThirdPartySharingSettings(
             distribution = DistributionIdManager.Distribution.DEFAULT,
             isUserMetaAttributed = false,
@@ -367,11 +374,29 @@ internal class AdjustMetricsServiceTest {
             isUserMolocoAttributed = false,
             isUserRakutenAttributed = false,
             isUserSkyflagAttributed = true,
+            isUserQuoraAttributed = false,
             controller = thirdPartySharingController,
         )
 
-        verify { thirdPartySharingController.disableAllThirdPartySharing() }
-        verify(exactly = 0) { thirdPartySharingController.enableThirdPartySharingForPartner(any()) }
+        verify { thirdPartySharingController.enableThirdPartySharingForPartner(DYNAMIC_CALLBACK_ID) }
+    }
+
+    @Test
+    fun `WHEN the distribution is DEFAULT AND the user is Quora attributed THEN sharing is enabled for dynamic callbacks`() {
+        AdjustMetricsService.applyThirdPartySharingSettings(
+            distribution = DistributionIdManager.Distribution.DEFAULT,
+            isUserMetaAttributed = false,
+            isUserTikTokAttributed = false,
+            isUserRedditAttributed = false,
+            isUserXTwitterAttributed = false,
+            isUserMolocoAttributed = false,
+            isUserRakutenAttributed = false,
+            isUserSkyflagAttributed = false,
+            isUserQuoraAttributed = true,
+            controller = thirdPartySharingController,
+        )
+
+        verify { thirdPartySharingController.enableThirdPartySharingForPartner(DYNAMIC_CALLBACK_ID) }
     }
 
     @Test
@@ -385,6 +410,7 @@ internal class AdjustMetricsServiceTest {
             isUserMolocoAttributed = false,
             isUserRakutenAttributed = false,
             isUserSkyflagAttributed = false,
+            isUserQuoraAttributed = false,
             controller = thirdPartySharingController,
         )
 
@@ -402,6 +428,7 @@ internal class AdjustMetricsServiceTest {
             isUserMolocoAttributed = false,
             isUserRakutenAttributed = false,
             isUserSkyflagAttributed = false,
+            isUserQuoraAttributed = false,
             controller = thirdPartySharingController,
         )
 
@@ -419,6 +446,7 @@ internal class AdjustMetricsServiceTest {
             isUserMolocoAttributed = false,
             isUserRakutenAttributed = false,
             isUserSkyflagAttributed = false,
+            isUserQuoraAttributed = false,
             controller = thirdPartySharingController,
         )
 
@@ -436,6 +464,7 @@ internal class AdjustMetricsServiceTest {
             isUserMolocoAttributed = false,
             isUserRakutenAttributed = false,
             isUserSkyflagAttributed = false,
+            isUserQuoraAttributed = false,
             controller = thirdPartySharingController,
         )
 
@@ -453,6 +482,7 @@ internal class AdjustMetricsServiceTest {
             isUserMolocoAttributed = false,
             isUserRakutenAttributed = false,
             isUserSkyflagAttributed = false,
+            isUserQuoraAttributed = false,
             controller = thirdPartySharingController,
         )
 
@@ -470,6 +500,7 @@ internal class AdjustMetricsServiceTest {
             isUserMolocoAttributed = false,
             isUserRakutenAttributed = false,
             isUserSkyflagAttributed = false,
+            isUserQuoraAttributed = false,
             controller = thirdPartySharingController,
         )
 

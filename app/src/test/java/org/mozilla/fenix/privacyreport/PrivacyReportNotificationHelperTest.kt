@@ -16,17 +16,26 @@ import mozilla.components.support.test.robolectric.testContext
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mozilla.fenix.BuildConfig
-import org.mozilla.fenix.R
+import org.mozilla.fenix.GleanMetrics.TrackingProtection
+import org.mozilla.fenix.helpers.FenixGleanTestRule
+import org.mozilla.fenix.privacyreport.PrivacyReportNotificationAvailability.APP_NOTIFICATIONS_DISABLED
+import org.mozilla.fenix.privacyreport.PrivacyReportNotificationAvailability.AVAILABLE
+import org.mozilla.fenix.privacyreport.PrivacyReportNotificationAvailability.CHANNEL_MISSING
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.Shadows.shadowOf
 
 @RunWith(RobolectricTestRunner::class)
 class PrivacyReportNotificationHelperTest {
 
+    @get:Rule val gleanRule = FenixGleanTestRule(testContext)
+
     private lateinit var notificationsDelegate: NotificationsDelegate
+
+    private val content = PrivacyReportNotificationContent(title = "A title", text = "Some text")
 
     @Before
     fun setUp() {
@@ -57,7 +66,7 @@ class PrivacyReportNotificationHelperTest {
 
     @Test
     fun `WHEN showPrivacyReportNotification is called THEN a notification is shown with click and dismiss intents`() {
-        showPrivacyReportNotification(testContext, notificationsDelegate, trackersBlockedCount = 5)
+        showPrivacyReportNotification(testContext, notificationsDelegate, content)
 
         val notificationManager = testContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val notifications = shadowOf(notificationManager).allNotifications
@@ -68,24 +77,19 @@ class PrivacyReportNotificationHelperTest {
     }
 
     @Test
-    fun `WHEN showPrivacyReportNotification is called with no trackersBlockedCount THEN the no-trackers headline is shown with no body text`() {
-        showPrivacyReportNotification(testContext, notificationsDelegate)
+    fun `WHEN showPrivacyReportNotification is called THEN the notification shows the content title and text`() {
+        showPrivacyReportNotification(testContext, notificationsDelegate, content)
 
         val notificationManager = testContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val notification = shadowOf(notificationManager).allNotifications.first()
 
-        val expectedTitle =
-            testContext.getString(
-                R.string.notification_privacy_report_headline_no_trackers,
-                testContext.getString(R.string.app_name),
-            )
-        assertEquals(expectedTitle, shadowOf(notification).contentTitle)
-        assertEquals("", shadowOf(notification).contentText)
+        assertEquals(content.title, shadowOf(notification).contentTitle)
+        assertEquals(content.text, shadowOf(notification).contentText)
     }
 
     @Test
     fun `WHEN showPrivacyReportNotification is called THEN the click intent opens the deep link directly and the dismiss intent targets the receiver`() {
-        showPrivacyReportNotification(testContext, notificationsDelegate, trackersBlockedCount = 5)
+        showPrivacyReportNotification(testContext, notificationsDelegate, content)
 
         val notificationManager = testContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val notification = shadowOf(notificationManager).allNotifications.first()
@@ -97,5 +101,43 @@ class PrivacyReportNotificationHelperTest {
         val dismissIntent = shadowOf(notification.deleteIntent).savedIntent
         assertEquals(ComponentName(testContext, PrivacyReportNotificationReceiver::class.java), dismissIntent.component)
         assertEquals(ACTION_PRIVACY_REPORT_NOTIFICATION_DISMISSED, dismissIntent.action)
+    }
+
+    @Test
+    fun `WHEN showPrivacyReportNotification sends the notification THEN the sent event is recorded`() {
+        showPrivacyReportNotification(testContext, notificationsDelegate, content)
+
+        assertEquals(1, TrackingProtection.privacyReportNotificationSent.testGetValue()!!.size)
+    }
+
+    @Test
+    fun `GIVEN notifications are disabled WHEN showPrivacyReportNotification is called THEN no sent event is recorded`() {
+        val notificationManager = testContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        shadowOf(notificationManager).setNotificationsEnabled(false)
+
+        showPrivacyReportNotification(testContext, notificationsDelegate, content)
+
+        assertEquals(0, shadowOf(notificationManager).allNotifications.size)
+        assertNull(TrackingProtection.privacyReportNotificationSent.testGetValue())
+    }
+
+    @Test
+    fun `GIVEN the channel exists WHEN privacyReportNotificationAvailability is called THEN it is available`() {
+        ensurePrivacyReportNotificationChannelExists(testContext)
+
+        assertEquals(AVAILABLE, privacyReportNotificationAvailability(testContext))
+    }
+
+    @Test
+    fun `GIVEN the channel was never created WHEN privacyReportNotificationAvailability is called THEN the channel is missing`() {
+        assertEquals(CHANNEL_MISSING, privacyReportNotificationAvailability(testContext))
+    }
+
+    @Test
+    fun `GIVEN app notifications are disabled and the channel was never created WHEN privacyReportNotificationAvailability is called THEN app notifications are disabled`() {
+        val notificationManager = testContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        shadowOf(notificationManager).setNotificationsEnabled(false)
+
+        assertEquals(APP_NOTIFICATIONS_DISABLED, privacyReportNotificationAvailability(testContext))
     }
 }

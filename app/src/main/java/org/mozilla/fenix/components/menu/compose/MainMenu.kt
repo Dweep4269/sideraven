@@ -45,6 +45,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
+import mozilla.components.compose.base.theme.PreviewThemeProvider
+import mozilla.components.compose.base.theme.Theme
+import mozilla.components.compose.base.theme.ThemedValue
+import mozilla.components.compose.base.theme.ThemedValueProvider
 import mozilla.components.feature.addons.Addon
 import mozilla.components.feature.addons.ui.displayName
 import mozilla.components.feature.addons.ui.summary
@@ -61,10 +65,6 @@ import org.mozilla.fenix.components.menu.compose.header.MozillaAccountMenuItem
 import org.mozilla.fenix.components.menu.store.IPProtectionMenuState
 import org.mozilla.fenix.components.menu.store.WebExtensionMenuItem
 import org.mozilla.fenix.theme.FirefoxTheme
-import org.mozilla.fenix.theme.PreviewThemeProvider
-import org.mozilla.fenix.theme.Theme
-import org.mozilla.fenix.theme.ThemedValue
-import org.mozilla.fenix.theme.ThemedValueProvider
 
 /**
  * Wrapper column containing the main menu items.
@@ -92,6 +92,7 @@ import org.mozilla.fenix.theme.ThemedValueProvider
  * @param isDownloadHighlighted `true` if the downloads menu item should be visually highlighted.
  * @param webExtensionMenuCount The number of web extensions.
  * @param showIPProtection Whether to show the IP Protection menu item.
+ * @param showPasswords Whether to show the passwords menu item.
  * @param ipProtectionMenuState The current [IPProtectionMenuState] for the IP protection item.
  * @param onMoreMenuClick Invoked when the user clicks on the more menu item.
  * @param onCustomizeReaderViewMenuClick Invoked when the user clicks on the Customize Reader View button.
@@ -147,6 +148,7 @@ fun MainMenu(
     isDownloadHighlighted: Boolean,
     webExtensionMenuCount: Int,
     showIPProtection: Boolean,
+    showPasswords: Boolean,
     ipProtectionMenuState: IPProtectionMenuState,
     onMoreMenuClick: () -> Unit,
     onCustomizeReaderViewMenuClick: () -> Unit,
@@ -309,6 +311,7 @@ fun MainMenu(
 
         LibraryMenuGroup(
             isDownloadHighlighted = isDownloadHighlighted,
+            showPasswords = showPasswords,
             onBookmarksMenuClick = onBookmarksMenuClick,
             onHistoryMenuClick = onHistoryMenuClick,
             onDownloadsMenuClick = onDownloadsMenuClick,
@@ -508,6 +511,7 @@ private fun MoreMenuButtonGroup(
 @Composable
 @Suppress("LongMethod")
 private fun LibraryMenuGroup(
+    showPasswords: Boolean,
     isDownloadHighlighted: Boolean = false,
     onBookmarksMenuClick: () -> Unit,
     onHistoryMenuClick: () -> Unit,
@@ -533,7 +537,7 @@ private fun LibraryMenuGroup(
             this.collectionInfo =
                 CollectionInfo(
                     rowCount = 1,
-                    columnCount = 4,
+                    columnCount = if (showPasswords) 4 else 3,
                 )
         },
         horizontalArrangement = Arrangement.SpaceEvenly,
@@ -566,21 +570,23 @@ private fun LibraryMenuGroup(
             isHighlighted = isDownloadHighlighted,
             iconRes = iconsR.drawable.mozac_ic_download_24,
             labelRes = R.string.library_downloads,
-            shape = middleShape,
+            shape = if (showPasswords) middleShape else rightShape,
             index = 2,
             onClick = onDownloadsMenuClick,
         )
 
-        Spacer(Modifier.width(spacerWidth))
+        if (showPasswords) {
+            Spacer(Modifier.width(spacerWidth))
 
-        LibraryMenuItem(
-            modifier = Modifier.weight(1f).fillMaxHeight(),
-            iconRes = iconsR.drawable.mozac_ic_login_24,
-            labelRes = R.string.browser_menu_passwords,
-            shape = rightShape,
-            index = 3,
-            onClick = onPasswordsMenuClick,
-        )
+            LibraryMenuItem(
+                modifier = Modifier.weight(1f).fillMaxHeight(),
+                iconRes = iconsR.drawable.mozac_ic_login_24,
+                labelRes = R.string.browser_menu_passwords,
+                shape = rightShape,
+                index = 3,
+                onClick = onPasswordsMenuClick,
+            )
+        }
     }
 }
 
@@ -742,6 +748,7 @@ private fun MenuDialogPreview(@PreviewParameter(PreviewThemeProvider::class) the
                 isDownloadHighlighted = true,
                 webExtensionMenuCount = 1,
                 showIPProtection = true,
+                showPasswords = true,
                 ipProtectionMenuState = IPProtectionMenuState(),
                 onMoreMenuClick = {},
                 onCustomizeReaderViewMenuClick = {},
@@ -829,6 +836,7 @@ private fun MenuDialogPrivatePreview(
                 onStopButtonClick = {},
                 onShareButtonClick = {},
                 showIPProtection = false,
+                showPasswords = true,
                 ipProtectionMenuState = IPProtectionMenuState(),
                 onIPProtectionClick = {},
                 onIPProtectionNavigate = {},

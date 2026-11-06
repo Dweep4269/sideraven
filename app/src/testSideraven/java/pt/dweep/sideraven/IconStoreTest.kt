@@ -94,4 +94,21 @@ class IconStoreTest {
 
         assertEquals(after, store.version.value)
     }
+
+    // The registrable domain, as the public suffix list would give it, for these tests' hosts.
+    private val siteOf: suspend (String) -> String? = { host -> host.split('.').takeLast(2).joinToString(".") }
+
+    @Test
+    fun `THEN a pin's tab gives the pin its icon on the pinned page, on the page a redirect landed on, and anywhere on the same site`() = kotlinx.coroutines.test.runTest {
+        org.junit.Assert.assertTrue(SidebarIcons.onPinSite("https://news.example/", "https://news.example/", atFirstPage = false, siteOf))
+        // gmail.com redirects to mail.google.com: another site, but still the page the pin opened.
+        org.junit.Assert.assertTrue(SidebarIcons.onPinSite("https://gmail.com/", "https://mail.google.com/mail/u/0/", atFirstPage = true, siteOf))
+        org.junit.Assert.assertTrue(SidebarIcons.onPinSite("https://reddit.com/", "https://www.reddit.com/r/android/", atFirstPage = false, siteOf))
+    }
+
+    @Test
+    fun `GIVEN a pin's tab browsed to another site THEN its icon isn't the pin's`() = kotlinx.coroutines.test.runTest {
+        org.junit.Assert.assertFalse(SidebarIcons.onPinSite("https://reddit.com/", "https://www.youtube.com/watch", atFirstPage = false, siteOf))
+        org.junit.Assert.assertFalse(SidebarIcons.onPinSite("https://reddit.com/", "about:blank", atFirstPage = false, siteOf))
+    }
 }

@@ -20,14 +20,12 @@ import mozilla.components.concept.sync.SyncEngine
 import mozilla.components.service.fxa.manager.FxaAccountManager
 import mozilla.components.service.fxa.sync.SyncReason
 import org.mozilla.fenix.R
-import org.mozilla.fenix.components.appstate.AppState
 import org.mozilla.fenix.databinding.ComponentHistoryBinding
 import org.mozilla.fenix.ext.components
 import org.mozilla.fenix.library.LibraryPageView
 import org.mozilla.fenix.theme.ThemeManager
 
 /** View that contains and configures the History List */
-@Suppress("LongParameterList")
 class HistoryView(
     container: ViewGroup,
     val store: HistoryFragmentStore,
@@ -137,12 +135,6 @@ class HistoryView(
                 // no-op
             }
         }
-    }
-
-    /** Updates the View with the latest changes to [AppState]. */
-    fun update(state: AppState) {
-        historyAdapter.updatePendingDeletionItems(state.pendingDeletionHistoryItems)
-        historyAdapter.notifyDataSetChanged()
     }
 
     private fun updateEmptyState(userHasHistory: Boolean) {

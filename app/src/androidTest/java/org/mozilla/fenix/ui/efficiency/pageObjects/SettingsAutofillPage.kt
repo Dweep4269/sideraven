@@ -23,8 +23,8 @@ import org.mozilla.fenix.settings.creditcards.ui.CreditCardEditorTestTags
 import org.mozilla.fenix.ui.efficiency.data.AddressDetails
 import org.mozilla.fenix.ui.efficiency.data.CreditCardDetails
 import org.mozilla.fenix.ui.efficiency.helpers.BasePage
-import org.mozilla.fenix.ui.efficiency.helpers.Selector
-import org.mozilla.fenix.ui.efficiency.navigation.NavigationRegistry
+import org.mozilla.fenix.ui.efficiency.navigation.NavigationGraph
+import org.mozilla.fenix.ui.efficiency.navigation.NavigationOptions
 import org.mozilla.fenix.ui.efficiency.navigation.NavigationStep
 import org.mozilla.fenix.ui.efficiency.selectors.SettingsAutofillSelectors
 import org.mozilla.fenix.ui.efficiency.selectors.SettingsSelectors
@@ -32,22 +32,24 @@ import org.mozilla.fenix.ui.efficiency.selectors.SettingsSelectors
 class SettingsAutofillPage(composeRule: AndroidComposeTestRule<HomeActivityIntentTestRule, *>) : BasePage(composeRule) {
     override val pageName = "SettingsAutofillPage"
 
-    init {
-        NavigationRegistry.register(
+    internal override fun registerNavigation(builder: NavigationGraph.Builder) {
+        builder.register(
             from = pageName,
             to = "SettingsPage",
             steps = listOf(NavigationStep.Click(SettingsSelectors.GO_BACK_BUTTON)),
         )
     }
 
-    override fun mozGetSelectorsByGroup(group: String): List<Selector> {
-        return SettingsAutofillSelectors.all.filter { it.groups.contains(group) }
-    }
+    override val selectorCatalog = SettingsAutofillSelectors
 
     // Narrow the return type to this page so callers can fluently chain page-specific helpers
     // (e.g. fillAndSaveAddress) directly off navigateToPage().
-    override fun navigateToPage(url: String, forceNavigation: Boolean): SettingsAutofillPage {
-        super.navigateToPage(url = url, forceNavigation = forceNavigation)
+    override fun navigateToPage(
+        url: String,
+        forceNavigation: Boolean,
+        navigationOptions: NavigationOptions,
+    ): SettingsAutofillPage {
+        super.navigateToPage(url = url, forceNavigation = forceNavigation, navigationOptions = navigationOptions)
         return this
     }
 
@@ -120,6 +122,56 @@ class SettingsAutofillPage(composeRule: AndroidComposeTestRule<HomeActivityInten
         saveButton.performClick()
 
         mozVerify(SettingsAutofillSelectors.MANAGE_SAVED_CREDIT_CARDS_BUTTON)
+        return this
+    }
+
+    /**
+     * Assert the Credit cards section on the Autofill screen, mirroring the legacy
+     * SettingsSubMenuAutofillRobot.verifyCreditCardsAutofillSection: the section title, the save-and-autofill option
+     * with its summary and the sync button, then either "Manage cards" or "Add card" depending on whether a card is
+     * saved, and finally the save-and-autofill toggle's state.
+     */
+    fun verifyCreditCardsAutofillSection(
+        cardsAutofillEnabled: Boolean,
+        userHasSavedCreditCard: Boolean,
+    ): SettingsAutofillPage {
+        mozVerify(SettingsAutofillSelectors.SETTINGS_AUTOFILL_TITLE)
+        mozVerify(SettingsAutofillSelectors.CREDIT_CARDS_SECTION_TITLE)
+        mozVerify(SettingsAutofillSelectors.SAVE_AND_AUTOFILL_CREDIT_CARDS_SUMMARY)
+        mozVerify(SettingsAutofillSelectors.SYNC_CREDIT_CARDS_ACROSS_DEVICES_BUTTON)
+        if (userHasSavedCreditCard) {
+            mozVerify(SettingsAutofillSelectors.MANAGE_SAVED_CREDIT_CARDS_BUTTON)
+        } else {
+            mozVerify(SettingsAutofillSelectors.ADD_CREDIT_CARD_BUTTON)
+        }
+        if (cardsAutofillEnabled) {
+            mozVerifyOptionSwitchIsChecked(SettingsAutofillSelectors.SAVE_AND_AUTOFILL_CREDIT_CARDS_OPTION)
+        } else {
+            mozVerifyOptionSwitchIsNotChecked(SettingsAutofillSelectors.SAVE_AND_AUTOFILL_CREDIT_CARDS_OPTION)
+        }
+        return this
+    }
+
+    /**
+     * Open "Manage cards" and decline the optional prompt offering to secure saved cards behind a device lock, leaving
+     * the screen on the Saved cards list.
+     */
+    fun openManageSavedCreditCards(): SettingsAutofillPage {
+        mozClick(SettingsAutofillSelectors.MANAGE_SAVED_CREDIT_CARDS_BUTTON)
+        mozClickIfPresent(SettingsAutofillSelectors.SECURED_CREDIT_CARDS_LATER_BUTTON)
+        return this
+    }
+
+    /**
+     * Assert the Saved cards list, mirroring the legacy verifySavedCreditCardsSection: the back button, the "Saved
+     * cards" toolbar title, the "Add card" button, and the saved card's masked last digits and expiry.
+     */
+    fun verifySavedCreditCardsSection(lastDigits: String, expiryMonthAndYear: String): SettingsAutofillPage {
+        mozVerify(SettingsSelectors.GO_BACK_BUTTON)
+        mozVerify(SettingsAutofillSelectors.SAVED_CREDIT_CARDS_TOOLBAR_TITLE)
+        mozVerify(SettingsAutofillSelectors.ADD_CREDIT_CARD_BUTTON)
+        mozVerify(SettingsAutofillSelectors.SAVED_CREDIT_CARD_DETAIL(lastDigits))
+        mozVerify(SettingsAutofillSelectors.SAVED_CREDIT_CARD_DETAIL(expiryMonthAndYear))
         return this
     }
 

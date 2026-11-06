@@ -28,7 +28,7 @@ import org.junit.runner.RunWith
 import org.mozilla.fenix.tabstray.LocalTabManagementFeatureHelper
 import org.mozilla.fenix.tabstray.TabManagementFeatureHelper
 import org.mozilla.fenix.tabstray.TabsTrayTestTag
-import org.mozilla.fenix.tabstray.browser.compose.TabItemInteractionState
+import org.mozilla.fenix.tabstray.browser.compose.ItemInteractionState
 import org.mozilla.fenix.tabstray.data.TabGroupTheme
 import org.mozilla.fenix.tabstray.data.TabsTrayItem
 import org.mozilla.fenix.tabstray.data.createTab
@@ -51,6 +51,8 @@ class TabGroupCardTest {
             override val ungroupTabGroupEnabled: Boolean = true
             override val tabGroupsOnboardingEnabled: Boolean = false
             override val tabGroupsLiveReorderEnabled: Boolean = false
+            override val tabGroupsStripEnabled: Boolean = false
+            override val showTabGroupsInMenu: Boolean = false
         }
 
     @Test
@@ -279,6 +281,30 @@ class TabGroupCardTest {
         assertEquals(group, clickedGroup)
     }
 
+    @Test
+    fun verifyUngroupTabGroupClick() {
+        val group = createTabGroup()
+        var ungroupClicked = false
+        var clickedGroup: TabsTrayItem.TabGroup? = null
+
+        composeTestRule.setContent {
+            FirefoxTheme {
+                ComposableUnderTest(
+                    group = group,
+                    onUngroupTabGroupClick = { arg ->
+                        ungroupClicked = true
+                        clickedGroup = arg
+                    },
+                )
+            }
+        }
+        composeTestRule.onNodeWithTag(TabsTrayTestTag.TAB_GROUP_THREE_DOT_BUTTON).performClick()
+        composeTestRule.onNodeWithTag(TabsTrayTestTag.UNGROUP_TAB_GROUP).performClick()
+
+        assertTrue(ungroupClicked)
+        assertEquals(group, clickedGroup)
+    }
+
     private fun verifyThumbnailSizesSimilar() {
         val first =
             composeTestRule
@@ -330,7 +356,7 @@ class TabGroupCardTest {
     fun verifyDraggedItemScale() {
         composeTestRule.mainClock.autoAdvance = false
         composeTestRule.setContent {
-            ComposableUnderTest(interactionState = TabItemInteractionState(isDragged = true))
+            ComposableUnderTest(interactionState = ItemInteractionState(isDragged = true))
         }
         composeTestRule.mainClock.advanceTimeBy(50L)
 
@@ -344,7 +370,7 @@ class TabGroupCardTest {
     fun verifyUndraggedItemScale() {
         composeTestRule.mainClock.autoAdvance = false
         composeTestRule.setContent {
-            ComposableUnderTest(interactionState = TabItemInteractionState(isDragged = false))
+            ComposableUnderTest(interactionState = ItemInteractionState(isDragged = false))
         }
         composeTestRule.mainClock.advanceTimeBy(50L)
 
@@ -358,7 +384,7 @@ class TabGroupCardTest {
     fun verifyDraggedItemAlpha() {
         composeTestRule.mainClock.autoAdvance = false
         composeTestRule.setContent {
-            ComposableUnderTest(interactionState = TabItemInteractionState(isDragged = true))
+            ComposableUnderTest(interactionState = ItemInteractionState(isDragged = true))
         }
         composeTestRule.mainClock.advanceTimeBy(50L)
 
@@ -372,7 +398,7 @@ class TabGroupCardTest {
     fun verifyUndraggedItemAlpha() {
         composeTestRule.mainClock.autoAdvance = false
         composeTestRule.setContent {
-            ComposableUnderTest(interactionState = TabItemInteractionState(isDragged = false))
+            ComposableUnderTest(interactionState = ItemInteractionState(isDragged = false))
         }
         composeTestRule.mainClock.advanceTimeBy(50L)
 
@@ -380,6 +406,45 @@ class TabGroupCardTest {
             composeTestRule.onNodeWithTag(TabsTrayTestTag.TAB_ITEM_ROOT).fetchSemanticsNode().config[AlphaKey]
 
         assertEquals("Undragged item opacity is 100%", 1f, undraggedAlpha)
+    }
+
+    @Test
+    fun verifyMediaIndicatorVisible() {
+        composeTestRule.setContent {
+            FirefoxTheme {
+                ComposableUnderTest(
+                    group =
+                        TabsTrayItem.TabGroup(
+                            title = "Group 1",
+                            theme = TabGroupTheme.Yellow,
+                            tabs = mutableListOf(createTab(url = ABOUT_HOME_URL, isMediaActive = true)),
+                        )
+                )
+            }
+        }
+        composeTestRule
+            .onNodeWithTag(
+                TabsTrayTestTag.TAB_ITEM_MEDIA_INDICATOR,
+                useUnmergedTree = true,
+            )
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun verifyMediaIndicatorNotVisible() {
+        composeTestRule.setContent {
+            FirefoxTheme {
+                ComposableUnderTest(
+                    group =
+                        TabsTrayItem.TabGroup(
+                            title = "Group 1",
+                            theme = TabGroupTheme.Yellow,
+                            tabs = mutableListOf(createTab(url = ABOUT_HOME_URL, isMediaActive = false)),
+                        )
+                )
+            }
+        }
+        composeTestRule.onNodeWithTag(TabsTrayTestTag.TAB_ITEM_MEDIA_INDICATOR).assertDoesNotExist()
     }
 
     @Composable
@@ -393,11 +458,12 @@ class TabGroupCardTest {
             ),
         onClick: (String) -> Unit = {},
         onLongClick: (String) -> Unit = {},
-        interactionState: TabItemInteractionState = TabItemInteractionState(),
+        interactionState: ItemInteractionState = ItemInteractionState(),
         onDeleteTabGroupClick: (String) -> Unit = {},
         onEditTabGroupClick: (TabsTrayItem.TabGroup) -> Unit = {},
         onCloseTabGroupClick: (TabsTrayItem.TabGroup) -> Unit = {},
         onShareTabGroupClick: (TabsTrayItem.TabGroup) -> Unit = {},
+        onUngroupTabGroupClick: (TabsTrayItem.TabGroup) -> Unit = {},
         featureHelper: TabManagementFeatureHelper = tabManagementFeatureHelper,
     ) {
         CompositionLocalProvider(LocalTabManagementFeatureHelper provides featureHelper) {
@@ -416,6 +482,7 @@ class TabGroupCardTest {
                 onEditTabGroupClick = { onEditTabGroupClick(group) },
                 onCloseTabGroupClick = { onCloseTabGroupClick(group) },
                 onShareTabGroupClick = { onShareTabGroupClick(group) },
+                onUngroupTabGroupClick = { onUngroupTabGroupClick(group) },
             )
         }
     }

@@ -108,6 +108,8 @@ internal fun PinnedTabsBlock(
     scroll: ScrollState = rememberScrollState(),
     // While Arrange Mode's grab bar is dragged, the height follows the finger instead of animating to it.
     resizing: Boolean = false,
+    // Pinned Fold: the block stays (empty) so it can animate shut.
+    keepWhenEmpty: Boolean = false,
 ) {
     val colors = MaterialTheme.colorScheme
     val rowBounds = remember { mutableStateMapOf<String, Rect>() }
@@ -133,7 +135,7 @@ internal fun PinnedTabsBlock(
             DropTarget.PinRejected -> Modifier.border(1.dp, colors.outline.copy(alpha = 0.5f), MaterialTheme.shapes.medium)
             DropTarget.None -> Modifier
         }
-    if (pinned.isEmpty() && rows.isEmpty()) return
+    if (pinned.isEmpty() && rows.isEmpty() && !keepWhenEmpty) return
     Column(
         modifier =
             Modifier
@@ -142,7 +144,7 @@ internal fun PinnedTabsBlock(
                 .then(outline)
                 .heightIn(max = maxHeight)
                 .verticalScroll(scroll)
-                .padding(vertical = 4.dp)
+                .padding(vertical = if (pinned.isEmpty() && rows.isEmpty()) 0.dp else 4.dp)
                 .testTag(SidebarTestTag.PINNED_TABS),
         verticalArrangement = Arrangement.spacedBy(2.dp),
     ) {
@@ -346,7 +348,7 @@ private fun PinnedTabRow(
                             else -> 1f
                         },
                     ),
-                )
+                ).greyWhenSleeping(pin.sleeping)
             val icon = pin.icon
             if (icon != null) {
                 Image(bitmap = icon.asImageBitmap(), contentDescription = null, modifier = iconModifier.clip(RoundedCornerShape(4.dp)))

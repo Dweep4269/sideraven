@@ -129,6 +129,15 @@ enum class AddressBarLayout {
     val other: AddressBarLayout get() = if (this == Top) Sidebar else Top
 }
 
+/** How the Sidebar presents Spaces above their Pinned Tabs. */
+enum class SpacesShown {
+    /** The icon row of 1.2: every Space an icon, tap to switch. */
+    IconRow,
+
+    /** The Space Header: the current Space's name in one row, swipe to switch, tap the name to fold. */
+    Header,
+}
+
 /** What New Tab opens. */
 enum class NewTabBehaviour { Search, HomePage, Blank }
 
@@ -324,6 +333,9 @@ open class SidebarModeStore(
     /** The chosen Address Bar Layout. */
     val addressBarLayout = choice(KEY_LAYOUT, AddressBarLayout.Sidebar)
 
+    /** How Spaces are presented: the icon row, or the Space Header (1.2's default is the Header). */
+    val spacesShown = choice(KEY_SPACES_SHOWN, SpacesShown.Header)
+
     /** Search Pop-up: hiding the keyboard closes it while nothing has been typed. Off by default: hiding it makes room to scroll. */
     val popupCloseOnKeyboardHide = flag(KEY_POPUP_KEYBOARD, false)
 
@@ -345,6 +357,20 @@ open class SidebarModeStore(
     /** How tall tab rows are. */
     val tabRows = choice(KEY_TAB_ROWS, TabRows.Comfortable)
 
+    /** The Spaces whose Pinned Tabs are folded (Pinned Fold), on this device only. */
+    val foldedSpaces = text(KEY_FOLDED_SPACES, "")
+
+    fun isFolded(spaceId: String): Boolean = spaceId in foldedSpaces.value.split(FOLD_SEPARATOR)
+
+    /** Folds the Space's Pinned Tabs, or unfolds them. */
+    fun toggleFold(spaceId: String) {
+        val ids = foldedSpaces.value.split(FOLD_SEPARATOR).filter { it.isNotEmpty() }.toSet()
+        foldedSpaces.set((if (spaceId in ids) ids - spaceId else ids + spaceId).joinToString(FOLD_SEPARATOR))
+    }
+
+    /** How long a tab goes unused before Auto-Sleep unloads it. */
+    val sleepTimer = choice(KEY_SLEEP_TIMER, SleepTimer.Minutes30)
+
     /** Whether swiping a tab row left closes it (Tab Close Gesture). */
     val swipeToClose = flag(KEY_SWIPE_TO_CLOSE, true)
 
@@ -353,6 +379,9 @@ open class SidebarModeStore(
 
     /** Whether swiping the Sidebar Address Bar sideways switches to the next or previous tab. */
     val addressSwipeTabs = flag(KEY_ADDRESS_SWIPE_TABS, true)
+
+    /** Whether Fenix's toolbar keeps its tab counter and New tab beside a Sidebar (issue #7). */
+    val toolbarTabButtons = flag(KEY_TOOLBAR_TAB_BUTTONS, false)
 
     /** How many Essentials sit in a row. */
     val essentialsPerRow = choice(KEY_ESSENTIALS_PER_ROW, EssentialsPerRow.Auto)
@@ -367,7 +396,6 @@ open class SidebarModeStore(
     val fullScreen = choice(KEY_FULL_SCREEN, FullScreen.Off)
 
     /** Whether the dark theme is pure black, for OLED screens; it replaces Space themes. */
-    val pureBlack = flag(KEY_PURE_BLACK, false)
 
     /** The accent colour (a Space palette key); Spaces on the default colour follow it. */
     val accent = text(KEY_ACCENT, DEFAULT_SPACE_ACCENT)
@@ -454,6 +482,7 @@ open class SidebarModeStore(
         const val KEY_LAYOUT_BUTTON_PLACE = "layout_button_place"
         const val KEY_NEW_TAB = "new_tab_behaviour"
         const val KEY_LAYOUT = "address_bar_layout"
+        const val KEY_SPACES_SHOWN = "spaces_shown"
         const val KEY_POPUP_KEYBOARD = "popup_close_on_keyboard_hide"
         const val KEY_POPUP_OUTSIDE = "popup_close_on_tap_outside"
         const val KEY_WIDTH = "sidebar_width"
@@ -469,10 +498,13 @@ open class SidebarModeStore(
         const val KEY_SWIPE_TO_CLOSE = "swipe_to_close"
         const val KEY_TAB_LIST_DIRECTION = "tab_list_direction"
         const val KEY_SPACE_THEMES = "space_themes"
-        const val KEY_PURE_BLACK = "pure_black"
         const val KEY_FULL_SCREEN = "full_screen"
         const val KEY_ADDRESS_SWIPE_NEW_TAB = "address_swipe_new_tab"
         const val KEY_ADDRESS_SWIPE_TABS = "address_swipe_tabs"
+        const val KEY_TOOLBAR_TAB_BUTTONS = "toolbar_tab_buttons"
+        const val KEY_SLEEP_TIMER = "sleep_timer"
+        const val KEY_FOLDED_SPACES = "folded_spaces"
+        const val FOLD_SEPARATOR = ","
         const val KEY_CLOSE_BUTTONS = "close_buttons"
     }
 }

@@ -11,6 +11,7 @@ package org.mozilla.fenix.components
 
 import AddonInstallIntentProcessor
 import android.content.Context
+import kotlinx.coroutines.CoroutineScope
 import mozilla.components.browser.state.store.BrowserStore
 import mozilla.components.concept.engine.Engine
 import mozilla.components.feature.customtabs.CustomTabIntentProcessor
@@ -29,7 +30,6 @@ import org.mozilla.fenix.perf.lazyMonitored
 import org.mozilla.fenix.shortcut.PasswordManagerIntentProcessor
 
 /** Component group for miscellaneous components. */
-@Suppress("LongParameterList")
 class IntentProcessors(
     private val context: Context,
     private val store: BrowserStore,
@@ -39,15 +39,28 @@ class IntentProcessors(
     private val searchUseCases: SearchUseCases,
     private val manifestStorage: ManifestStorage,
     private val engine: Engine,
+    private val applicationScope: CoroutineScope,
 ) {
     /** Provides intent processing functionality for ACTION_VIEW and ACTION_SEND intents. */
     val intentProcessor by lazyMonitored {
-        TabIntentProcessor(tabsUseCases, searchUseCases.newTabSearch, isPrivate = false, engine = engine)
+        TabIntentProcessor(
+            tabsUseCases,
+            searchUseCases.newTabSearch,
+            isPrivate = false,
+            engine = engine,
+            applicationScope = applicationScope,
+        )
     }
 
     /** Provides intent processing functionality for ACTION_VIEW and ACTION_SEND intents in private tabs. */
     val privateIntentProcessor by lazyMonitored {
-        TabIntentProcessor(tabsUseCases, searchUseCases.newPrivateTabSearch, isPrivate = true, engine = engine)
+        TabIntentProcessor(
+            tabsUseCases,
+            searchUseCases.newPrivateTabSearch,
+            isPrivate = true,
+            engine = engine,
+            applicationScope = applicationScope,
+        )
     }
 
     val customTabIntentProcessor by lazyMonitored {

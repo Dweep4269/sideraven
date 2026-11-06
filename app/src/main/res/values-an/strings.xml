@@ -78,16 +78,8 @@
   <string name="home_screen_shortcut_open_new_tab_2">Nueva pestanya</string>
   <!-- Shortcut action to open new private tab -->
   <string name="home_screen_shortcut_open_new_private_tab_2">Nueva pestanya privada</string>
-  <!--
-    Recent Tabs
-
-    Header text for jumping back into the recent tab in the home screen
-  -->
-  <string name="recent_tabs_header">Tornar ta la pestanya</string>
   <!-- Button text for showing all the tabs in the tabs tray -->
   <string name="recent_tabs_show_all">Amostrar-lo tot</string>
-  <!-- Content description for the button which navigates the user to show all recent tabs in the tabs tray. -->
-  <string name="recent_tabs_show_all_content_description_2">Amostrar lo botón de totas as pestanyas recients</string>
   <!--
     Text for the menu button to remove a grouped highlight from the user's browsing history
     in the Recently visited section
@@ -280,8 +272,6 @@
   <string name="customize_addon_collection_hint">Nombre d’a colección</string>
   <!-- Hint displayed on input field for custom collection user ID -->
   <string name="customize_addon_collection_user_hint">Propietario d’a colección (ID d’usuario)</string>
-  <!-- Header text for jumping back into the recent tab in customize the home screen -->
-  <string name="customize_toggle_jump_back_in">Tornar ta la pestanya</string>
   <!--
     Title for the customize home screen section with recently visited. Recently visited is
     a section where users see a list of tabs that they have visited in the past few days
@@ -431,8 +421,6 @@
     Title of preference for tabs management
   -->
   <string name="preferences_tabs">Pestanyas</string>
-  <!-- Title of preference that allows a user to specify the tab view -->
-  <string name="preferences_tab_view">Vista de pestanyas</string>
   <!-- Option for a list tab view -->
   <string name="tab_view_list">Lista</string>
   <!-- Option for a grid tab view -->
@@ -463,7 +451,7 @@
   <string name="close_tabs_after_one_week_summary">Tancar dimpués d’una semana</string>
   <!-- Summary for tabs preference when auto closing tabs setting is set to auto close tabs after one month -->
   <string name="close_tabs_after_one_month_summary">Tancar dimpués d’un mes</string>
-  <!-- Title of inactive tabs preference -->
+  <!-- Summary of the preference that allows a user to enable or disable the inactive tabs feature. -->
   <string name="preferences_inactive_tabs_title">Las pestanyas que no has visto dende fa dos semanas se mueven ta la sección inactiva.</string>
   <!--
     Studies
@@ -532,16 +520,6 @@
     %1$d is the number of bookmarks selected
   -->
   <string name="history_multi_select_title">%1$d triau(s)</string>
-  <!-- Text for the header that groups the history for today -->
-  <string name="history_today">Hue</string>
-  <!-- Text for the header that groups the history for yesterday -->
-  <string name="history_yesterday">Ahiere</string>
-  <!-- Text for the header that groups the history the past 7 days -->
-  <string name="history_7_days">Zaguers 7 días</string>
-  <!-- Text for the header that groups the history the past 30 days -->
-  <string name="history_30_days">Zaguers 30 días</string>
-  <!-- Text for the header that groups the history older than the last month -->
-  <string name="history_older">Mas antigo</string>
   <!-- Text shown when no history exists -->
   <string name="history_empty_message">No i hai garra historial</string>
   <!--

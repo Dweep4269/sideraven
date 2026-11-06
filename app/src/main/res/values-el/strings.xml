@@ -151,16 +151,8 @@
     Header text on the homescreen for continuing to browse the most recent browser tab
   -->
   <string name="recent_tabs_header_2">Συνέχεια</string>
-  <!--
-    Recent Tabs
-
-    Header text for jumping back into the recent tab in the home screen
-  -->
-  <string name="recent_tabs_header">Άμεση επιστροφή</string>
   <!-- Button text for showing all the tabs in the tabs tray -->
   <string name="recent_tabs_show_all">Εμφάνιση όλων</string>
-  <!-- Content description for the button which navigates the user to show all recent tabs in the tabs tray. -->
-  <string name="recent_tabs_show_all_content_description_2">Κουμπί «Εμφάνιση όλων των πρόσφατων καρτελών»</string>
   <!-- Text for button in synced tab card that opens synced tabs tray -->
   <string name="recent_tabs_see_all_synced_tabs_button_text">Προβολή όλων των συγχρονισμένων καρτελών</string>
   <!-- Accessibility description for device icon used for recent synced tab -->
@@ -281,6 +273,10 @@
   <string name="browser_main_menu_content_description_navigation_header">Πλοήγηση</string>
   <!-- Content description (not visible, for screen readers etc.) for bottom sheet handlebar custom tab menu. -->
   <string name="browser_custom_tab_menu_handlebar_content_description">Κλείσιμο φύλλου μενού προσαρμοσμένων καρτελών</string>
+  <!-- URL bar indicator shown on a cached version of the website, when the tab is reloading, but the content is not live yet -->
+  <string name="browser_toolbar_cached_page_indicator">Αποθηκευμένη έκδοση</string>
+  <!-- Message shown when a cached website has finished reloading and the tab is now showing the live version of the page -->
+  <string name="browser_toolbar_live_page_toast">Ενημερωμένη έκδοση</string>
   <!-- Browser menu label that bookmarks the currently visited page -->
   <string name="browser_menu_bookmark_this_page_2">Προσθήκη σελιδοδείκτη</string>
   <!-- Browser menu label that navigates to the edit bookmark screen for the current bookmarked page -->
@@ -295,8 +291,12 @@
   <string name="browser_menu_summarize_page">Σύνοψη σελίδας</string>
   <!-- Browser menu badge text for summarization feature -->
   <string name="browser_menu_summarize_page_badge">Νέο</string>
+  <!-- Browser menu badge text for new, highlighted feature -->
+  <string name="browser_menu_page_badge_text">Νέο</string>
   <!-- Browser menu label for navigating to the Web Compat Reporter feature, which provides users the ability to send bug reports for broken sites. -->
   <string name="browser_menu_webcompat_reporter_2">Αναφορά προβληματικού ιστοτόπου</string>
+  <!-- Browser menu label for adding a tab to a tab group -->
+  <string name="browser_menu_add_to_tab_group">Προσθήκη σε ομάδα</string>
   <!-- Browser menu label that is displayed when the current page has been translated by the translation feature. -->
   <string name="browser_menu_translated">Μεταφράστηκε</string>
   <!-- Browser menu label for the print feature -->
@@ -313,8 +313,6 @@
   <string name="browser_menu_default_banner_title">Ορίστε το %1$s ως προεπιλογή</string>
   <!-- Label text within the set as default banner -->
   <string name="browser_menu_default_banner_subtitle_2">Γρήγορο, ιδιωτικό και φτιαγμένο για εσάς.</string>
-  <!-- Content description (not visible, for screen readers etc.) for the button that dismisses the set as default banner in the menu -->
-  <string name="browser_menu_default_banner_dismiss_promotion">Απόρριψη προωθητικής ενέργειας</string>
   <!-- Content description (not visible, for screen readers etc.) for recommended extensions in main menu -->
   <string name="browser_menu_recommended_extensions_content_description">Περισσότερες πληροφορίες</string>
   <!--
@@ -709,6 +707,14 @@
   <string name="search_widget_text_long">Αναζήτηση στο διαδίκτυο</string>
   <!-- Content description (not visible, for screen readers etc.): Voice search -->
   <string name="search_widget_voice">Φωνητική αναζήτηση</string>
+  <!-- Content description (not visible, for screen readers etc.): Button in the search widget that starts a search in a private tab -->
+  <string name="search_widget_private_search">Ιδιωτική αναζήτηση</string>
+  <!-- Widget description in the widget picker screen for the search bar widget that includes buttons for private search and for voice search -->
+  <string name="search_bar_widget_description">Γραμμή αναζήτησης με ιδιωτική και φωνητική αναζήτηση</string>
+  <!-- Widget description in the widget picker screen for the search bar widget that includes buttons for image search, private search and voice search -->
+  <string name="search_bar_with_lens_widget_description">Γραμμή αναζήτησης με αναζήτηση εικόνων, ιδιωτική και φωνητική αναζήτηση</string>
+  <!-- Widget description in the widget picker screen for the compact search bar widget -->
+  <string name="compact_search_bar_widget_description">Μικρή γραμμή αναζήτησης</string>
   <!--
     Preferences
 
@@ -775,9 +781,9 @@
   <!-- Preference for enabling "HTTPS-Only" mode -->
   <string name="preferences_https_only_title">Λειτουργία «Μόνο HTTPS»</string>
   <!-- Preference title for using the screen lock to hide tabs in private browsing -->
-  <string name="preferences_pbm_lock_screen_title">Χρήση κλειδώματος οθόνης για την απόκρυψη καρτελών στην ιδιωτική περιήγηση</string>
+  <string name="preferences_pbm_lock_screen_title">Χρήση κλειδώματος οθόνης για την απόκρυψη ιδιωτικών καρτελών</string>
   <!-- Informs the user how to access the tabs when "Use screen lock to hide tabs in private browsing" is enabled -->
-  <string name="preferences_pbm_lock_screen_summary_3">Δείτε τις καρτέλες σας με το δακτυλικό σας αποτύπωμα, ένα PIN ή με αναγνώριση προσώπου. Η ενεργοποίηση αυτής της λειτουργίας εμποδίζει επίσης την καταγραφή και τον διαμοιρασμό οθόνης.</string>
+  <string name="preferences_pbm_lock_screen_summary_3">Δείτε τις καρτέλες σας με δακτυλικό αποτύπωμα, PIN ή αναγνώριση προσώπου. Αυτή η λειτουργία εμποδίζει επίσης την καταγραφή και τον διαμοιρασμό της οθόνης.</string>
   <!-- Description of the preference to enable "HTTPS-Only" mode. -->
   <string name="preferences_https_only_summary">Προσπαθεί αυτόματα να συνδεθεί σε ιστοτόπους με το πρωτόκολλο κρυπτογράφησης HTTPS για αυξημένη ασφάλεια.</string>
   <!-- Summary of https only preference if https only is set to off -->
@@ -806,8 +812,10 @@
   <string name="preferences_override_sync_tokenserver">Προσαρμοσμένος διακομιστής Sync</string>
   <!-- Preference category for account information -->
   <string name="preferences_category_account">Λογαριασμός</string>
+  <!-- Preference category for sync controls. Sync can be translated, it's just short for ”Synchronization” in English. -->
+  <string name="preferences_category_sync_controls">Συγχρονισμός</string>
   <!-- Preference for changing where the AddressBar is positioned -->
-  <string name="preferences_toolbar_2">Τοποθεσία γραμμής διευθύνσεων</string>
+  <string name="preferences_toolbar_2">Θέση γραμμής διευθύνσεων</string>
   <!-- Preference for changing toolbar layout -->
   <string name="preferences_toolbar_layout">Διάταξη γραμμής εργαλείων</string>
   <!-- Preference for changing default theme to dark or light mode -->
@@ -862,6 +870,8 @@
   <string name="preferences_search_synced_tabs">Αναζήτηση συγχρονισμένων καρτελών</string>
   <!-- Preference for account settings -->
   <string name="preferences_account_settings">Ρυθμίσεις λογαριασμού</string>
+  <!-- Preference for account and sync settings -->
+  <string name="preferences_account_and_sync_settings">Λογαριασμός και συγχρονισμός</string>
   <!-- Preference for enabling url autocomplete -->
   <string name="preferences_enable_autocomplete_urls">Αυτόματη συμπλήρωση URL</string>
   <!-- Preference title for switch preference to show sponsored Firefox Suggest search suggestions -->
@@ -909,6 +919,8 @@
   <string name="preference_downloads_folder_permission_lost" tools:ignore="UnusedResources">Δεν έχετε δικαίωμα χρήσης αυτού του φακέλου. Δοκιμάστε να επιλέξετε έναν άλλο.</string>
   <!-- Preference title for choosing an app to handle downloads -->
   <string name="preferences_choose_app_for_downloads">Διαχείριση λήψεων με άλλη εφαρμογή</string>
+  <!-- Message shown when no app is available to let the user pick a download folder. -->
+  <string name="preferences_downloads_no_folder_picker_available">Δεν είναι δυνατό το άνοιγμα της επιλογής φακέλων στη συσκευή.</string>
   <!-- Preference category for deleting or removing downloads -->
   <string name="preferences_category_delete_or_remove_downloads">Διαγραφή ή αφαίρεση λήψεων</string>
   <string name="preferences_downloads_delete_from_device">Διαγραφή από τη συσκευή</string>
@@ -984,8 +996,6 @@
   <string name="customize_toggle_privacy_report">Αναφορά απορρήτου</string>
   <!-- Title for a customize home screen section. Continue is a section that displays the most recent browser tab, so users can continue browsing where they left off. -->
   <string name="customize_toggle_continue">Συνέχεια</string>
-  <!-- Header text for jumping back into the recent tab in customize the home screen -->
-  <string name="customize_toggle_jump_back_in">Άμεση επιστροφή</string>
   <!-- Title for the customize home screen section with bookmarks. -->
   <string name="customize_toggle_bookmarks">Σελιδοδείκτες</string>
   <!--
@@ -1141,6 +1151,12 @@
   <string name="preferences_sync_now">Συγχρονισμός τώρα</string>
   <!-- Preference category for sync -->
   <string name="preferences_sync_category">Επιλέξτε τι θα συγχρονίζεται</string>
+  <!-- Preference category for sync controls -->
+  <string name="preferences_category_sync">Συγχρονισμένα δεδομένα</string>
+  <!-- Summary for the sync preference category. -->
+  <string name="preferences_sync_category_summary">Διαχείριση δεδομένων προς συγχρονισμό με όλες τις συνδεδεμένες συσκευές</string>
+  <!-- Summary for the sync preference category, when user has disabled all synchronisation items. -->
+  <string name="preferences_sync_category_no_engine_selected_summary">Δεν συγχρονίζετε τίποτα. Επιλέξτε τι θα διατηρείται συγχρονισμένο στις συσκευές σας.</string>
   <!-- Preference for syncing history -->
   <string name="preferences_sync_history">Ιστορικό</string>
   <!-- Preference for syncing bookmarks -->
@@ -1153,6 +1169,10 @@
   <string name="preferences_sign_out">Αποσύνδεση</string>
   <!-- Preference displays and allows changing current FxA device name -->
   <string name="preferences_sync_device_name">Όνομα συσκευής</string>
+  <!-- Preference category for Device name -->
+  <string name="preferences_device_name_category">Όνομα συσκευής</string>
+  <!-- Label for the Preference that displays and allows changing current device name on Mozilla Account -->
+  <string name="preferences_sync_change_device_name">Αλλαγή ονόματος συσκευής</string>
   <!-- Text shown when user enters empty device name -->
   <string name="empty_device_name_error">Το όνομα συσκευής δεν μπορεί να είναι κενό.</string>
   <!-- Label indicating that sync is in progress -->
@@ -1272,8 +1292,6 @@
   <string name="preference_simple_toolbar">Απλή</string>
   <!-- Preference for using expanded toolbar -->
   <string name="preference_expanded_toolbar">Ανεπτυγμένη</string>
-  <!-- Preference description indicating the toolbar location preference is disabled when the tab strip is enabled -->
-  <string name="preference_toolbar_pref_disabled_explanation">Η γραμμή διευθύνσεων πρέπει να βρίσκεται στο πάνω μέρος όταν εμφανίζεται η γραμμή καρτελών.</string>
   <!-- New tab shortcut in toolbar customization -->
   <string name="toolbar_customize_shortcut_new_tab">Άνοιγμα νέας καρτέλας</string>
   <!-- Share shortcut in toolbar customization -->
@@ -1317,6 +1335,12 @@
     Preferences for showing tab strip
   -->
   <string name="preference_tab_strip_show">Εμφάνιση γραμμής καρτελών</string>
+  <!-- Preference for tab bar placement (top or bottom of the screen) -->
+  <string name="preference_tab_strip_location_header">Θέση γραμμής καρτελών</string>
+  <!-- Preference for using top tab strip -->
+  <string name="preference_top_tab_strip">Πάνω</string>
+  <!-- Preference for using bottom tab strip -->
+  <string name="preference_bottom_tab_strip">Κάτω</string>
   <!--
     Gestures Preferences
 
@@ -1349,6 +1373,8 @@
   <string name="library_desktop_bookmarks_unfiled">Άλλοι σελιδοδείκτες</string>
   <!-- Option in Library to open History page -->
   <string name="library_history">Ιστορικό</string>
+  <!-- Content description (not visible, for screen readers etc.) for the check mark that replaces a site's icon in History and Recently closed tabs when the item is selected -->
+  <string name="library_item_selected_content_description">Επιλεγμένο</string>
   <!-- Settings Page Title -->
   <string name="settings_title">Ρυθμίσεις</string>
   <!-- Content description (not visible, for screen readers etc.): "Close button for library settings" -->
@@ -1399,8 +1425,8 @@
     Title of preference for tabs management
   -->
   <string name="preferences_tabs">Καρτέλες</string>
-  <!-- Title of preference that allows a user to specify the tab view -->
-  <string name="preferences_tab_view">Προβολή καρτελών</string>
+  <!-- Title of preference that allows a user to specify the tab layout -->
+  <string name="preferences_tab_layout">Διάταξη καρτελών</string>
   <!-- Option for a list tab view -->
   <string name="tab_view_list">Λίστα</string>
   <!-- Option for a grid tab view -->
@@ -1419,6 +1445,8 @@
   <string name="preference_auto_close_tabs" tools:ignore="UnusedResources">Αυτόματο κλείσιμο ανοικτών καρτελών</string>
   <!-- Content description (not visible, for screen readers etc.): Close tab button -->
   <string name="tab_manager_close_tabs">Κλείσιμο</string>
+  <!-- Content description for the media playback indicator in the tabs tray. -->
+  <string name="tab_indicator_media_playing">Αναπαραγωγή πολυμέσων</string>
   <!--
     Opening screen
 
@@ -1446,15 +1474,19 @@
   <!-- Summary for homepage preference indicating opening the homepage when re-opening the app after four hours of inactivity -->
   <string name="opening_screen_after_four_hours_of_inactivity_summary">Άνοιγμα στην αρχική σελίδα μετά από τέσσερις ώρες</string>
   <!--
-    Inactive tabs
+    Tab organization
 
-    Category header of a preference that allows a user to enable or disable the inactive tabs feature
+    Category header for the preferences that control how tabs are organized
   -->
-  <string name="preferences_inactive_tabs">Μετακίνηση παλαιών καρτελών στις ανενεργές</string>
-  <!-- Title of inactive tabs preference -->
+  <string name="preferences_tab_organization">Οργάνωση καρτελών</string>
+  <!-- Title of the preference that allows a user to enable or disable the inactive tabs feature -->
+  <string name="preferences_inactive_tabs_toggle_title">Ανενεργές καρτέλες</string>
+  <!-- Summary of the preference that allows a user to enable or disable the inactive tabs feature. -->
   <string name="preferences_inactive_tabs_title">Μετακίνηση των καρτελών που δεν έχουν προβληθεί για δύο εβδομάδες στην ενότητα «Ανενεργές».</string>
-  <!-- Title for the preference to enable or disable the tab groups feature -->
-  <string name="preferences_tab_groups_feature">Ενεργοποίηση ομάδων καρτελών</string>
+  <!-- Title of the preference that allows a user to enable or disable the tab groups feature -->
+  <string name="preferences_tab_groups_title">Ομάδες καρτελών</string>
+  <!-- Summary of the preference that allows a user to enable or disable the tab groups feature -->
+  <string name="preferences_tab_groups_description">Οργανώστε τις καρτέλες σας σε ομάδες που μπορείτε να ονομάσετε και να αποθηκεύσετε.</string>
   <!--
     Privacy report
 
@@ -1670,6 +1702,11 @@
   <string name="close_tab_and_delete_group_confirmation_dialog_cancel">Ακύρωση</string>
   <!-- Content description for the three dot button next to a tab group" -->
   <string name="tab_group_three_dot_button_content_description">Περισσότερες επιλογές</string>
+  <!--
+    Content description for the Expand button on the contracted menu for a tab group:
+    when tapped, tabs are displayed in an expanded grid or list view, taking up the full screen.
+  -->
+  <string name="tab_groups_strip_expand_group_content_description">Αναπτύξτε τη για να δείτε τις καρτέλες σε πλήρη οθόνη</string>
   <!-- Text shown on the edit button for a tab group on the three dot menu -->
   <string name="tab_group_three_dot_menu_edit">Επεξεργασία</string>
   <!-- Text shown on the ungroup button for a tab group on the three dot menu -->
@@ -1737,16 +1774,6 @@
     %1$d is the number of bookmarks selected
   -->
   <string name="history_multi_select_title">%1$d επιλογή(ές)</string>
-  <!-- Text for the header that groups the history for today -->
-  <string name="history_today">Σήμερα</string>
-  <!-- Text for the header that groups the history for yesterday -->
-  <string name="history_yesterday">Χθες</string>
-  <!-- Text for the header that groups the history the past 7 days -->
-  <string name="history_7_days">Τελευταίες 7 ημέρες</string>
-  <!-- Text for the header that groups the history the past 30 days -->
-  <string name="history_30_days">Τελευταίες 30 ημέρες</string>
-  <!-- Text for the header that groups the history older than the last month -->
-  <string name="history_older">Παλαιότερα</string>
   <!-- Text shown when no history exists -->
   <string name="history_empty_message">Δεν υπάρχει ιστορικό</string>
   <!--
@@ -2165,7 +2192,7 @@
   <!-- Title for the bookmark list empty state -->
   <string name="bookmark_empty_list_title">Δεν υπάρχει κανένας σελιδοδείκτης ακόμα</string>
   <!-- Title for the bookmark list empty state at the root level. -->
-  <string name="bookmark_empty_list_root_title">Κρατήστε όλους τους αγαπημένους σας σελιδοδείκτες μαζί</string>
+  <string name="bookmark_empty_list_root_title">Συγκεντρώστε όλους τους αγαπημένους σας σελιδοδείκτες</string>
   <!-- Bookmark screen folder description. %s is the count of bookmark folder children -->
   <string name="bookmarks_folder_description">Σελιδοδείκτες στον φάκελο: %s</string>
   <!-- Text for the button to navigate to sync authentication -->
@@ -2245,7 +2272,7 @@
   <!-- Label for site specific setting that indicates that all video and audio autoplay is allowed -->
   <string name="quick_setting_option_autoplay_allowed">Αποδοχή ήχου και βίντεο</string>
   <!-- Label that indicates that video and audio autoplay is only allowed over Wi-Fi -->
-  <string name="preference_option_autoplay_allowed_wifi_only2">Φραγή ήχου και βίντεο μόνο σε σύνδεση δεδομένων</string>
+  <string name="preference_option_autoplay_allowed_wifi_only2">Φραγή ήχου και βίντεο μόνο κατά τη χρήση δεδομένων κινητής</string>
   <!-- Subtext that explains 'autoplay on Wi-Fi only' option -->
   <string name="preference_option_autoplay_allowed_wifi_subtext">Θα γίνεται αναπαραγωγή ήχου και βίντεο σε Wi-Fi</string>
   <!-- Label for global setting that indicates that video autoplay is allowed, but audio autoplay is blocked -->
@@ -2375,12 +2402,12 @@
   <string name="sync_sign_in">Σύνδεση στο Sync</string>
   <!-- An option from the share dialog to send link to all other sync devices -->
   <string name="sync_send_to_all">Αποστολή σε όλες τις συσκευές</string>
-  <!-- Text displayed when no other sync devices are available for link sharing -->
-  <string name="sync_no_devices_available">Καμία διαθέσιμη συσκευή</string>
-  <!-- Text displayed when no other sync devices are available for link sharing. -->
-  <string name="sync_no_devices_available_description">Όλες οι συσκευές που έχουν συνδεθεί και συγχρονίζονται σε αυτόν τον λογαριασμό θα εμφανίζονται εδώ.</string>
   <!-- An option from the share dialog to reconnect to sync -->
   <string name="sync_reconnect">Εκ νέου σύνδεση στο Sync</string>
+  <!-- Label for the button in the share dialog that sends the tab to the selected sync devices -->
+  <string name="sync_send_to_selected_devices">Αποστολή</string>
+  <!-- Content description announced when a device is selected in the share dialog -->
+  <string name="send_to_devices_device_selected_content_description">Επιλεγμένο</string>
   <!-- Text displayed when sync is offline and cannot be accessed -->
   <string name="sync_offline">Εκτός σύνδεσης</string>
   <!-- An option to connect additional devices -->
@@ -2413,10 +2440,14 @@
   <string name="sync_send_tab_empty_state_title">Καμία συνδεδεμένη συσκευή</string>
   <!-- Send tab to synced devices: Empty state message - Displayed when the user has no synced devices -->
   <string name="sync_send_tab_empty_state_description" tools:ignore="BrandUsage">Για να στείλετε μια καρτέλα, συνδεθείτε στο Firefox σε τουλάχιστον άλλη μία συσκευή.</string>
+  <!-- Send tab to synced devices: Empty state link - Displayed when the user has no synced devices -->
+  <string name="sync_send_tab_empty_state_link">Μάθετε πώς να συνδέσετε μια συσκευή</string>
   <!-- Send tab to synced devices: Connectivity Error title -->
   <string name="sync_send_tab_error_connection_title">Ελέγξτε τη σύνδεσή σας στο διαδίκτυο</string>
   <!-- Send tab to synced devices: Connectivity Error message - Suggested user action after internet connection has been established -->
   <string name="sync_send_tab_error_connection_text">Έπειτα, δοκιμάστε να στείλετε ξανά την καρτέλα σας.</string>
+  <!-- Send tab to synced devices: Connectivity Error button - When tapped, refreshes the list of connected devices. -->
+  <string name="sync_send_tab_error_connection_button">Επανάληψη</string>
   <!--
     Notifications
 
@@ -2599,6 +2630,12 @@
   <string name="sign_in_create_account_text" tools:ignore="BrandUsage"><![CDATA[Δεν έχετε λογαριασμό; <u>Δημιουργήστε έναν</u> για συγχρονισμό του Firefox μεταξύ συσκευών.]]></string>
   <!-- Text shown in confirmation dialog to sign out of account. %s is the name of the app (for example "Firefox"). -->
   <string name="sign_out_confirmation_message_2">Το %s θα σταματήσει να συγχρονίζεται με τον λογαριασμό σας, αλλά δεν θα διαγράψει τα δεδομένα περιήγησης από αυτήν τη συσκευή.</string>
+  <!-- Title of the confirmation dialog shown when the user signs out of their account -->
+  <string name="sign_out_dialog_title">Αποσύνδεση από τον λογαριασμό;</string>
+  <!-- Body of the confirmation dialog shown when the user signs out of their account -->
+  <string name="sign_out_dialog_message">Τα συγχρονισμένα δεδομένα παραμένουν στον λογαριασμό σας.</string>
+  <!-- Text for the primary action button of the confirmation dialog shown when the user signs out of their account -->
+  <string name="sign_out_dialog_confirm_button">Αποσύνδεση</string>
   <!-- Option to continue signing out of account shown in confirmation dialog to sign out of account -->
   <string name="sign_out_disconnect">Αποσύνδεση</string>
   <!-- Option to cancel signing out shown in confirmation dialog to sign out of account -->
@@ -3000,7 +3037,7 @@
   <!-- Title for the Suggest Email Masks toggle -->
   <string name="preferences_email_masks_suggest_title">Πρόταση μασκών email</string>
   <!-- Summary for the Suggest Email Masks toggle. -->
-  <string name="preferences_email_masks_suggest_summary">Αποκρύψτε το πραγματικό σας email για να προστατέψετε τα εισερχόμενά σας από ανεπιθύμητα μηνύματα. Ορισμένοι ιστότοποι δεν υποστηρίζουν μάσκες email.</string>
+  <string name="preferences_email_masks_suggest_summary">Αποκρύψτε το πραγματικό σας email για να προστατεύετε τα εισερχόμενά σας από ανεπιθύμητα μηνύματα. Ορισμένοι ιστότοποι δεν υποστηρίζουν τις μάσκες email.</string>
   <!-- Text that links to additional information about the Email Masks -->
   <string name="preferences_email_masks_suggest_learn_more">Μάθετε περισσότερα</string>
   <!-- Title for the Manage Email Masks links to Firefox Relay dashboard -->
@@ -3018,14 +3055,14 @@
   <!-- Label for the BETA badge for the browser VPN entry in the settings list -->
   <string name="preferences_ip_protection_beta_badge_label">BETA</string>
   <!-- Title for the browser VPN settings screen (displayed in the app bar) -->
-  <string name="ip_protection_title">VPN</string>
+  <string name="ip_protection_settings_title">Ενσωματωμένο VPN</string>
   <!-- Label for the browser VPN toggle on the settings screen -->
   <string name="ip_protection_toggle_label">VPN</string>
   <!-- Content description for the browser VPN settings screen top bar back button -->
   <string name="ip_protection_navigate_back_button_content_description">Πλοήγηση προς τα πίσω</string>
   <!-- Headline for the browser VPN promo card. %s is the name of the app (for example "Firefox"). -->
   <string name="ip_protection_promo_headline">Ενσωματωμένο VPN του %s</string>
-  <!-- Body text for the browser VPN promo card . %s is a learn more link using ip_protection_learn_more as text. -->
+  <!-- Body text for the browser VPN settings header, shown when no promo is running. %s is a learn more link using ip_protection_learn_more as text. -->
   <string name="ip_protection_promo_body_2">Περιηγηθείτε με επιπλέον προστασία κρύβοντας την τοποθεσία σας, ακόμα και σε δημόσια Wi-Fi. %s</string>
   <!-- Link text that opens additional information about the browser VPN -->
   <string name="ip_protection_learn_more">Μάθετε περισσότερα</string>
@@ -3045,7 +3082,7 @@
   <!-- Header for the browser VPN `location` section -->
   <string name="ip_protection_location_section">Τοποθεσία</string>
   <!-- Label for the recommended automatic location option on the browser VPN settings screen -->
-  <string name="ip_protection_location_recommended_label">Προτείνεται</string>
+  <string name="ip_protection_location_recommended_label">Προτεινόμενη</string>
   <!-- Badge label shown in the menu item when the browser VPN is active -->
   <string name="preferences_ip_protection_on">Ενεργό</string>
   <!-- Badge label shown in the menu item when the browser VPN is off -->
@@ -3058,8 +3095,6 @@
   <string name="ip_protection_menu_error">Σφάλμα</string>
   <!-- Badge label shown in the VPN menu item when the user is eligible for the feature but needs to authenticate / authorize to enable it -->
   <string name="ip_protection_menu_try_vpn_cta">Δωρεάν δοκιμή</string>
-  <!-- Badge label shown in the menu item when the user is eligible to use the browser VPN but should authenticate or authorize it first. -->
-  <string name="ip_protection_menu_auth_required">Δοκιμή</string>
   <!-- Content description for the chevron button that opens the browser VPN settings screen -->
   <string name="ip_protection_navigate_settings">Άνοιγμα ρυθμίσεων VPN</string>
   <!--
@@ -3114,13 +3149,13 @@
   -->
   <string name="ip_protection_data_limit_reached_snackbar">Έχουν χρησιμοποιηθεί %1$d GB δεδομένων VPN. Θα γίνει επαναφορά της πρόσβασης τον επόμενο μήνα.</string>
   <!-- Snackbar (in-app pop-up notification) action button text that takes the user to the VPN settings screen. -->
-  <string name="ip_protection_data_limit_reached_snackbar_action">Ρυθμίσεις</string>
+  <string name="ip_protection_open_settings_snackbar_action">Ρυθμίσεις</string>
   <!-- Description shown on the browser VPN settings screen prompting the user to turn the VPN on. -->
   <string name="ip_protection_settings_description" tools:ignore="UnusedResources">Ενεργοποιήστε το VPN για να κάνετε την περιήγησή σας πιο ιδιωτική και την καταγραφή της πιο δύσκολη.</string>
   <!-- Title shown on the browser VPN settings screen for location selection section. -->
   <string name="ip_protection_location_title" tools:ignore="UnusedResources">Τοποθεσία</string>
   <!-- Label for the Recommended server location option which is automatically selected by the browser. -->
-  <string name="ip_protection_recommended_location" tools:ignore="UnusedResources">Προτείνεται</string>
+  <string name="ip_protection_recommended_location" tools:ignore="UnusedResources">Προτεινόμενη</string>
   <!-- Headline for the card that promotes the standalone Mozilla VPN product. -->
   <string name="ip_protection_mozilla_vpn_upsell_headline" tools:ignore="UnusedResources,BrandUsage">Προστατέψτε περισσότερα με το Mozilla VPN</string>
   <!-- Body for the card that promotes the standalone Mozilla VPN product. -->
@@ -4488,6 +4523,16 @@
   <string name="lens_camera_mode_qr">Σάρωση QR</string>
   <!-- Toast shown when the user picks an image from the gallery in QR mode but no QR code is found in it -->
   <string name="lens_camera_qr_no_code_found">Δεν βρέθηκε κωδικός QR στην εικόνα</string>
+  <!-- Status shown under an image picked from the gallery while it is being sent to Google Lens for a visual search -->
+  <string name="lens_camera_loading_status">Αναζήτηση σε εξέλιξη</string>
+  <!-- Button shown under an image picked from the gallery while it is being sent to Google Lens. Tapping it stops the search and returns to the camera. -->
+  <string name="lens_camera_loading_cancel_button">Ακύρωση</string>
+  <!-- Snackbar message shown when an image picked from the gallery could not be opened or read, so it was never sent to Google Lens. Shown after returning to the camera. -->
+  <string name="lens_camera_image_load_failed">Δεν ήταν δυνατή η φόρτωση αυτής της εικόνας. Δοκιμάστε κάποια άλλη.</string>
+  <!-- Snackbar message shown when an image picked from the gallery could not be searched because of a network problem or an error from Google Lens. Shown after returning to the camera, next to the lens_camera_upload_failed_retry_button action. -->
+  <string name="lens_camera_upload_failed">Δεν ήταν δυνατή η λήψη αποτελεσμάτων από το Google Lens</string>
+  <!-- Action in the snackbar shown when an image picked from the gallery could not be searched with Google Lens. Tapping it searches the same image again. -->
+  <string name="lens_camera_upload_failed_retry_button">Δοκιμή ξανά</string>
   <!-- Title of the bottom sheet shown the first time the user opens the Google Lens camera screen -->
   <string name="lens_opt_out_title">Αναζήτηση με Google Lens</string>
   <!-- Description of the bottom sheet shown the first time the user opens the Google Lens camera screen -->
@@ -4568,4 +4613,14 @@
   <string name="pdf_tools_signature_clear_button">Απαλοιφή</string>
   <!-- The text for the button that adds the signature the user has typed to the PDF. -->
   <string name="pdf_tools_signature_add_button">Προσθήκη</string>
+  <!--
+    Listen to page
+
+    Content description for the reader mode panel: a group of buttons floating over the content
+  -->
+  <string name="reader_mode_panel_content_description">Επιλογές λειτουργίας ανάγνωσης</string>
+  <!-- Content description for the button in reader mode panel that turns on the read aloud feature (playback of content begins when button is pressed) -->
+  <string name="reader_mode_panel_listen_content_description">Εκφώνηση</string>
+  <!-- Content description for media player displayed in Reader Mode when the Listen to Page (Read Aloud) feature is selected -->
+  <string name="reader_mode_panel_media_player_content_description">Αναπαραγωγή πολυμέσων</string>
 </resources>

@@ -6,6 +6,7 @@ package org.mozilla.fenix.home.blocklist
 
 import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
+import mozilla.components.feature.top.sites.TopSite
 import mozilla.components.support.ktx.kotlin.sha1
 import org.mozilla.fenix.ext.containsQueryParameters
 import org.mozilla.fenix.home.bookmarks.Bookmark
@@ -107,6 +108,16 @@ class BlocklistHandler(private val settings: Settings) {
             it.url.toUri().containsQueryParameters(settings.frecencyFilterQuery)
     }
 
+    /**
+     * Filter a list of top sites by the blocklist. Requires this class to be contextually in a scope.
+     *
+     * This is intended for the pool of default top sites provided by the application and does not apply to user-pinned
+     * top sites.
+     */
+    @JvmName("filterTopSite")
+    fun <T : TopSite> List<T>.filteredByBlocklist(): List<T> =
+        settings.homescreenBlocklist.let { blocklist -> filterNot { blocklistContainsUrl(blocklist, it.url) } }
+
     private fun blocklistContainsUrl(blocklist: Set<String>, url: String): Boolean = blocklist.any {
         it == url.stripAndHash()
     }
@@ -130,3 +141,7 @@ private fun String.stripProtocolAndCommonSubdomains(): String {
     }
     return stripped
 }
+
+/** Whether this URL and [url] are the same entry in the blocklist. */
+internal fun String.hasSameBlocklistEntryAs(url: String): Boolean =
+    stripProtocolAndCommonSubdomains() == url.stripProtocolAndCommonSubdomains()

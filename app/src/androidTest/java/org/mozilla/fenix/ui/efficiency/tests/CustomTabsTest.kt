@@ -8,6 +8,7 @@ import mozilla.components.support.ktx.util.PromptAbuserDetector
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import org.mozilla.fenix.customannotations.Critical
 import org.mozilla.fenix.customannotations.SmokeTest
 import org.mozilla.fenix.helpers.TestAssetHelper.downloadPageAsset
 import org.mozilla.fenix.helpers.TestAssetHelper.getGenericAsset
@@ -24,13 +25,11 @@ import org.mozilla.fenix.ui.efficiency.selectors.NotificationSelectors
 import org.mozilla.fenix.ui.efficiency.selectors.SettingsPasswordsSelectors
 import org.mozilla.fenix.ui.efficiency.selectors.SettingsSavedPasswordsSelectors
 import org.mozilla.fenix.ui.efficiency.selectors.SettingsSelectors
+import org.mozilla.fenix.ui.efficiency.selectors.ShareOverlaySelectors
 import org.mozilla.fenix.ui.efficiency.selectors.TabHistorySelectors
 import org.mozilla.fenix.ui.efficiency.selectors.ToolbarSelectors
 
 class CustomTabsTest : BaseTest() {
-
-    private val mockWebServer
-        get() = fenixTestRule.mockWebServer
 
     // Required by verifyDownloadInACustomTabTest: without it the download prompt's Download button
     // resolves and the click reports success, but the click is dropped as prompt abuse, so the dialog
@@ -56,7 +55,7 @@ class CustomTabsTest : BaseTest() {
         on.customTabs.launchCustomTab(customTabPage.url.toString(), customMenuItem)
         on.customTabs.mozVerify(CustomTabsSelectors.CLOSE_BUTTON)
         on.customTabs.openMainMenu()
-        on.customTabs.mozVerifyElementsByGroup("customTabMainMenuItems")
+        on.customTabs.mozVerifyElementsByGroup(CustomTabsSelectors.Group.CUSTOM_TAB_MAIN_MENU_ITEMS)
         on.customTabs.mozVerify(CustomTabsSelectors.MENU_CUSTOM_ITEM(customMenuItem))
     }
 
@@ -143,7 +142,7 @@ class CustomTabsTest : BaseTest() {
         on.customTabs.clickWebContent(downloadFile)
         on.downloads
             .mozVerify(DownloadsSelectors.DOWNLOAD_DIALOG_TITLE)
-            .mozVerifyElementsByGroup("downloadDialog")
+            .mozVerifyElementsByGroup(DownloadsSelectors.Group.DOWNLOAD_DIALOG)
             .mozClick(DownloadsSelectors.DOWNLOAD_DIALOG_CONFIRM_BUTTON)
             .mozVerify(DownloadsSelectors.DOWNLOAD_COMPLETE_SNACKBAR, timeout = 15_000)
         on.notification
@@ -187,7 +186,7 @@ class CustomTabsTest : BaseTest() {
         // the intended page instead of whatever the tab happened to be showing.
         on.customTabs.verifyWebContent(customTabPage.content)
         on.customTabs.openMainMenu().mozClick(CustomTabsSelectors.MENU_SHARE)
-        on.shareOverlay.mozVerifyElementsByGroup("shareTabLayout")
+        on.shareOverlay.mozVerifyElementsByGroup(ShareOverlaySelectors.Group.SHARE_TAB_LAYOUT)
     }
 
     // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/249659
@@ -243,5 +242,32 @@ class CustomTabsTest : BaseTest() {
         const val LOGIN_FORM_URL = "https://mozilla-mobile.github.io/testapp/loginForm"
         const val LOGIN_USERNAME = "mozilla"
         const val LOGIN_PASSWORD = "firefox"
+    }
+
+    // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/2334762
+    @Critical
+    @Test
+    fun copyCustomTabToolbarUrlTest() {
+        val customTabPage = mockWebServer.getGenericAsset(1)
+        val defaultWebPage = mockWebServer.getGenericAsset(2)
+        val customTabUrl = customTabPage.url.toString()
+        val defaultWebPageUrl = defaultWebPage.url.toString()
+
+        on.customTabs.launchCustomTab(customTabUrl, "TestMenuItem")
+        on.customTabs.verifyUrl(customTabUrl)
+        on.customTabs.longClickAndCopyToolbarUrl()
+
+        // Re-enter through an external link, as legacy does; this lands in the full browser. Assert the browser
+        // loaded before driving the search bar: the external-link intent switches activities, so the toolbar is
+        // not immediately present. ENGINE_VIEW is the layout-invariant "browser is loaded" signal.
+        on.customTabs.openUrlFromExternalLink(defaultWebPageUrl)
+        on.browserPage.mozVerify(BrowserPageSelectors.ENGINE_VIEW, timeout = waitingTimeLong)
+
+        on.searchBar
+            .navigateToPage()
+            .clickClearButton()
+            .longClickToolbar()
+            .clickContextMenuItem("Paste")
+            .verifyTypedToolbarText(customTabUrl, exists = true)
     }
 }

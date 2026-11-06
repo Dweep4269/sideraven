@@ -43,13 +43,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import mozilla.components.compose.base.BottomSheetHandle
+import mozilla.components.compose.base.theme.PreviewThemeProvider
+import mozilla.components.compose.base.theme.Theme
 import mozilla.components.ui.icons.R as iconsR
 import org.mozilla.fenix.R
 import org.mozilla.fenix.components.menu.compose.ExpandableMenuItemAnimation
 import org.mozilla.fenix.components.menu.compose.MenuGroup
 import org.mozilla.fenix.theme.FirefoxTheme
-import org.mozilla.fenix.theme.PreviewThemeProvider
-import org.mozilla.fenix.theme.Theme
 import org.mozilla.fenix.webcompat.store.PreviewReporterItem
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -167,7 +167,15 @@ private fun PreviewReporterItemRow(
             ) {
                 Icon(
                     painter = painterResource(id = iconsR.drawable.mozac_ic_chevron_down_20),
-                    contentDescription = null,
+                    contentDescription =
+                        "${previewReporterItem.title}, " +
+                            stringResource(
+                                if (isExpanded) {
+                                    R.string.a11y_action_label_collapse
+                                } else {
+                                    R.string.a11y_action_label_expand
+                                }
+                            ),
                     modifier = Modifier.rotate(rotation),
                     tint = MaterialTheme.colorScheme.onSurface,
                 )

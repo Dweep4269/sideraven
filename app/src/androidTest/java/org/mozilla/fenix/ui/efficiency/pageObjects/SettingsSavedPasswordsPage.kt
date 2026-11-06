@@ -7,8 +7,10 @@ package org.mozilla.fenix.ui.efficiency.pageObjects
 import androidx.compose.ui.test.junit4.AndroidComposeTestRule
 import org.mozilla.fenix.helpers.HomeActivityIntentTestRule
 import org.mozilla.fenix.ui.efficiency.helpers.BasePage
-import org.mozilla.fenix.ui.efficiency.helpers.Selector
-import org.mozilla.fenix.ui.efficiency.navigation.NavigationRegistry
+import org.mozilla.fenix.ui.efficiency.helpers.PageReadinessCondition
+import org.mozilla.fenix.ui.efficiency.helpers.PageReadinessProfiles
+import org.mozilla.fenix.ui.efficiency.helpers.PageReadinessRule
+import org.mozilla.fenix.ui.efficiency.navigation.NavigationGraph
 import org.mozilla.fenix.ui.efficiency.navigation.NavigationStep
 import org.mozilla.fenix.ui.efficiency.selectors.BrowserPageSelectors
 import org.mozilla.fenix.ui.efficiency.selectors.HomeSelectors
@@ -21,43 +23,54 @@ class SettingsSavedPasswordsPage(composeRule: AndroidComposeTestRule<HomeActivit
     BasePage(composeRule) {
     override val pageName = "SettingsSavedPasswordsPage"
 
-    init {
-        NavigationRegistry.register(
+    internal override fun registerNavigation(builder: NavigationGraph.Builder) {
+        builder.register(
             from = "HomePage",
             to = pageName,
+            variant = "via-settings",
             steps =
                 listOf(
                     NavigationStep.Click(HomeSelectors.MAIN_MENU_BUTTON),
                     NavigationStep.Click(MainMenuSelectors.SETTINGS_BUTTON),
                     NavigationStep.Click(SettingsSelectors.PASSWORDS_BUTTON),
                     NavigationStep.Click(SettingsPasswordsSelectors.SAVED_PASSWORDS_OPTION),
-                    NavigationStep.ClickIfPresent(SettingsSavedPasswordsSelectors.LOGINS_SECURITY_DIALOG_LATER_BUTTON),
+                    NavigationStep.ClickIfPresent(
+                        SettingsSavedPasswordsSelectors.LOGINS_SECURITY_DIALOG_LATER_BUTTON,
+                        timeout = 5_000,
+                    ),
                 ),
         )
 
-        NavigationRegistry.register(
+        builder.register(
             from = "HomePage",
             to = pageName,
+            variant = "direct-main-menu",
             steps =
                 listOf(
                     NavigationStep.Click(HomeSelectors.MAIN_MENU_BUTTON),
                     NavigationStep.Click(MainMenuSelectors.PASSWORDS_BUTTON),
-                    NavigationStep.ClickIfPresent(SettingsSavedPasswordsSelectors.LOGINS_SECURITY_DIALOG_LATER_BUTTON),
+                    NavigationStep.ClickIfPresent(
+                        SettingsSavedPasswordsSelectors.LOGINS_SECURITY_DIALOG_LATER_BUTTON,
+                        timeout = 5_000,
+                    ),
                 ),
         )
 
-        NavigationRegistry.register(
+        builder.register(
             from = "BrowserPage",
             to = pageName,
             steps =
                 listOf(
                     NavigationStep.Click(BrowserPageSelectors.MAIN_MENU_BUTTON),
                     NavigationStep.Click(MainMenuSelectors.PASSWORDS_BUTTON),
-                    NavigationStep.ClickIfPresent(SettingsSavedPasswordsSelectors.LOGINS_SECURITY_DIALOG_LATER_BUTTON),
+                    NavigationStep.ClickIfPresent(
+                        SettingsSavedPasswordsSelectors.LOGINS_SECURITY_DIALOG_LATER_BUTTON,
+                        timeout = 5_000,
+                    ),
                 ),
         )
 
-        NavigationRegistry.register(
+        builder.register(
             from = pageName,
             to = "BrowserPage",
             steps =
@@ -67,9 +80,37 @@ class SettingsSavedPasswordsPage(composeRule: AndroidComposeTestRule<HomeActivit
                     NavigationStep.ClickIfPresent(SettingsSelectors.GO_BACK_BUTTON),
                 ),
         )
+
+        // "Saved passwords" is a one-tap option on the Passwords settings screen. There is no reverse edge:
+        // saved passwords can also be opened from the main-menu "Passwords" shortcut (whose back parent is the
+        // browser, not this screen), so a single "Navigate up" is not a reliable route back to Passwords.
+        builder.register(
+            from = "SettingsPasswordsPage",
+            to = pageName,
+            steps =
+                listOf(
+                    NavigationStep.Click(SettingsPasswordsSelectors.SAVED_PASSWORDS_OPTION),
+                    NavigationStep.ClickIfPresent(
+                        SettingsSavedPasswordsSelectors.LOGINS_SECURITY_DIALOG_LATER_BUTTON,
+                        timeout = 5_000,
+                    ),
+                ),
+        )
     }
 
-    override fun mozGetSelectorsByGroup(group: String): List<Selector> {
-        return SettingsSavedPasswordsSelectors.all.filter { it.groups.contains(group) }
-    }
+    override val selectorCatalog = SettingsSavedPasswordsSelectors
+
+    override fun readinessContract() =
+        super.readinessContract()
+            .withRule(
+                PageReadinessRule(
+                    name = "saved-passwords-content-state",
+                    profiles = PageReadinessProfiles.IDENTITY_ANCHOR,
+                    condition =
+                        PageReadinessCondition.anyOf(
+                            SettingsSavedPasswordsSelectors.EMPTY_SAVED_PASSWORDS_LIST_ADD_PASSWORD_BUTTON,
+                            SettingsSavedPasswordsSelectors.SAVED_PASSWORDS_LIST,
+                        ),
+                )
+            )
 }

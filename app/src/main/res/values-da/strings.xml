@@ -151,16 +151,8 @@
     Header text on the homescreen for continuing to browse the most recent browser tab
   -->
   <string name="recent_tabs_header_2">Fortsæt</string>
-  <!--
-    Recent Tabs
-
-    Header text for jumping back into the recent tab in the home screen
-  -->
-  <string name="recent_tabs_header">Hop tilbage til</string>
   <!-- Button text for showing all the tabs in the tabs tray -->
   <string name="recent_tabs_show_all">Vis alle</string>
-  <!-- Content description for the button which navigates the user to show all recent tabs in the tabs tray. -->
-  <string name="recent_tabs_show_all_content_description_2">Knap til visning af alle seneste faneblade</string>
   <!-- Text for button in synced tab card that opens synced tabs tray -->
   <string name="recent_tabs_see_all_synced_tabs_button_text">Vis alle synkroniserede faneblade</string>
   <!-- Accessibility description for device icon used for recent synced tab -->
@@ -281,6 +273,10 @@
   <string name="browser_main_menu_content_description_navigation_header">Navigation</string>
   <!-- Content description (not visible, for screen readers etc.) for bottom sheet handlebar custom tab menu. -->
   <string name="browser_custom_tab_menu_handlebar_content_description">Luk menuen tilpasset fanebladsmenu</string>
+  <!-- URL bar indicator shown on a cached version of the website, when the tab is reloading, but the content is not live yet -->
+  <string name="browser_toolbar_cached_page_indicator">Cached</string>
+  <!-- Message shown when a cached website has finished reloading and the tab is now showing the live version of the page -->
+  <string name="browser_toolbar_live_page_toast">Aktuelle side</string>
   <!-- Browser menu label that bookmarks the currently visited page -->
   <string name="browser_menu_bookmark_this_page_2">Bogmærk side</string>
   <!-- Browser menu label that navigates to the edit bookmark screen for the current bookmarked page -->
@@ -295,8 +291,12 @@
   <string name="browser_menu_summarize_page">Sammenfat side</string>
   <!-- Browser menu badge text for summarization feature -->
   <string name="browser_menu_summarize_page_badge">Ny</string>
+  <!-- Browser menu badge text for new, highlighted feature -->
+  <string name="browser_menu_page_badge_text">Ny</string>
   <!-- Browser menu label for navigating to the Web Compat Reporter feature, which provides users the ability to send bug reports for broken sites. -->
   <string name="browser_menu_webcompat_reporter_2">Rapporter problem med websted</string>
+  <!-- Browser menu label for adding a tab to a tab group -->
+  <string name="browser_menu_add_to_tab_group">Føj til gruppe</string>
   <!-- Browser menu label that is displayed when the current page has been translated by the translation feature. -->
   <string name="browser_menu_translated">Oversat</string>
   <!-- Browser menu label for the print feature -->
@@ -313,8 +313,6 @@
   <string name="browser_menu_default_banner_title">Gør %1$s til din standard-browser</string>
   <!-- Label text within the set as default banner -->
   <string name="browser_menu_default_banner_subtitle_2">Hurtigt, privat og lavet til dig.</string>
-  <!-- Content description (not visible, for screen readers etc.) for the button that dismisses the set as default banner in the menu -->
-  <string name="browser_menu_default_banner_dismiss_promotion">Afvis promovering</string>
   <!-- Content description (not visible, for screen readers etc.) for recommended extensions in main menu -->
   <string name="browser_menu_recommended_extensions_content_description">Mere information</string>
   <!--
@@ -709,6 +707,14 @@
   <string name="search_widget_text_long">Søg på nettet</string>
   <!-- Content description (not visible, for screen readers etc.): Voice search -->
   <string name="search_widget_voice">Stemme-søgning</string>
+  <!-- Content description (not visible, for screen readers etc.): Button in the search widget that starts a search in a private tab -->
+  <string name="search_widget_private_search">Privat søgning</string>
+  <!-- Widget description in the widget picker screen for the search bar widget that includes buttons for private search and for voice search -->
+  <string name="search_bar_widget_description">Søgefelt med privat søgning og stemme-søgning</string>
+  <!-- Widget description in the widget picker screen for the search bar widget that includes buttons for image search, private search and voice search -->
+  <string name="search_bar_with_lens_widget_description">Søgefelt med billedsøgning, privat søgning og stemme-søgning</string>
+  <!-- Widget description in the widget picker screen for the compact search bar widget -->
+  <string name="compact_search_bar_widget_description">Kompakt søgefelt</string>
   <!--
     Preferences
 
@@ -806,6 +812,8 @@
   <string name="preferences_override_sync_tokenserver">Selvvalgt synkroniseringsserver</string>
   <!-- Preference category for account information -->
   <string name="preferences_category_account">Konto</string>
+  <!-- Preference category for sync controls. Sync can be translated, it's just short for ”Synchronization” in English. -->
+  <string name="preferences_category_sync_controls">Synkronisering</string>
   <!-- Preference for changing where the AddressBar is positioned -->
   <string name="preferences_toolbar_2">Adresselinjens placering</string>
   <!-- Preference for changing toolbar layout -->
@@ -862,6 +870,8 @@
   <string name="preferences_search_synced_tabs">Søg i synkroniserede faneblade</string>
   <!-- Preference for account settings -->
   <string name="preferences_account_settings">Kontoindstillinger</string>
+  <!-- Preference for account and sync settings -->
+  <string name="preferences_account_and_sync_settings">Konto og synkronisering</string>
   <!-- Preference for enabling url autocomplete -->
   <string name="preferences_enable_autocomplete_urls">Autofuldfør adresser</string>
   <!-- Preference title for switch preference to show sponsored Firefox Suggest search suggestions -->
@@ -909,6 +919,8 @@
   <string name="preference_downloads_folder_permission_lost" tools:ignore="UnusedResources">Du har ikke tilladelse til at bruge denne mappe. Prøv at vælge en anden.</string>
   <!-- Preference title for choosing an app to handle downloads -->
   <string name="preferences_choose_app_for_downloads">Håndter filhentninger med en anden app</string>
+  <!-- Message shown when no app is available to let the user pick a download folder. -->
+  <string name="preferences_downloads_no_folder_picker_available">Kan ikke åbne mappevælgeren på denne enhed.</string>
   <!-- Preference category for deleting or removing downloads -->
   <string name="preferences_category_delete_or_remove_downloads">Slet eller fjern filhentninger</string>
   <string name="preferences_downloads_delete_from_device">Slet fra enhed</string>
@@ -982,8 +994,8 @@
     Title for the customize home screen section with privacy report.
   -->
   <string name="customize_toggle_privacy_report">Privatlivsrapport</string>
-  <!-- Header text for jumping back into the recent tab in customize the home screen -->
-  <string name="customize_toggle_jump_back_in">Hop tilbage til</string>
+  <!-- Title for a customize home screen section. Continue is a section that displays the most recent browser tab, so users can continue browsing where they left off. -->
+  <string name="customize_toggle_continue">Fortsæt</string>
   <!-- Title for the customize home screen section with bookmarks. -->
   <string name="customize_toggle_bookmarks">Bogmærker</string>
   <!--
@@ -1139,6 +1151,12 @@
   <string name="preferences_sync_now">Synkroniser nu</string>
   <!-- Preference category for sync -->
   <string name="preferences_sync_category">Vælg, hvad der skal synkroniseres</string>
+  <!-- Preference category for sync controls -->
+  <string name="preferences_category_sync">Synkroniserede data</string>
+  <!-- Summary for the sync preference category. -->
+  <string name="preferences_sync_category_summary">Håndter, hvad som skal synkroniseres til dine tilknyttede enheder</string>
+  <!-- Summary for the sync preference category, when user has disabled all synchronisation items. -->
+  <string name="preferences_sync_category_no_engine_selected_summary">Du synkroniserer ikke noget. Vælg, hvad der skal synkroniseres på tværs af dine enheder.</string>
   <!-- Preference for syncing history -->
   <string name="preferences_sync_history">Historik</string>
   <!-- Preference for syncing bookmarks -->
@@ -1151,6 +1169,10 @@
   <string name="preferences_sign_out">Log ud</string>
   <!-- Preference displays and allows changing current FxA device name -->
   <string name="preferences_sync_device_name">Enhedsnavn</string>
+  <!-- Preference category for Device name -->
+  <string name="preferences_device_name_category">Enhedens navn</string>
+  <!-- Label for the Preference that displays and allows changing current device name on Mozilla Account -->
+  <string name="preferences_sync_change_device_name">Skift enhedsnavn</string>
   <!-- Text shown when user enters empty device name -->
   <string name="empty_device_name_error">Enhedsnavnet kan ikke være tomt.</string>
   <!-- Label indicating that sync is in progress -->
@@ -1270,8 +1292,6 @@
   <string name="preference_simple_toolbar">Enkel</string>
   <!-- Preference for using expanded toolbar -->
   <string name="preference_expanded_toolbar">Udvidet</string>
-  <!-- Preference description indicating the toolbar location preference is disabled when the tab strip is enabled -->
-  <string name="preference_toolbar_pref_disabled_explanation">Adresselinjen skal være øverst, når fanebladslinjen vises.</string>
   <!-- New tab shortcut in toolbar customization -->
   <string name="toolbar_customize_shortcut_new_tab">Åbn et nyt faneblad</string>
   <!-- Share shortcut in toolbar customization -->
@@ -1315,6 +1335,12 @@
     Preferences for showing tab strip
   -->
   <string name="preference_tab_strip_show">Vis fanebladslinje</string>
+  <!-- Preference for tab bar placement (top or bottom of the screen) -->
+  <string name="preference_tab_strip_location_header">Placering af fanebladslinjen</string>
+  <!-- Preference for using top tab strip -->
+  <string name="preference_top_tab_strip">Top</string>
+  <!-- Preference for using bottom tab strip -->
+  <string name="preference_bottom_tab_strip">Bund</string>
   <!--
     Gestures Preferences
 
@@ -1347,6 +1373,8 @@
   <string name="library_desktop_bookmarks_unfiled">Andre bogmærker</string>
   <!-- Option in Library to open History page -->
   <string name="library_history">Historik</string>
+  <!-- Content description (not visible, for screen readers etc.) for the check mark that replaces a site's icon in History and Recently closed tabs when the item is selected -->
+  <string name="library_item_selected_content_description">Valgt</string>
   <!-- Settings Page Title -->
   <string name="settings_title">Indstillinger</string>
   <!-- Content description (not visible, for screen readers etc.): "Close button for library settings" -->
@@ -1397,8 +1425,8 @@
     Title of preference for tabs management
   -->
   <string name="preferences_tabs">Faneblade</string>
-  <!-- Title of preference that allows a user to specify the tab view -->
-  <string name="preferences_tab_view">Fanebladsvisning</string>
+  <!-- Title of preference that allows a user to specify the tab layout -->
+  <string name="preferences_tab_layout">Fanebladslayout</string>
   <!-- Option for a list tab view -->
   <string name="tab_view_list">Liste</string>
   <!-- Option for a grid tab view -->
@@ -1417,6 +1445,8 @@
   <string name="preference_auto_close_tabs" tools:ignore="UnusedResources">Luk automatisk åbne faneblade</string>
   <!-- Content description (not visible, for screen readers etc.): Close tab button -->
   <string name="tab_manager_close_tabs">Luk</string>
+  <!-- Content description for the media playback indicator in the tabs tray. -->
+  <string name="tab_indicator_media_playing">Afspiller medieindhold</string>
   <!--
     Opening screen
 
@@ -1444,15 +1474,19 @@
   <!-- Summary for homepage preference indicating opening the homepage when re-opening the app after four hours of inactivity -->
   <string name="opening_screen_after_four_hours_of_inactivity_summary">Åbn på startside efter fire timers inaktivitet</string>
   <!--
-    Inactive tabs
+    Tab organization
 
-    Category header of a preference that allows a user to enable or disable the inactive tabs feature
+    Category header for the preferences that control how tabs are organized
   -->
-  <string name="preferences_inactive_tabs">Flyt gamle faneblade til afsnittet Inaktive faneblade</string>
-  <!-- Title of inactive tabs preference -->
+  <string name="preferences_tab_organization">Fanebladsorganisering</string>
+  <!-- Title of the preference that allows a user to enable or disable the inactive tabs feature -->
+  <string name="preferences_inactive_tabs_toggle_title">Inaktive faneblade</string>
+  <!-- Summary of the preference that allows a user to enable or disable the inactive tabs feature. -->
   <string name="preferences_inactive_tabs_title">Faneblade, du ikke har set i to uger, flyttes til afsnittet Inaktive faneblade.</string>
-  <!-- Title for the preference to enable or disable the tab groups feature -->
-  <string name="preferences_tab_groups_feature">Aktiver fanebladsgrupper</string>
+  <!-- Title of the preference that allows a user to enable or disable the tab groups feature -->
+  <string name="preferences_tab_groups_title">Fanebladsgrupper</string>
+  <!-- Summary of the preference that allows a user to enable or disable the tab groups feature -->
+  <string name="preferences_tab_groups_description">Organisere dine faneblade i grupper, du kan navngive og gemme.</string>
   <!--
     Privacy report
 
@@ -1668,6 +1702,11 @@
   <string name="close_tab_and_delete_group_confirmation_dialog_cancel">Annuller</string>
   <!-- Content description for the three dot button next to a tab group" -->
   <string name="tab_group_three_dot_button_content_description">Flere indstillinger</string>
+  <!--
+    Content description for the Expand button on the contracted menu for a tab group:
+    when tapped, tabs are displayed in an expanded grid or list view, taking up the full screen.
+  -->
+  <string name="tab_groups_strip_expand_group_content_description">Udvid for at vise faneblade i fuld skærm</string>
   <!-- Text shown on the edit button for a tab group on the three dot menu -->
   <string name="tab_group_three_dot_menu_edit">Rediger</string>
   <!-- Text shown on the ungroup button for a tab group on the three dot menu -->
@@ -1735,16 +1774,6 @@
     %1$d is the number of bookmarks selected
   -->
   <string name="history_multi_select_title">%1$d valgt</string>
-  <!-- Text for the header that groups the history for today -->
-  <string name="history_today">I dag</string>
-  <!-- Text for the header that groups the history for yesterday -->
-  <string name="history_yesterday">I går</string>
-  <!-- Text for the header that groups the history the past 7 days -->
-  <string name="history_7_days">De seneste 7 dage</string>
-  <!-- Text for the header that groups the history the past 30 days -->
-  <string name="history_30_days">De seneste 30 dage</string>
-  <!-- Text for the header that groups the history older than the last month -->
-  <string name="history_older">Ældre</string>
   <!-- Text shown when no history exists -->
   <string name="history_empty_message">Ingen historik</string>
   <!--
@@ -2373,12 +2402,12 @@
   <string name="sync_sign_in">Log ind på Sync</string>
   <!-- An option from the share dialog to send link to all other sync devices -->
   <string name="sync_send_to_all">Send til alle enheder</string>
-  <!-- Text displayed when no other sync devices are available for link sharing -->
-  <string name="sync_no_devices_available">Ingen tilgængelige enheder</string>
-  <!-- Text displayed when no other sync devices are available for link sharing. -->
-  <string name="sync_no_devices_available_description">Alle enheder, der er logget ind og synkroniserer med denne konto, vises her.</string>
   <!-- An option from the share dialog to reconnect to sync -->
   <string name="sync_reconnect">Genopret forbindelse til Sync</string>
+  <!-- Label for the button in the share dialog that sends the tab to the selected sync devices -->
+  <string name="sync_send_to_selected_devices">Send</string>
+  <!-- Content description announced when a device is selected in the share dialog -->
+  <string name="send_to_devices_device_selected_content_description">Valgt</string>
   <!-- Text displayed when sync is offline and cannot be accessed -->
   <string name="sync_offline">Offline</string>
   <!-- An option to connect additional devices -->
@@ -2401,6 +2430,24 @@
   <string name="sent_from_firefox_template" tools:ignore="UnusedResources">%1$s\n\nSendt fra %2$s 🦊 prøv den mobile browser: %3$s</string>
   <!-- A short message template for the shared link with a footer. %1$s is the shared link, %2$s is the app name (e.g. Firefox) and %3$s is a download link for the app. -->
   <string name="sent_from_firefox_template_short" tools:ignore="UnusedResources">%1$s\n\nSendt fra %2$s 🦊 %3$s</string>
+  <!-- Send tab to synced devices: Authentication error title - Message asking the user to re-authenticate -->
+  <string name="sync_send_tab_error_auth_title">Log ind igen for at sende faneblade mellem enheder</string>
+  <!-- Send tab to synced devices: Authentication error button - Allows user to re-authenticate -->
+  <string name="sync_send_tab_error_auth_button">Log ind</string>
+  <!-- Send tab to synced devices: Authentication error button - Allows user to remove the currently connected account -->
+  <string name="sync_send_tab_error_auth_remove_account">Fjern konto</string>
+  <!-- Send tab to synced devices: Empty state title - Displayed when the user has no synced devices -->
+  <string name="sync_send_tab_empty_state_title">Ingen enheder forbundet</string>
+  <!-- Send tab to synced devices: Empty state message - Displayed when the user has no synced devices -->
+  <string name="sync_send_tab_empty_state_description" tools:ignore="BrandUsage">Log ind på Firefox på mindst én anden enhed for at sende et faneblad.</string>
+  <!-- Send tab to synced devices: Empty state link - Displayed when the user has no synced devices -->
+  <string name="sync_send_tab_empty_state_link">Læs hvordan du tilslutter en enhed</string>
+  <!-- Send tab to synced devices: Connectivity Error title -->
+  <string name="sync_send_tab_error_connection_title">Kontroller din internetforbindelse</string>
+  <!-- Send tab to synced devices: Connectivity Error message - Suggested user action after internet connection has been established -->
+  <string name="sync_send_tab_error_connection_text">Prøv derefter at sende din faneblade igen.</string>
+  <!-- Send tab to synced devices: Connectivity Error button - When tapped, refreshes the list of connected devices. -->
+  <string name="sync_send_tab_error_connection_button">Prøv igen</string>
   <!--
     Notifications
 
@@ -2422,6 +2469,18 @@
     The app name is in the text, due to limitations with localizing Nimbus experiments
   -->
   <string name="nimbus_notification_default_browser_text" tools:ignore="BrandUsage,UnusedResources">Gør Firefox til din standard-browser</string>
+  <!--
+    Privacy report notification
+
+    Name of the weekly privacy report notification channel. Displayed in the "App notifications" system settings for the app.
+  -->
+  <string name="notification_privacy_report_channel_name">Privatlivsrapport</string>
+  <!-- Description of the weekly privacy report notification channel. Displayed in the "App notifications" system settings for the app. %1$s is the app name (e.g. Firefox) -->
+  <string name="notification_privacy_report_channel_description">%1$s viser, hvor mange sporings-mekanismer der blev blokeret, mens du browsede.</string>
+  <!-- Body text for the weekly privacy report notification for when trackers have been blocked. %1$s is the app name (e.g. Firefox) -->
+  <string name="notification_privacy_report_body_has_trackers">Fortsæt med at browse. %1$s vil fortsætte med at blokere.</string>
+  <!-- Headline text of the weekly privacy report notification for when no trackers have been blocked. %1$s is the app name (e.g. Firefox) -->
+  <string name="notification_privacy_report_headline_no_trackers">%1$s blokerer sporings-mekanismer, mens du browser. Du kan se dem her.</string>
   <!--
     Survey
 
@@ -2571,6 +2630,12 @@
   <string name="sign_in_create_account_text" tools:ignore="BrandUsage"><![CDATA[Ingen konto? <u>Opret en</u> for at synkronisere Firefox mellem enheder.]]></string>
   <!-- Text shown in confirmation dialog to sign out of account. %s is the name of the app (for example "Firefox"). -->
   <string name="sign_out_confirmation_message_2">%s vil ikke længere synkronisere med din konto, men sletter ikke dine data på denne enhed.</string>
+  <!-- Title of the confirmation dialog shown when the user signs out of their account -->
+  <string name="sign_out_dialog_title">Log ud af din konto?</string>
+  <!-- Body of the confirmation dialog shown when the user signs out of their account -->
+  <string name="sign_out_dialog_message">Synkroniserede data forbliver gemt på din konto.</string>
+  <!-- Text for the primary action button of the confirmation dialog shown when the user signs out of their account -->
+  <string name="sign_out_dialog_confirm_button">Log ud</string>
   <!-- Option to continue signing out of account shown in confirmation dialog to sign out of account -->
   <string name="sign_out_disconnect">Afbryd forbindelse</string>
   <!-- Option to cancel signing out shown in confirmation dialog to sign out of account -->
@@ -2990,14 +3055,14 @@
   <!-- Label for the BETA badge for the browser VPN entry in the settings list -->
   <string name="preferences_ip_protection_beta_badge_label">BETA</string>
   <!-- Title for the browser VPN settings screen (displayed in the app bar) -->
-  <string name="ip_protection_title">VPN</string>
+  <string name="ip_protection_settings_title">Indbygget VPN</string>
   <!-- Label for the browser VPN toggle on the settings screen -->
   <string name="ip_protection_toggle_label">VPN</string>
   <!-- Content description for the browser VPN settings screen top bar back button -->
   <string name="ip_protection_navigate_back_button_content_description">Gå tilbage</string>
   <!-- Headline for the browser VPN promo card. %s is the name of the app (for example "Firefox"). -->
   <string name="ip_protection_promo_headline">Den indbyggede VPN i %s</string>
-  <!-- Body text for the browser VPN promo card . %s is a learn more link using ip_protection_learn_more as text. -->
+  <!-- Body text for the browser VPN settings header, shown when no promo is running. %s is a learn more link using ip_protection_learn_more as text. -->
   <string name="ip_protection_promo_body_2">Brug nettet med yderligere beskyttelse ved at skjule din placering, selv når du er på et offentligt wi-fi. %s</string>
   <!-- Link text that opens additional information about the browser VPN -->
   <string name="ip_protection_learn_more">Lær mere</string>
@@ -3028,8 +3093,8 @@
   <string name="ip_protection_menu_paused">Sat på pause</string>
   <!-- Badge label shown in the menu item when the browser VPN has an error -->
   <string name="ip_protection_menu_error">Fejl</string>
-  <!-- Badge label shown in the menu item when the user is eligible to use the browser VPN but should authenticate or authorize it first. -->
-  <string name="ip_protection_menu_auth_required">Prøv den</string>
+  <!-- Badge label shown in the VPN menu item when the user is eligible for the feature but needs to authenticate / authorize to enable it -->
+  <string name="ip_protection_menu_try_vpn_cta">Prøv den gratis</string>
   <!-- Content description for the chevron button that opens the browser VPN settings screen -->
   <string name="ip_protection_navigate_settings">Åbn VPN-indstillinger</string>
   <!--
@@ -3076,13 +3141,15 @@
   <string name="ip_protection_onboarding_not_now_button">Ikke nu</string>
   <!-- Snackbar (in-app pop-up notification) text to signal the browser VPN connection error -->
   <string name="ip_protection_connection_error_snackbar">Kunne ikke oprette forbindelse til VPN. Prøv igen om et par minutter.</string>
+  <!-- Snackbar (in-app pop-up notification) text to signal the VPN location has been reset due to the previously selected VPN location being no longer available. -->
+  <string name="ip_protection_location_selection_reset_snackbar">Den valgte VPN-placering er ikke tilgængelig. Skiftede til den anbefalede placering.</string>
   <!--
     Snackbar (in-app pop-up notification) text to signal the browser VPN has reached the monthly data limit.
     %1$d is the total monthly allowance in GB (for example "50").
   -->
   <string name="ip_protection_data_limit_reached_snackbar">%1$d GB \u0020VPN-data brugt. Mængden af tilgængelig data nulstilles næste måned.</string>
   <!-- Snackbar (in-app pop-up notification) action button text that takes the user to the VPN settings screen. -->
-  <string name="ip_protection_data_limit_reached_snackbar_action">Indstillinger</string>
+  <string name="ip_protection_open_settings_snackbar_action">Indstillinger</string>
   <!-- Description shown on the browser VPN settings screen prompting the user to turn the VPN on. -->
   <string name="ip_protection_settings_description" tools:ignore="UnusedResources">Slå VPN til for at gøre din browsing mere privat og sværere at spore.</string>
   <!-- Title shown on the browser VPN settings screen for location selection section. -->
@@ -4456,6 +4523,16 @@
   <string name="lens_camera_mode_qr">QR-skanner</string>
   <!-- Toast shown when the user picks an image from the gallery in QR mode but no QR code is found in it -->
   <string name="lens_camera_qr_no_code_found">Ingen QR-kode fundet på billedet</string>
+  <!-- Status shown under an image picked from the gallery while it is being sent to Google Lens for a visual search -->
+  <string name="lens_camera_loading_status">Søger efter dette</string>
+  <!-- Button shown under an image picked from the gallery while it is being sent to Google Lens. Tapping it stops the search and returns to the camera. -->
+  <string name="lens_camera_loading_cancel_button">Annuller</string>
+  <!-- Snackbar message shown when an image picked from the gallery could not be opened or read, so it was never sent to Google Lens. Shown after returning to the camera. -->
+  <string name="lens_camera_image_load_failed">Kunne ikke indlæse dette billede. Prøv et andet.</string>
+  <!-- Snackbar message shown when an image picked from the gallery could not be searched because of a network problem or an error from Google Lens. Shown after returning to the camera, next to the lens_camera_upload_failed_retry_button action. -->
+  <string name="lens_camera_upload_failed">Kunne ikke hente resultater fra Google Lens</string>
+  <!-- Action in the snackbar shown when an image picked from the gallery could not be searched with Google Lens. Tapping it searches the same image again. -->
+  <string name="lens_camera_upload_failed_retry_button">Prøv igen</string>
   <!-- Title of the bottom sheet shown the first time the user opens the Google Lens camera screen -->
   <string name="lens_opt_out_title">Find det med Google Lens</string>
   <!-- Description of the bottom sheet shown the first time the user opens the Google Lens camera screen -->
@@ -4522,4 +4599,28 @@
   <string name="pdf_tools_print_content_description">Udskriv PDF-fil</string>
   <!-- Content description for accessibility (used by screen readers): Description for the button that opens the sharing options for the PDF being displayed on the screen. -->
   <string name="pdf_tools_share_content_description">Del PDF-fil</string>
+  <!--
+    PDF viewer add a signature dialog
+
+    The title of the dialog for adding a signature to a PDF.
+  -->
+  <string name="pdf_tools_signature_title">Tilføj en signatur</string>
+  <!-- Content description for accessibility (used by screen readers): Description for the button that closes the dialog for adding a signature to a PDF. -->
+  <string name="pdf_tools_signature_close_content_description">Luk PDF-signaturpanelet</string>
+  <!-- The placeholder text shown in the empty text input field where users can enter the signature they wish to add to a PDF. -->
+  <string name="pdf_tools_signature_placeholder">Skriv signatur</string>
+  <!-- The text for the button that erases the text the user entered in the "add a signature" field. -->
+  <string name="pdf_tools_signature_clear_button">Ryd</string>
+  <!-- The text for the button that adds the signature the user has typed to the PDF. -->
+  <string name="pdf_tools_signature_add_button">Tilføj</string>
+  <!--
+    Listen to page
+
+    Content description for the reader mode panel: a group of buttons floating over the content
+  -->
+  <string name="reader_mode_panel_content_description">Indstillinger for læsetilstand</string>
+  <!-- Content description for the button in reader mode panel that turns on the read aloud feature (playback of content begins when button is pressed) -->
+  <string name="reader_mode_panel_listen_content_description">Læs højt</string>
+  <!-- Content description for media player displayed in Reader Mode when the Listen to Page (Read Aloud) feature is selected -->
+  <string name="reader_mode_panel_media_player_content_description">Medieafspiller</string>
 </resources>

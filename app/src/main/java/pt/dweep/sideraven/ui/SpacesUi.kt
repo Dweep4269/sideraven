@@ -7,10 +7,15 @@ package pt.dweep.sideraven.ui
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
@@ -63,6 +68,7 @@ import androidx.compose.foundation.layout.heightIn
 import pt.dweep.sideraven.ZenIcons
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
@@ -82,7 +88,18 @@ import mozilla.components.ui.icons.R as iconsR
 internal val SpaceEmojiPresets =
     listOf("📁", "🏠", "💼", "📚", "🎮", "🎵", "🛒", "✈️", "💡", "🧪", "🎨", "📰", "💬", "🏃", "🍳", "💰", "🌱")
 
-/** The Space icon row in Sidebar Controls: tap to switch, + to create. */
+/** The Space Header's fold state and control, when the Sidebar shows Spaces as a header. */
+internal data class SpaceHeaderFold(
+    val folded: Boolean,
+    val canFold: Boolean,
+    val onToggle: () -> Unit,
+)
+
+/**
+ * The Spaces above their Pinned Tabs: the 1.2 icon row (tap to switch, + to create), or, with
+ * [header], the Space Header — the current Space's name in one row, the fold control in it, and a
+ * sideways swipe between Spaces.
+ */
 @Composable
 internal fun SpaceRow(
     spaces: List<SidebarSpace>,
@@ -91,11 +108,15 @@ internal fun SpaceRow(
     zenSyncOn: Boolean = false,
     dropTarget: String? = null,
     onIconBounds: (spaceId: String, bounds: androidx.compose.ui.geometry.Rect) -> Unit = { _, _ -> },
+    header: SpaceHeaderFold? = null,
+    modifier: Modifier = Modifier,
 ) {
     var creating by rememberSaveable { mutableStateOf(false) }
     var editing by rememberSaveable { mutableStateOf<String?>(null) }
     var confirmingDelete by rememberSaveable { mutableStateOf<String?>(null) }
     var creatingFolder by rememberSaveable { mutableStateOf(false) }
+    var menuOpen by remember { mutableStateOf(false) }
+    var listOpen by remember { mutableStateOf(false) }
     // Deleting a Space that has Pinned Tabs asks first; otherwise Undo is enough.
     // A synced Space's delete reaches other devices, so it always asks while Zen Sync is on.
     val requestDelete: (SidebarSpace) -> Unit = { space ->
@@ -107,174 +128,213 @@ internal fun SpaceRow(
     val moveLaterLabel = stringResource(R.string.sideraven_move_later)
     val deleteLabel = stringResource(R.string.sideraven_space_delete)
     val unloadAllLabel = stringResource(R.string.sideraven_unload_all)
-    val itemWidthPx = with(LocalDensity.current) { (SPACE_ITEM_SIZE + SPACE_ITEM_GAP).toPx() }
-    val touchSlop = LocalViewConfiguration.current.touchSlop
-    val haptics = LocalHapticFeedback.current
-    val home = rememberSpringHome()
-    val currentOnIntent by rememberUpdatedState(onIntent)
-    Row(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .horizontalScroll(rememberScrollState())
-                .padding(horizontal = 8.dp, vertical = 4.dp)
-                .testTag(SidebarTestTag.SPACE_ROW),
-        horizontalArrangement = Arrangement.spacedBy(SPACE_ITEM_GAP),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        spaces.forEachIndexed { index, space ->
-            key(space.id) {
-            var menuOpen by remember { mutableStateOf(false) }
-            var dragX by remember { mutableStateOf(0f) }
-            var dragging by remember { mutableStateOf(false) }
+    val newSpaceLabel = stringResource(R.string.sideraven_new_space)
+    val currentSpace = spaces.firstOrNull { it.isCurrent }
+
+    if (header != null && currentSpace != null) {
+        SpaceHeader(
+            spaces = spaces,
+            fold = header,
+            dropTarget = dropTarget,
+            onIconBounds = onIconBounds,
+            syncProblem = syncProblem,
+            menuOpen = menuOpen,
+            listOpen = listOpen,
+            onOpenList = { listOpen = true },
+            onOpenMenu = { menuOpen = true },
+            onCloseMenu = { menuOpen = false },
+            onCloseList = { listOpen = false },
+            // The menus live in the Header's icon Box, so each one grows out of the icon itself,
+            // like the icon row's menu does.
+            menuItems = {
+                SpaceMenuItems(
+                    space = currentSpace,
+                    canDelete = spaces.size > 1,
+                    onDismiss = { menuOpen = false },
+                    onEdit = { editing = currentSpace.id },
+                    onNewFolder = { creatingFolder = true },
+                    onUnload = { onIntent(SidebarIntent.UnloadSpace(currentSpace.id)) },
+                    onCloseUnpinned = { onIntent(SidebarIntent.CloseUnpinnedTabs(currentSpace.id)) },
+                    onDelete = { requestDelete(currentSpace) },
+                )
+            },
+            listItems = {
+                spaces.forEach { space ->
+                    DropdownMenuItem(
+                        leadingIcon = { SpaceIcon(space.icon, size = 20.dp) },
+                        text = {
+                            Text(
+                                text = space.name,
+                                color = if (space.isCurrent) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+                            )
+                        },
+                        trailingIcon =
+                            if (space.isCurrent) {
+                                {
+                                    Icon(
+                                        painter = painterResource(iconsR.drawable.mozac_ic_checkmark_24),
+                                        contentDescription = currentLabel,
+                                        modifier = Modifier.size(18.dp),
+                                    )
+                                }
+                            } else {
+                                null
+                            },
+                        onClick = {
+                            listOpen = false
+                            if (!space.isCurrent) onIntent(SidebarIntent.SwitchSpace(space.id))
+                        },
+                    )
+                }
+                DropdownMenuItem(
+                    leadingIcon = { Icon(painterResource(iconsR.drawable.mozac_ic_plus_24), contentDescription = null) },
+                    text = { Text(newSpaceLabel) },
+                    onClick = {
+                        listOpen = false
+                        creating = true
+                    },
+                )
+            },
+            onIntent = onIntent,
+            modifier = modifier,
+        )
+    } else {
+        val itemWidthPx = with(LocalDensity.current) { (SPACE_ITEM_SIZE + SPACE_ITEM_GAP).toPx() }
+        val touchSlop = LocalViewConfiguration.current.touchSlop
+        val haptics = LocalHapticFeedback.current
+        val home = rememberSpringHome()
+        val currentOnIntent by rememberUpdatedState(onIntent)
+        Row(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .horizontalScroll(rememberScrollState())
+                    .padding(horizontal = 8.dp, vertical = 4.dp)
+                    .testTag(SidebarTestTag.SPACE_ROW),
+            horizontalArrangement = Arrangement.spacedBy(SPACE_ITEM_GAP),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            spaces.forEachIndexed { index, space ->
+                key(space.id) {
+                    var itemMenuOpen by remember { mutableStateOf(false) }
+                    var dragX by remember { mutableStateOf(0f) }
+                    var dragging by remember { mutableStateOf(false) }
+                    Box(
+                        modifier =
+                            Modifier
+                                .zIndex(if (dragging) 1f else 0f)
+                                .graphicsLayer { translationX = dragX }
+                                // Long-press then drag reorders; long-press and release opens the menu.
+                                .pointerInput(space.id, index, spaces.size) {
+                                    var moved = false
+                                    detectDragGesturesAfterLongPress(
+                                        onDragStart = {
+                                            moved = false
+                                            home.stop()
+                                            dragging = true
+                                            dragX = 0f
+                                            haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                                        },
+                                        onDrag = { change, amount ->
+                                            change.consume()
+                                            dragX += amount.x
+                                            if (kotlin.math.abs(dragX) > touchSlop) moved = true
+                                        },
+                                        onDragEnd = {
+                                            val target = (index + (dragX / itemWidthPx).roundToInt()).coerceIn(0, spaces.size - 1)
+                                            if (!moved) {
+                                                itemMenuOpen = true
+                                            } else if (target != index) {
+                                                currentOnIntent(SidebarIntent.MoveSpace(space.id, target))
+                                            }
+                                            dragging = false
+                                            // Moved: it is already in its new place; put back: it settles home.
+                                            if (moved && target != index) dragX = 0f else home.axis(dragX) { dragX = it }
+                                        },
+                                        onDragCancel = {
+                                            if (!moved) itemMenuOpen = true
+                                            dragging = false
+                                            home.axis(dragX) { dragX = it }
+                                        },
+                                    )
+                                }
+                                .size(SPACE_ITEM_SIZE)
+                                .onGloballyPositioned { onIconBounds(space.id, it.boundsInRoot()) }
+                                .clip(CircleShape)
+                                .clickable(role = Role.Tab) { if (!dragging) onIntent(SidebarIntent.SwitchSpace(space.id)) }
+                                .semantics {
+                                    contentDescription = space.name
+                                    selected = space.isCurrent
+                                    if (space.isCurrent) stateDescription = currentLabel
+                                    customActions =
+                                        buildList {
+                                            add(CustomAccessibilityAction(editLabel) { editing = space.id; true })
+                                            if (spaces.size > 1) {
+                                                add(CustomAccessibilityAction(deleteLabel) { requestDelete(space); true })
+                                            }
+                                            // TalkBack's way to reorder (dragging is the touch way).
+                                            if (index > 0) add(CustomAccessibilityAction(moveEarlierLabel) { onIntent(SidebarIntent.MoveSpace(space.id, index - 1)); true })
+                                            if (index < spaces.lastIndex) add(CustomAccessibilityAction(moveLaterLabel) { onIntent(SidebarIntent.MoveSpace(space.id, index + 1)); true })
+                                        }
+                                },
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        DropdownMenu(
+                            expanded = itemMenuOpen,
+                            onDismissRequest = { itemMenuOpen = false },
+                            modifier = Modifier.testTag(SidebarTestTag.SPACE_MENU),
+                        ) {
+                            SpaceMenuItems(
+                                space = space,
+                                canDelete = spaces.size > 1,
+                                onDismiss = { itemMenuOpen = false },
+                                onEdit = { editing = space.id },
+                                onNewFolder = { creatingFolder = true },
+                                onUnload = { onIntent(SidebarIntent.UnloadSpace(space.id)) },
+                                onCloseUnpinned = { onIntent(SidebarIntent.CloseUnpinnedTabs(space.id)) },
+                                onDelete = { requestDelete(space) },
+                            )
+                        }
+                        Box(
+                            modifier =
+                                Modifier
+                                    .size(34.dp)
+                                    .clip(CircleShape)
+                                    .then(
+                                        // A tab dragged over a Space icon highlights it as the drop target.
+                                        if (space.isCurrent || space.id == dropTarget) {
+                                            Modifier
+                                                .background(MaterialTheme.colorScheme.surfaceContainerHighest)
+                                                .border(2.dp, MaterialTheme.colorScheme.primary, CircleShape)
+                                        } else {
+                                            Modifier
+                                        },
+                                    ),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            SpaceIcon(space.icon, size = 18.dp)
+                        }
+                    }
+                }
+            }
+            if (syncProblem) SyncProblemDot()
             Box(
                 modifier =
                     Modifier
-                        .zIndex(if (dragging) 1f else 0f)
-                        .graphicsLayer { translationX = dragX }
-                        // Long-press then drag reorders; long-press and release opens the menu.
-                        .pointerInput(space.id, index, spaces.size) {
-                            var moved = false
-                            detectDragGesturesAfterLongPress(
-                                onDragStart = {
-                                    moved = false
-                                    home.stop()
-                                    dragging = true
-                                    dragX = 0f
-                                    haptics.performHapticFeedback(HapticFeedbackType.LongPress)
-                                },
-                                onDrag = { change, amount ->
-                                    change.consume()
-                                    dragX += amount.x
-                                    if (kotlin.math.abs(dragX) > touchSlop) moved = true
-                                },
-                                onDragEnd = {
-                                    val target = (index + (dragX / itemWidthPx).roundToInt()).coerceIn(0, spaces.size - 1)
-                                    if (!moved) {
-                                        menuOpen = true
-                                    } else if (target != index) {
-                                        currentOnIntent(SidebarIntent.MoveSpace(space.id, target))
-                                    }
-                                    dragging = false
-                                    // Moved: it is already in its new place; put back: it settles home.
-                                    if (moved && target != index) dragX = 0f else home.axis(dragX) { dragX = it }
-                                },
-                                onDragCancel = {
-                                    if (!moved) menuOpen = true
-                                    dragging = false
-                                    home.axis(dragX) { dragX = it }
-                                },
-                            )
-                        }
-                        .size(SPACE_ITEM_SIZE)
-                        .onGloballyPositioned { onIconBounds(space.id, it.boundsInRoot()) }
+                        .size(44.dp)
                         .clip(CircleShape)
-                        .clickable(role = Role.Tab) { if (!dragging) onIntent(SidebarIntent.SwitchSpace(space.id)) }
-                        .semantics {
-                            contentDescription = space.name
-                            selected = space.isCurrent
-                            if (space.isCurrent) stateDescription = currentLabel
-                            customActions =
-                                buildList {
-                                    add(CustomAccessibilityAction(editLabel) { editing = space.id; true })
-                                    if (spaces.size > 1) {
-                                        add(CustomAccessibilityAction(deleteLabel) { requestDelete(space); true })
-                                    }
-                                    // TalkBack's way to reorder (dragging is the touch way).
-                                    if (index > 0) add(CustomAccessibilityAction(moveEarlierLabel) { onIntent(SidebarIntent.MoveSpace(space.id, index - 1)); true })
-                                    if (index < spaces.lastIndex) add(CustomAccessibilityAction(moveLaterLabel) { onIntent(SidebarIntent.MoveSpace(space.id, index + 1)); true })
-                                }
-                        },
+                        .clickable(role = Role.Button) { creating = true }
+                        .semantics { contentDescription = newSpaceLabel }
+                        .testTag(SidebarTestTag.NEW_SPACE),
                 contentAlignment = Alignment.Center,
             ) {
-                DropdownMenu(
-                    expanded = menuOpen,
-                    onDismissRequest = { menuOpen = false },
-                    modifier = Modifier.testTag(SidebarTestTag.SPACE_MENU),
-                ) {
-                    // The Space's name, now that the Sidebar no longer shows it above the tabs.
-                    Text(
-                        text = space.name,
-                        style = MaterialTheme.typography.titleSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
-                    )
-                    DropdownMenuItem(
-                        text = { Text(editLabel) },
-                        onClick = {
-                            menuOpen = false
-                            editing = space.id
-                        },
-                    )
-                    if (space.isCurrent) {
-                        DropdownMenuItem(
-                            text = { Text(stringResource(R.string.sideraven_new_folder)) },
-                            onClick = {
-                                menuOpen = false
-                                creatingFolder = true
-                            },
-                        )
-                    }
-                    if (space.pinnedCount > 0) {
-                        DropdownMenuItem(
-                            text = { Text(unloadAllLabel) },
-                            onClick = {
-                                menuOpen = false
-                                onIntent(SidebarIntent.UnloadSpace(space.id))
-                            },
-                        )
-                    }
-                    DropdownMenuItem(
-                        text = { Text(deleteLabel) },
-                        enabled = spaces.size > 1,
-                        onClick = {
-                            menuOpen = false
-                            requestDelete(space)
-                        },
-                    )
-                }
-                Box(
-                    modifier =
-                        Modifier
-                            .size(34.dp)
-                            .clip(CircleShape)
-                            .then(
-                                // A tab dragged over a Space icon highlights it as the drop target.
-                                if (space.isCurrent || space.id == dropTarget) {
-                                    Modifier
-                                        .background(MaterialTheme.colorScheme.surfaceContainerHighest)
-                                        .border(2.dp, MaterialTheme.colorScheme.primary, CircleShape)
-                                } else {
-                                    Modifier
-                                },
-                            ),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    SpaceIcon(space.icon, size = 18.dp)
-                }
+                Icon(
+                    painter = painterResource(iconsR.drawable.mozac_ic_plus_24),
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
             }
-            }
-        }
-        if (syncProblem) SyncProblemDot()
-        val newSpaceLabel = stringResource(R.string.sideraven_new_space)
-        Box(
-            modifier =
-                Modifier
-                    .size(44.dp)
-                    .clip(CircleShape)
-                    .clickable(role = Role.Button) { creating = true }
-                    .semantics { contentDescription = newSpaceLabel }
-                    .testTag(SidebarTestTag.NEW_SPACE),
-            contentAlignment = Alignment.Center,
-        ) {
-            Icon(
-                painter = painterResource(iconsR.drawable.mozac_ic_plus_24),
-                contentDescription = null,
-                modifier = Modifier.size(18.dp),
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
         }
     }
     if (creating) {
@@ -347,9 +407,233 @@ internal fun SpaceRow(
     }
 }
 
+/** A Space's menu: its name, then edit, new folder, unload, close unpinned and delete. */
+@Composable
+private fun SpaceMenuItems(
+    space: SidebarSpace,
+    canDelete: Boolean,
+    onDismiss: () -> Unit,
+    onEdit: () -> Unit,
+    onNewFolder: () -> Unit,
+    onUnload: () -> Unit,
+    onCloseUnpinned: () -> Unit,
+    onDelete: () -> Unit,
+) {
+    // The Space's name, now that the Sidebar no longer shows it above the tabs.
+    Text(
+        text = space.name,
+        style = MaterialTheme.typography.titleSmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+        modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+    )
+    DropdownMenuItem(
+        text = { Text(stringResource(R.string.sideraven_space_edit)) },
+        onClick = {
+            onDismiss()
+            onEdit()
+        },
+    )
+    if (space.isCurrent) {
+        DropdownMenuItem(
+            text = { Text(stringResource(R.string.sideraven_new_folder)) },
+            onClick = {
+                onDismiss()
+                onNewFolder()
+            },
+        )
+    }
+    DropdownMenuItem(
+        text = { Text(stringResource(R.string.sideraven_unload_all)) },
+        onClick = {
+            onDismiss()
+            onUnload()
+        },
+    )
+    if (space.unpinnedCount > 0) {
+        DropdownMenuItem(
+            text = { Text(stringResource(R.string.sideraven_close_unpinned)) },
+            onClick = {
+                onDismiss()
+                onCloseUnpinned()
+            },
+        )
+    }
+    DropdownMenuItem(
+        text = { Text(stringResource(R.string.sideraven_space_delete)) },
+        enabled = canDelete,
+        onClick = {
+            onDismiss()
+            onDelete()
+        },
+    )
+}
+
+/**
+ * The Space Header: the current Space's icon, name and fold control in one 40 dp row. Tap the icon
+ * for every Space (and a new one), long-press it for the Space's menu; tap the name to fold its
+ * Pinned Tabs; swipe sideways for the previous or next Space.
+ */
+@Composable
+private fun SpaceHeader(
+    spaces: List<SidebarSpace>,
+    fold: SpaceHeaderFold,
+    dropTarget: String?,
+    onIconBounds: (spaceId: String, bounds: androidx.compose.ui.geometry.Rect) -> Unit,
+    syncProblem: Boolean,
+    menuOpen: Boolean,
+    listOpen: Boolean,
+    onOpenList: () -> Unit,
+    onOpenMenu: () -> Unit,
+    onCloseMenu: () -> Unit,
+    onCloseList: () -> Unit,
+    menuItems: @Composable ColumnScope.() -> Unit,
+    listItems: @Composable ColumnScope.() -> Unit,
+    onIntent: (SidebarIntent) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val current = spaces.firstOrNull { it.isCurrent } ?: return
+    val colors = MaterialTheme.colorScheme
+    val haptics = LocalHapticFeedback.current
+    val threshold = with(LocalDensity.current) { SPACE_SWITCH_THRESHOLD.toPx() }
+    val currentSpaces by rememberUpdatedState(spaces)
+    val currentOnIntent by rememberUpdatedState(onIntent)
+    val foldLabel = stringResource(if (fold.folded) R.string.sideraven_unfold_pinned else R.string.sideraven_fold_pinned)
+    val previousLabel = stringResource(R.string.sideraven_previous_space)
+    val nextLabel = stringResource(R.string.sideraven_next_space)
+    val chevron by animateFloatAsState(if (fold.folded) 0f else 180f, label = "spaceHeaderChevron")
+    // A neighbouring Space: -1 the one before, +1 the one after (no wrapping).
+    fun neighbour(step: Int): SidebarSpace? {
+        val list = currentSpaces
+        val at = list.indexOfFirst { it.isCurrent }
+        return list.getOrNull(at + step)
+    }
+    Row(
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .height(SPACE_HEADER_HEIGHT)
+                .padding(horizontal = 8.dp)
+                .pointerInput(Unit) {
+                    var total = 0f
+                    detectHorizontalDragGestures(
+                        onDragStart = { total = 0f },
+                        onDragEnd = {
+                            if (kotlin.math.abs(total) > threshold) {
+                                // Swiping left brings the next Space in, as a page would.
+                                neighbour(if (total < 0) 1 else -1)?.let { space ->
+                                    haptics.performHapticFeedback(HapticFeedbackType.GestureThresholdActivate)
+                                    currentOnIntent(SidebarIntent.SwitchSpace(space.id))
+                                }
+                            }
+                        },
+                    ) { change, amount ->
+                        change.consume()
+                        total += amount
+                    }
+                }.semantics {
+                    customActions =
+                        listOfNotNull(
+                            neighbour(-1)?.let { space -> CustomAccessibilityAction(previousLabel) { onIntent(SidebarIntent.SwitchSpace(space.id)).let { true } } },
+                            neighbour(1)?.let { space -> CustomAccessibilityAction(nextLabel) { onIntent(SidebarIntent.SwitchSpace(space.id)).let { true } } },
+                        )
+                }.testTag(SidebarTestTag.SPACE_HEADER),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Box(
+            modifier =
+                Modifier
+                    .size(SPACE_HEADER_ICON)
+                    .clip(CircleShape)
+                    .onGloballyPositioned { onIconBounds(current.id, it.boundsInRoot()) }
+                    // Tap lists the Spaces; long-press is the Space's own menu, as in the icon row.
+                    .combinedClickable(role = Role.Button, onClick = onOpenList, onLongClick = onOpenMenu)
+                    .then(
+                        if (current.id == dropTarget) {
+                            Modifier.border(2.dp, colors.primary, CircleShape)
+                        } else {
+                            Modifier
+                        },
+                    )
+                    .semantics { contentDescription = current.name },
+            contentAlignment = Alignment.Center,
+        ) {
+            // Both menus hang off the icon, like the icon row's menu hangs off its icon.
+            DropdownMenu(
+                expanded = listOpen,
+                onDismissRequest = onCloseList,
+                modifier = Modifier.testTag(SidebarTestTag.SPACE_MENU),
+            ) {
+                listItems()
+            }
+            DropdownMenu(
+                expanded = menuOpen,
+                onDismissRequest = onCloseMenu,
+                modifier = Modifier.testTag(SidebarTestTag.SPACE_MENU),
+            ) {
+                menuItems()
+            }
+            SpaceIcon(current.icon, size = 20.dp)
+        }
+        Spacer(Modifier.width(8.dp))
+        Row(
+            modifier =
+                Modifier
+                    .weight(1f)
+                    .height(SPACE_HEADER_HEIGHT)
+                    .clip(MaterialTheme.shapes.small)
+                    .then(
+                        if (fold.canFold) {
+                            Modifier.clickable(role = Role.Button, onClickLabel = foldLabel) { fold.onToggle() }
+                        } else {
+                            Modifier
+                        },
+                    )
+                    .padding(horizontal = 4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Text(
+                text = current.name,
+                style = MaterialTheme.typography.titleSmall,
+                color = colors.onSurface,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f),
+            )
+            // Only the Divider under the pins says the count; the Header repeats itself otherwise.
+            if (fold.canFold) {
+                Spacer(Modifier.width(6.dp))
+                Icon(
+                    painter = painterResource(iconsR.drawable.mozac_ic_chevron_down_24),
+                    contentDescription = null,
+                    modifier = Modifier.size(16.dp).graphicsLayer { rotationZ = chevron },
+                    tint = colors.onSurfaceVariant,
+                )
+            }
+        }
+        if (syncProblem) SyncProblemDot()
+    }
+}
+
+/** Folded Pinned Tabs, drawn as a stack: two rules, the shorter under the longer. */
+@Composable
+private fun PinnedStackMark(color: androidx.compose.ui.graphics.Color) {
+    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+        Box(Modifier.size(width = 12.dp, height = 2.dp).clip(RoundedCornerShape(1.dp)).background(color))
+        Box(Modifier.size(width = 8.dp, height = 2.dp).clip(RoundedCornerShape(1.dp)).background(color))
+    }
+}
+
 /** A Space icon's touch target and the gap between icons. */
 private val SPACE_ITEM_SIZE = 44.dp
 private val SPACE_ITEM_GAP = 2.dp
+
+/** The Space Header: one row, its icon, and how far a sideways swipe must go to change Space. */
+private val SPACE_HEADER_HEIGHT = 40.dp
+private val SPACE_HEADER_ICON = 36.dp
+private val SPACE_SWITCH_THRESHOLD = 48.dp
 
 internal fun accentLabel(key: String): Int =
     when (key) {

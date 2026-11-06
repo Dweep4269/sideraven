@@ -16,19 +16,19 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import mozilla.components.compose.base.theme.Theme
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mozilla.fenix.R
 import org.mozilla.fenix.tabstray.TabsTrayTestTag
-import org.mozilla.fenix.tabstray.controller.NoOpTabInteractionHandler
+import org.mozilla.fenix.tabstray.controller.NoOpItemInteractionHandler
 import org.mozilla.fenix.tabstray.data.TabsTrayItem
 import org.mozilla.fenix.tabstray.data.createTab
 import org.mozilla.fenix.tabstray.redux.state.TabsTrayState
 import org.mozilla.fenix.tabstray.ui.tabpage.TabLayout
 import org.mozilla.fenix.theme.FirefoxTheme
-import org.mozilla.fenix.theme.Theme
 
 @RunWith(AndroidJUnit4::class)
 class TabGroupOnboardingItemTest {
@@ -202,7 +202,7 @@ class TabGroupOnboardingItemTest {
                         selectedItemIndex = 0,
                         selectionMode = TabsTrayState.Mode.Normal,
                         focusEnabled = true,
-                        tabInteractionHandler = NoOpTabInteractionHandler,
+                        itemInteractionHandler = NoOpItemInteractionHandler,
                         onTabClose = {},
                         onItemClick = {},
                         onItemLongClick = {},
@@ -210,6 +210,7 @@ class TabGroupOnboardingItemTest {
                         onCloseTabGroupClick = {},
                         onShareTabGroupClick = {},
                         onDeleteTabGroupClick = {},
+                        onUngroupTabGroupClick = {},
                         onTabGroupOnboardingDismiss = {},
                         liveReorderEnabled = false,
                     )

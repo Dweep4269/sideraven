@@ -18,6 +18,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.UiObject
 import androidx.test.uiautomator.UiObject2
+import org.mozilla.fenix.helpers.TestAssetHelper.waitingTimeShort
 
 /**
  * Do a thing to a located element, whatever backend it came from, so a verb names its action and nothing else. One copy
@@ -29,15 +30,16 @@ object UiActions {
     private val device: UiDevice
         get() = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
 
-    fun click(element: Any) {
-        // resolve() hands back the UiElement facade; mozGetElement hands back a raw backend node.
-        if (element is UiElement) return element.click()
+    fun click(element: UiElement) {
         dispatch(
             element,
             "click",
             espresso = { it.perform(ViewActions.click()) },
+            // A UiObject is resolved on one poll tick and acted on the next; on a screen still animating (e.g. the
+            // launcher settling a freshly-added home-screen shortcut) the node can flicker out in that gap, so bridge
+            // it with waitForExists rather than a single instantaneous exists() that throws on a transient miss.
             uiObject = {
-                if (!it.exists()) throw AssertionError("UiObject does not exist")
+                if (!it.waitForExists(waitingTimeShort)) throw AssertionError("UiObject does not exist")
                 if (!it.click()) throw AssertionError("Failed to click UiObject")
             },
             uiObject2 = { it.click() },
@@ -49,13 +51,13 @@ object UiActions {
         )
     }
 
-    fun longClick(element: Any, durationMillis: Long = 5_000) =
+    fun longClick(element: UiElement, durationMillis: Long = 5_000) =
         dispatch(
             element,
             "long click",
             espresso = { it.perform(ViewActions.longClick()) },
             uiObject = {
-                if (!it.exists()) throw AssertionError("UiObject does not exist")
+                if (!it.waitForExists(waitingTimeShort)) throw AssertionError("UiObject does not exist")
                 if (!it.longClick()) throw AssertionError("Failed to long click UiObject")
             },
             uiObject2 = { it.longClick() },
@@ -66,7 +68,7 @@ object UiActions {
             },
         )
 
-    fun enterText(element: Any, text: String) =
+    fun enterText(element: UiElement, text: String) =
         dispatch(
             element,
             "enter text",
@@ -76,7 +78,7 @@ object UiActions {
             compose = { it.performTextInput(text) },
         )
 
-    fun clear(element: Any) =
+    fun clear(element: UiElement) =
         dispatch(
             element,
             "clear",
@@ -88,7 +90,7 @@ object UiActions {
 
     // UiAutomator has no per-element IME action, so the key goes to the focused field via the device -
     // which is what the hand-written copies of this branch already did.
-    fun pressEnter(element: Any) =
+    fun pressEnter(element: UiElement) =
         dispatch(
             element,
             "press enter",
@@ -99,19 +101,20 @@ object UiActions {
         )
 
     private inline fun dispatch(
-        element: Any,
+        element: UiElement,
         action: String,
         espresso: (ViewInteraction) -> Unit,
         uiObject: (UiObject) -> Unit,
         uiObject2: (UiObject2) -> Unit,
         compose: (SemanticsNodeInteraction) -> Unit,
     ) {
-        when (element) {
-            is ViewInteraction -> espresso(element)
-            is UiObject -> uiObject(element)
-            is UiObject2 -> uiObject2(element)
-            is SemanticsNodeInteraction -> compose(element)
-            else -> unsupported(element, action)
+        val raw = element.backend()
+        when (raw) {
+            is ViewInteraction -> espresso(raw)
+            is UiObject -> uiObject(raw)
+            is UiObject2 -> uiObject2(raw)
+            is SemanticsNodeInteraction -> compose(raw)
+            else -> unsupported(raw, action)
         }
     }
 

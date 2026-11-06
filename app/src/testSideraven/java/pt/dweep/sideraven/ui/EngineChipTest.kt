@@ -5,14 +5,13 @@
 package pt.dweep.sideraven.ui
 
 import android.graphics.Bitmap
+import android.view.KeyEvent
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertContentDescriptionContains
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performImeAction
-import androidx.compose.ui.test.performTextReplacement
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mozilla.components.browser.state.search.SearchEngine
 import org.junit.Assert.assertEquals
@@ -22,7 +21,7 @@ import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 import pt.dweep.sideraven.theme.SideravenTheme
 
-/** The engine chip, for one search with another engine or scope. */
+/** The engine chip, for one search with another engine or scope; the field is the toolbar's control. */
 @OptIn(ExperimentalTestApi::class)
 @RunWith(AndroidJUnit4::class)
 @Config(qualifiers = "w1280dp-h800dp")
@@ -38,6 +37,11 @@ class EngineChipTest {
     private val providerRequests = mutableListOf<String>()
     private val submitted = mutableListOf<String>()
     private var settingsOpened = 0
+    private var controller: FieldController? = null
+
+    /** The on-screen control. */
+    private val edit
+        get() = requireNotNull(controller?.edit) { "the field never attached" }
 
     private fun show() =
         composeRule.setContent {
@@ -59,6 +63,7 @@ class EngineChipTest {
                             onSubmitWith = { text, engine -> submitted += "${engine.id}:$text" },
                             onSearchSettings = { settingsOpened++ },
                         ),
+                    fieldController = { controller = it },
                 )
             }
         }
@@ -82,8 +87,9 @@ class EngineChipTest {
 
         composeRule.onNodeWithTag(SidebarTestTag.SEARCH_ENGINE_CHIP).performClick()
         composeRule.onNodeWithText("DuckDuckGo").performClick()
-        composeRule.onNodeWithTag(SidebarTestTag.SEARCH_FIELD).performTextReplacement("cats")
-        composeRule.onNodeWithTag(SidebarTestTag.SEARCH_FIELD).performImeAction()
+        composeRule.runOnIdle { edit.setText("cats") }
+        composeRule.waitForIdle()
+        composeRule.runOnIdle { edit.dispatchKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_ENTER)) }
 
         assertEquals(listOf("ddg"), providerRequests)
         assertEquals(listOf("ddg:cats"), submitted)
@@ -96,8 +102,9 @@ class EngineChipTest {
 
         composeRule.onNodeWithTag(SidebarTestTag.SEARCH_ENGINE_CHIP).performClick()
         composeRule.onNodeWithText("History").performClick()
-        composeRule.onNodeWithTag(SidebarTestTag.SEARCH_FIELD).performTextReplacement("news")
-        composeRule.onNodeWithTag(SidebarTestTag.SEARCH_FIELD).performImeAction()
+        composeRule.runOnIdle { edit.setText("news") }
+        composeRule.waitForIdle()
+        composeRule.runOnIdle { edit.dispatchKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_ENTER)) }
 
         assertEquals(listOf("history_search_engine_id"), providerRequests)
         assertEquals(listOf("default:news"), submitted)

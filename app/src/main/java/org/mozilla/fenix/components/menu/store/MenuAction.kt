@@ -5,13 +5,14 @@
 package org.mozilla.fenix.components.menu.store
 
 import android.app.PendingIntent
+import mozilla.components.compose.menu.store.MenuEvent
 import mozilla.components.feature.addons.Addon
-import mozilla.components.lib.state.Action
 import mozilla.components.service.fxa.manager.AccountState
 import org.mozilla.fenix.components.menu.MenuAccessPoint
+import org.mozilla.fenix.tabgroups.flow.TabGroupFlowEntryPoint
 
 /** Actions to dispatch through the [MenuStore] to modify the [MenuState]. */
-sealed class MenuAction : Action {
+sealed class MenuAction : MenuEvent {
 
     /**
      * [MenuAction] dispatched to indicate that the store is initialized and ready to use. This action is dispatched
@@ -61,11 +62,11 @@ sealed class MenuAction : Action {
     /** [MenuAction] dispatched to move the current private tab to a non-private tab. */
     data object MoveToNonPrivateTab : MenuAction()
 
-    /** [MenuAction] dispatched when it's a new installation of Firefox. */
-    data object MenuBanner : MenuAction()
+    /** [MenuAction] dispatched when the default browser banner is clicked. */
+    data object DefaultBrowserMenuBannerClicked : MenuAction()
 
-    /** [MenuAction] dispatched when menu banner should be dismissed. */
-    data object DismissMenuBanner : MenuAction()
+    /** [MenuAction] dispatched when default browser menu banner is dismissed. */
+    data object DefaultBrowserMenuBannerDismissed : MenuAction()
 
     /**
      * [MenuAction] dispatched when the extension state is updated.
@@ -93,8 +94,12 @@ sealed class MenuAction : Action {
      * [MenuAction] dispatched when an addon is to be installed.
      *
      * @property addon The [Addon] to install.
+     * @property addonName The localized name of the addon.
      */
-    data class InstallAddon(val addon: Addon) : MenuAction()
+    data class InstallAddon(
+        val addon: Addon,
+        val addonName: String? = null,
+    ) : MenuAction()
 
     /**
      * [MenuAction] dispatched when an addon installation is in progress.
@@ -154,6 +159,32 @@ sealed class MenuAction : Action {
      */
     data class UpdateIPProtectionMenuState(val state: IPProtectionMenuState) : MenuAction()
 
+    /** [MenuAction] dispatched when the user clicks the IP protection menu item. */
+    data object IPProtectionToggle : MenuAction()
+
+    /**
+     * [MenuAction] dispatched when the user expands or collapses the extensions menu item. The expansion itself is
+     * owned by the menu item, this only allows observers to react to it.
+     */
+    data object OnExtensionsMenuClicked : MenuAction()
+
+    /**
+     * [MenuAction] dispatched when the user clicks what an extension offers for the current page.
+     *
+     * @property extensionId The id of the extension owning the clicked action.
+     * @property isPageAction Whether the clicked action is a page action, as opposed to a browser action.
+     */
+    data class WebExtensionActionClicked(
+        val extensionId: String,
+        val isPageAction: Boolean,
+    ) : MenuAction()
+
+    /** [MenuAction] dispatched when the user asks to save the current webpage content as a PDF. */
+    data object SaveAsPdfRequested : MenuAction()
+
+    /** [MenuAction] dispatched when the user asks to print the current webpage. */
+    data object PrintRequested : MenuAction()
+
     /** [MenuAction] dispatched when a navigation event occurs for a specific destination. */
     sealed class Navigate : MenuAction() {
 
@@ -186,11 +217,18 @@ sealed class MenuAction : Action {
         /** [Navigate] action dispatched when navigating to passwords. */
         data object Passwords : Navigate()
 
-        /** [Navigate] action dispatched when navigating to edit the existing bookmark. */
-        data object EditBookmark : Navigate()
+        /**
+         * [Navigate] action dispatched when navigating to edit the existing bookmark.
+         *
+         * @property guidToEdit The guid of the bookmark to edit if known.
+         */
+        data class EditBookmark(val guidToEdit: String? = null) : Navigate()
 
         /** [Navigate] action dispatched when navigating to add site to home screen. */
         data object AddToHomeScreen : Navigate()
+
+        /** [Navigate] action dispatched when opening the tab group flow. */
+        data class OpenTabGroupFlow(val entryPoint: TabGroupFlowEntryPoint) : Navigate()
 
         /**
          * [Navigate] action dispatched when navigating to save a site to a collection.

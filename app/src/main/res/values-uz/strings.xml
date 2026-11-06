@@ -86,16 +86,8 @@
   <string name="home_screen_shortcut_open_new_tab_2">Yangi varaq</string>
   <!-- Shortcut action to open new private tab -->
   <string name="home_screen_shortcut_open_new_private_tab_2">Yangi maxfiy varaq</string>
-  <!--
-    Recent Tabs
-
-    Header text for jumping back into the recent tab in the home screen
-  -->
-  <string name="recent_tabs_header">Orqaga qaytish</string>
   <!-- Button text for showing all the tabs in the tabs tray -->
   <string name="recent_tabs_show_all">Barchasini koʻrsatish</string>
-  <!-- Content description for the button which navigates the user to show all recent tabs in the tabs tray. -->
-  <string name="recent_tabs_show_all_content_description_2">Barcha oxirgi varaqlarni koʻrsatish tugmasi</string>
   <!-- Text for button in synced tab card that opens synced tabs tray -->
   <string name="recent_tabs_see_all_synced_tabs_button_text">Barcha sinxronlangan varaqlarni qidirish</string>
   <!-- Accessibility description for device icon used for recent synced tab -->
@@ -322,8 +314,6 @@
   <string name="customize_addon_collection_hint">Toʻplam nomi</string>
   <!-- Hint displayed on input field for custom collection user ID -->
   <string name="customize_addon_collection_user_hint">Toʻplam egasi (foydalanuvchi identifikatori)</string>
-  <!-- Header text for jumping back into the recent tab in customize the home screen -->
-  <string name="customize_toggle_jump_back_in">Orqaga qaytish</string>
   <!--
     Title for the customize home screen section with recently visited. Recently visited is
     a section where users see a list of tabs that they have visited in the past few days
@@ -515,8 +505,6 @@
     Title of preference for tabs management
   -->
   <string name="preferences_tabs">Varaqlar</string>
-  <!-- Title of preference that allows a user to specify the tab view -->
-  <string name="preferences_tab_view">Varaqni koʻrish</string>
   <!-- Option for a list tab view -->
   <string name="tab_view_list">Roʻyxat</string>
   <!-- Option for a grid tab view -->
@@ -553,13 +541,7 @@
   <string name="close_tabs_after_one_week_summary">Bir haftadan keyin yopish</string>
   <!-- Summary for tabs preference when auto closing tabs setting is set to auto close tabs after one month -->
   <string name="close_tabs_after_one_month_summary">Bir oydan keyin yopish</string>
-  <!--
-    Inactive tabs
-
-    Category header of a preference that allows a user to enable or disable the inactive tabs feature
-  -->
-  <string name="preferences_inactive_tabs">Eski varaqlarni nofaol holatga oʻtkazish</string>
-  <!-- Title of inactive tabs preference -->
+  <!-- Summary of the preference that allows a user to enable or disable the inactive tabs feature. -->
   <string name="preferences_inactive_tabs_title">Ikki hafta davomida ochilmagan varaqlar nofaol boʻlimga oʻtkaziladi.</string>
   <!--
     Studies
@@ -628,16 +610,6 @@
     %1$d is the number of bookmarks selected
   -->
   <string name="history_multi_select_title">Tanlandi: %1$d</string>
-  <!-- Text for the header that groups the history for today -->
-  <string name="history_today">Bugun</string>
-  <!-- Text for the header that groups the history for yesterday -->
-  <string name="history_yesterday">Kecha</string>
-  <!-- Text for the header that groups the history the past 7 days -->
-  <string name="history_7_days">Soʻnggi 7 kun</string>
-  <!-- Text for the header that groups the history the past 30 days -->
-  <string name="history_30_days">Soʻnggi 30 kun</string>
-  <!-- Text for the header that groups the history older than the last month -->
-  <string name="history_older">Eskiroq</string>
   <!-- Text shown when no history exists -->
   <string name="history_empty_message">Tarix yoʻq</string>
   <!--

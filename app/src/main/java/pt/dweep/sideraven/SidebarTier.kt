@@ -110,40 +110,60 @@ object SidebarGate {
     fun showsSidebar(context: Context): Boolean = showsSidebar(SidebarTier.from(context))
 
     /**
-     * Whether the toolbar's tab counter slot shows: the tab counter when there's no
-     * Sidebar; beside a Sidebar only in Auto-Hide Mode with the Sidebar Flap off, as the Sidebar
-     * Button, so there is always a visible way to open it. Elsewhere the Sidebar covers it.
+     * Whether the toolbar's tab counter slot shows: the tab counter when there's no Sidebar, or
+     * when [tabButtons] keeps it beside one; otherwise beside a Sidebar only in Auto-Hide Mode with
+     * the Sidebar Flap off, as the Sidebar Button, so there is always a visible way to open it.
+     * Elsewhere the Sidebar covers it.
      */
     fun showsTabCounter(
         tier: SidebarTier,
         chosenMode: SidebarMode?,
         flapEnabled: Boolean,
-    ): Boolean = !showsSidebar(tier) || (SidebarMode.effective(chosenMode, tier) == SidebarMode.AutoHide && !flapEnabled)
+        tabButtons: Boolean = false,
+    ): Boolean = !showsSidebar(tier) || tabButtons || (SidebarMode.effective(chosenMode, tier) == SidebarMode.AutoHide && !flapEnabled)
 
     /** [showsTabCounter] for the window a UI [Context] belongs to. */
     fun showsTabCounter(context: Context): Boolean =
         PreferencesSidebarModeStore.get(context).let { store ->
-            showsTabCounter(SidebarTier.from(context), store.chosenMode.value, store.flapEnabled.value)
+            showsTabCounter(SidebarTier.from(context), store.chosenMode.value, store.flapEnabled.value, store.toolbarTabButtons.value)
         }
 
-    /** Whether Fenix's quick-action button is hidden: beside a Sidebar, when it is New Tab (the Sidebar has one). */
+    /**
+     * Whether the tab counter slot is drawn as the Sidebar Button: beside a Sidebar, unless
+     * [tabButtons] keeps the real tab counter (which still opens the Sidebar in Auto-Hide Mode).
+     */
+    fun showsSidebarButton(
+        tier: SidebarTier,
+        tabButtons: Boolean,
+    ): Boolean = showsSidebar(tier) && !tabButtons
+
+    fun showsSidebarButton(context: Context): Boolean =
+        showsSidebarButton(SidebarTier.from(context), PreferencesSidebarModeStore.get(context).toolbarTabButtons.value)
+
+    /**
+     * Whether Fenix's quick-action button is hidden: beside a Sidebar, when it is New Tab (the Sidebar
+     * has one), unless [tabButtons] keeps it.
+     */
     fun hidesShortcut(
         tier: SidebarTier,
         isNewTab: Boolean,
-    ): Boolean = showsSidebar(tier) && isNewTab
+        tabButtons: Boolean = false,
+    ): Boolean = showsSidebar(tier) && isNewTab && !tabButtons
 
     fun hidesShortcut(
         context: Context,
         isNewTab: Boolean,
-    ): Boolean = hidesShortcut(SidebarTier.from(context), isNewTab)
+    ): Boolean = hidesShortcut(SidebarTier.from(context), isNewTab, PreferencesSidebarModeStore.get(context).toolbarTabButtons.value)
 
     /** The Sidebar's surface colour while it shows (null otherwise): Fenix's toolbar takes it. */
     val sidebarSurface = MutableStateFlow<Int?>(null)
 
-    /** Emits whenever the Sidebar Mode or the Flap setting changes, so the toolbar can rebuild its buttons. */
+    /** Emits whenever the Sidebar Mode, the Flap or the toolbar's tab buttons change, so the toolbar can rebuild its buttons. */
     fun modeChanges(context: Context): Flow<Any?> =
         PreferencesSidebarModeStore.get(context).let { store ->
-            kotlinx.coroutines.flow.combine(store.chosenMode.flow, store.flapEnabled.flow, store.phoneSidebar.flow) { mode, flap, phone -> Triple(mode, flap, phone) }
+            kotlinx.coroutines.flow.combine(store.chosenMode.flow, store.flapEnabled.flow, store.phoneSidebar.flow, store.toolbarTabButtons.flow) { mode, flap, phone, buttons ->
+                listOf(mode, flap, phone, buttons)
+            }
         }
 
     /** Whether the Auto-Hide Sidebar is currently revealed. One Sidebar per process. */

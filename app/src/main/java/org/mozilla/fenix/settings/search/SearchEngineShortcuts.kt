@@ -30,6 +30,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -48,13 +49,13 @@ import mozilla.components.compose.base.menu.DropdownMenu
 import mozilla.components.compose.base.menu.MenuItem
 import mozilla.components.compose.base.menu.MenuItem.FixedItem.Level
 import mozilla.components.compose.base.text.Text
+import mozilla.components.compose.base.theme.PreviewThemeProvider
+import mozilla.components.compose.base.theme.Theme
 import mozilla.components.lib.state.ext.observeAsComposableState
 import mozilla.components.ui.icons.R as iconsR
 import org.mozilla.fenix.R
 import org.mozilla.fenix.compose.settings.SettingsSectionHeader
 import org.mozilla.fenix.theme.FirefoxTheme
-import org.mozilla.fenix.theme.PreviewThemeProvider
-import org.mozilla.fenix.theme.Theme
 
 /**
  * Top-level UI for search shortcuts settings.
@@ -116,6 +117,17 @@ fun SearchEngineShortcuts(
     }
 }
 
+/** Test tag to allow automated tests to access search engine shortcut ui elements. */
+internal object SearchEngineShortcutsTestTag {
+    private const val SHORTCUTS_LIST = "search_engine_shortcuts_list"
+
+    /**
+     * The checkbox for [engineName]. The surrounding Row carries no semantics, so every checkbox and name in the list
+     * are siblings of one another and a tag is the only way to tell them apart.
+     */
+    fun checkbox(engineName: String) = "$SHORTCUTS_LIST.checkbox.$engineName"
+}
+
 @Composable
 private fun Title(title: String) {
     SettingsSectionHeader(
@@ -138,7 +150,7 @@ private fun SearchItem(
 
     Row(modifier = Modifier.defaultMinSize(minHeight = 56.dp).padding(start = 4.dp)) {
         Checkbox(
-            modifier = Modifier.align(Alignment.CenterVertically),
+            modifier = Modifier.align(Alignment.CenterVertically).testTag(SearchEngineShortcutsTestTag.checkbox(name)),
             checked = isEnabled,
             onCheckedChange = { onCheckboxClicked.invoke(engine, it) },
         )

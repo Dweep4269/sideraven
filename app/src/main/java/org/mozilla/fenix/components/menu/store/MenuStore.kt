@@ -5,6 +5,8 @@
 package org.mozilla.fenix.components.menu.store
 
 import androidx.annotation.VisibleForTesting
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 import mozilla.components.lib.state.Middleware
 import mozilla.components.lib.state.Store
 
@@ -18,9 +20,17 @@ class MenuStore(
         reducer = ::reducer,
         middleware = middleware,
     ) {
+
+    /** [SharedFlow] of one-shot [NavigationEvent]s emitted by middlewares for the menu UI to consume. */
+    val navigationEvents: SharedFlow<NavigationEvent>
+        field = MutableSharedFlow<NavigationEvent>(extraBufferCapacity = 1)
+
     init {
         dispatch(MenuAction.InitAction)
     }
+
+    /** Emit a one-shot [NavigationEvent] to be consumed by the menu UI. */
+    internal fun emitEvent(event: NavigationEvent) = navigationEvents.tryEmit(event)
 }
 
 private fun reducer(state: MenuState, action: MenuAction): MenuState {
@@ -31,8 +41,8 @@ private fun reducer(state: MenuState, action: MenuAction): MenuState {
         is MenuAction.RemoveShortcut,
         is MenuAction.DeleteBrowsingDataAndQuit,
         is MenuAction.FindInPage,
-        is MenuAction.MenuBanner,
-        is MenuAction.DismissMenuBanner,
+        is MenuAction.DefaultBrowserMenuBannerClicked,
+        is MenuAction.DefaultBrowserMenuBannerDismissed,
         is MenuAction.OpenInApp,
         is MenuAction.OpenInFirefox,
         is MenuAction.InstallAddon,
@@ -40,7 +50,12 @@ private fun reducer(state: MenuState, action: MenuAction): MenuState {
         is MenuAction.CustomizeReaderView,
         is MenuAction.Navigate,
         is MenuAction.OnSummarizationMenuExposed,
-        is MenuAction.MoveToNonPrivateTab -> state
+        is MenuAction.MoveToNonPrivateTab,
+        is MenuAction.IPProtectionToggle,
+        is MenuAction.SaveAsPdfRequested,
+        is MenuAction.PrintRequested,
+        is MenuAction.OnExtensionsMenuClicked,
+        is MenuAction.WebExtensionActionClicked -> state
 
         is MenuAction.OnMoreMenuClicked -> state.copy(isMoreMenuExpanded = !state.isMoreMenuExpanded)
         is MenuAction.RequestDesktopSite -> state.copy(isDesktopMode = true)

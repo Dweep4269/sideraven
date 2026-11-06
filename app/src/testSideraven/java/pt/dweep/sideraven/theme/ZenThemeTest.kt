@@ -18,7 +18,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mozilla.fenix.theme.Theme
+import mozilla.components.compose.base.theme.Theme
 import kotlin.math.max
 import kotlin.math.min
 

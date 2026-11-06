@@ -63,12 +63,6 @@
   <string name="home_screen_shortcut_open_new_tab_2">نیا ٹیب</string>
   <!-- Shortcut action to open new private tab -->
   <string name="home_screen_shortcut_open_new_private_tab_2">نیا نجی ٹیب</string>
-  <!--
-    Recent Tabs
-
-    Header text for jumping back into the recent tab in the home screen
-  -->
-  <string name="recent_tabs_header">واپس جائیں</string>
   <!-- Button text for showing all the tabs in the tabs tray -->
   <string name="recent_tabs_show_all">تمام دکھائیں</string>
   <!--
@@ -253,8 +247,6 @@
   <string name="customize_addon_collection_hint">مجموعہ کا نام</string>
   <!-- Hint displayed on input field for custom collection user ID -->
   <string name="customize_addon_collection_user_hint">مجموعہ کرنے والا مالک (صارف شناخت)</string>
-  <!-- Header text for jumping back into the recent tab in customize the home screen -->
-  <string name="customize_toggle_jump_back_in">واپس جائیں</string>
   <!--
     Title for the customize home screen section with recently visited. Recently visited is
     a section where users see a list of tabs that they have visited in the past few days
@@ -406,8 +398,6 @@
     Title of preference for tabs management
   -->
   <string name="preferences_tabs">ٹیبس</string>
-  <!-- Title of preference that allows a user to specify the tab view -->
-  <string name="preferences_tab_view">ٹیب ویو</string>
   <!-- Option for a list tab view -->
   <string name="tab_view_list">فہرست</string>
   <!-- Option for a grid tab view -->
@@ -442,12 +432,6 @@
   <string name="close_tabs_after_one_week_summary">ایک ہفتے کے بعد بند کریں</string>
   <!-- Summary for tabs preference when auto closing tabs setting is set to auto close tabs after one month -->
   <string name="close_tabs_after_one_month_summary">ایک ماہ کے بعد بند کریں</string>
-  <!--
-    Inactive tabs
-
-    Category header of a preference that allows a user to enable or disable the inactive tabs feature
-  -->
-  <string name="preferences_inactive_tabs">پرانے ٹیبز کو غیر فعال میں منتقل کریں۔</string>
   <!--
     Studies
 
@@ -509,16 +493,6 @@
     %1$d is the number of bookmarks selected
   -->
   <string name="history_multi_select_title">%1$d منتخب کیا گیا</string>
-  <!-- Text for the header that groups the history for today -->
-  <string name="history_today">آج</string>
-  <!-- Text for the header that groups the history for yesterday -->
-  <string name="history_yesterday">کل</string>
-  <!-- Text for the header that groups the history the past 7 days -->
-  <string name="history_7_days">پچھلے 7 دن</string>
-  <!-- Text for the header that groups the history the past 30 days -->
-  <string name="history_30_days">پچھلے 30 دن</string>
-  <!-- Text for the header that groups the history older than the last month -->
-  <string name="history_older">‏‏زیادہ پرانا</string>
   <!-- Text shown when no history exists -->
   <string name="history_empty_message">یہاں کوئی سابقات نہیں ہے</string>
   <!--

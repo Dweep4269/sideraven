@@ -7,6 +7,7 @@ package org.mozilla.fenix.home.store
 import android.content.res.Configuration
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalWindowInfo
 import org.mozilla.fenix.browser.browsingmode.BrowsingMode
 import org.mozilla.fenix.browser.browsingmode.BrowsingModeManager
 import org.mozilla.fenix.components.appstate.AppState
@@ -18,12 +19,14 @@ import org.mozilla.fenix.ext.shouldShowRecentTabs
 import org.mozilla.fenix.home.bookmarks.Bookmark
 import org.mozilla.fenix.home.collections.CollectionsState
 import org.mozilla.fenix.home.collections.migration.CollectionsMigrationCardState
-import org.mozilla.fenix.home.pocket.PocketState
 import org.mozilla.fenix.home.recentsyncedtabs.RecentSyncedTab
 import org.mozilla.fenix.home.recentsyncedtabs.RecentSyncedTabState
 import org.mozilla.fenix.home.recenttabs.RecentTab
 import org.mozilla.fenix.home.recentvisits.RecentlyVisitedItem
 import org.mozilla.fenix.home.topsites.TopSiteState
+import org.mozilla.fenix.home.topsites.calculateTopSitesRowLayout
+import org.mozilla.fenix.home.topsites.collapsedTopSitesCount
+import org.mozilla.fenix.home.ui.horizontalMargin
 import org.mozilla.fenix.termsofuse.store.PrivacyNoticeBannerState
 import org.mozilla.fenix.utils.Settings
 
@@ -64,7 +67,6 @@ internal sealed class HomepageState {
      * @property recentlyVisited List of [RecentlyVisitedItem] to display, or null when the recent history section is
      *   hidden.
      * @property collectionsState State of the collections section to display.
-     * @property pocketState State of the pocket section to display, or null when the section is hidden.
      * @property showTopSitesHeader Whether to show the shortcuts section header and "show all" button.
      * @property showPrivacyReport Whether to show the privacy report section.
      * @property longfoxEnabled Whether the longfox game is enabled.
@@ -86,7 +88,6 @@ internal sealed class HomepageState {
         val bookmarks: List<Bookmark>? = null,
         val recentlyVisited: List<RecentlyVisitedItem>? = null,
         val collectionsState: CollectionsState,
-        val pocketState: PocketState? = null,
         val showTopSitesHeader: Boolean,
         val showPrivacyReport: Boolean,
         val longfoxEnabled: Boolean,
@@ -210,13 +211,9 @@ internal sealed class HomepageState {
                             showCollections = settings.collections,
                             shouldShowCollectionsMigrationCard = collectionsMigrationCardState.visible,
                         ),
-                    pocketState =
-                        PocketState.build(appState = appState).takeIf {
-                            settings.showPocketRecommendationsFeature &&
-                                recommendationState.pocketStories.isNotEmpty() &&
-                                !settings.privateModeAndStoriesEntryPointEnabled
-                        },
-                    showTopSitesHeader = !(settings.privateModeAndStoriesEntryPointEnabled && topSites.size < 8),
+                    showTopSitesHeader =
+                        !(settings.privateModeAndStoriesEntryPointEnabled &&
+                            topSites.size < collapsedTopSitesCount(topSitesColumns())) && !settings.showMoreShortcuts,
                     showPrivacyReport = settings.showPrivacyReportFeature,
                     longfoxEnabled = settings.longfoxEnabled,
                     showLongfoxAnimation = settings.longfoxEnabled && longfoxEntryPointReady,
@@ -244,6 +241,13 @@ internal sealed class HomepageState {
     }
 }
 
+/** Returns the number of shortcut columns the homepage lays out for the current screen width. */
+@Composable
+private fun topSitesColumns(): Int {
+    val availableWidth = LocalWindowInfo.current.containerDpSize.width - horizontalMargin * 2
+    return calculateTopSitesRowLayout(availableWidth).columns
+}
+
 private fun buildHeaderState(settings: Settings): HeaderState {
     return if (settings.privateModeAndStoriesEntryPointEnabled) {
         HeaderState.Experimental.Normal(
@@ -251,7 +255,7 @@ private fun buildHeaderState(settings: Settings): HeaderState {
             showStoriesButton = settings.showPocketRecommendationsFeature,
         )
     } else {
-        HeaderState.Normal
+        HeaderState.Normal(showStoriesButton = settings.showPocketRecommendationsFeature)
     }
 }
 
@@ -259,7 +263,7 @@ private fun buildPrivateHeaderState(settings: Settings): HeaderState {
     return if (settings.privateModeAndStoriesEntryPointEnabled) {
         HeaderState.Experimental.Private
     } else {
-        HeaderState.Normal
+        HeaderState.Normal(showStoriesButton = false)
     }
 }
 
@@ -269,8 +273,10 @@ internal sealed class HeaderState {
     /**
      * Represents the non-experimental header state for both normal and private mode. The header's colors are derived
      * from the wallpaper at render time (see `HomepageHeader`), so no colors are held here.
+     *
+     * @property showStoriesButton Whether to show the stories button.
      */
-    data object Normal : HeaderState()
+    data class Normal(val showStoriesButton: Boolean) : HeaderState()
 
     /** Represents the experimental states for the entry points experiment. */
     sealed class Experimental : HeaderState() {

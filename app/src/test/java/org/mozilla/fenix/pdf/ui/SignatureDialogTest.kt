@@ -6,7 +6,12 @@ package org.mozilla.fenix.pdf.ui
 
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.clearText
+import androidx.compose.ui.autofill.ContentDataType
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsEnabled
+import androidx.compose.ui.test.assertIsFocused
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.v2.createComposeRule
@@ -14,13 +19,13 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import mozilla.components.compose.base.theme.Theme
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mozilla.fenix.pdf.PdfToolsTestTag
 import org.mozilla.fenix.theme.FirefoxTheme
-import org.mozilla.fenix.theme.Theme
 
 @RunWith(AndroidJUnit4::class)
 class SignatureDialogTest {
@@ -50,6 +55,29 @@ class SignatureDialogTest {
 
     private fun typeSignature() {
         composeTestRule.onNodeWithTag(PdfToolsTestTag.SIGNATURE_INPUT).performTextInput(signature)
+    }
+
+    @Test
+    fun `WHEN the dialog is shown THEN the signature field takes focus`() {
+        // Test for Bug 2067260
+        setTestContent()
+
+        composeTestRule.onNodeWithTag(PdfToolsTestTag.SIGNATURE_INPUT).assertIsFocused()
+    }
+
+    @Test
+    fun `WHEN the dialog is shown THEN the signature field does not offer autofill`() {
+        // Test for Bug 2071386
+        setTestContent()
+
+        composeTestRule
+            .onNodeWithTag(PdfToolsTestTag.SIGNATURE_INPUT)
+            .assert(
+                SemanticsMatcher.expectValue(
+                    SemanticsProperties.ContentDataType,
+                    ContentDataType.None,
+                )
+            )
     }
 
     @Test

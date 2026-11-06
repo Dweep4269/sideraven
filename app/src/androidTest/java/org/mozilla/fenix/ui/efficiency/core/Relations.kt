@@ -12,6 +12,10 @@ import androidx.test.espresso.ViewInteraction
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.hasSibling
 import androidx.test.espresso.matcher.ViewMatchers.isChecked
+import androidx.test.espresso.matcher.ViewMatchers.isNotChecked
+import androidx.test.espresso.matcher.ViewMatchers.withChild
+import androidx.test.espresso.matcher.ViewMatchers.withClassName
+import androidx.test.espresso.matcher.ViewMatchers.withParent
 import androidx.test.espresso.matcher.ViewMatchers.withResourceName
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.uiautomator.By
@@ -20,6 +24,7 @@ import androidx.test.uiautomator.UiObject2
 import androidx.test.uiautomator.UiSelector
 import org.hamcrest.Matchers.allOf
 import org.hamcrest.Matchers.containsString
+import org.hamcrest.Matchers.endsWith
 
 /**
  * Questions about an element's neighbours.
@@ -30,16 +35,17 @@ import org.hamcrest.Matchers.containsString
  */
 object Relations {
 
-    fun hasSiblingWithText(element: Any, text: String): Boolean = runCatching {
-        when (element) {
+    fun hasSiblingWithText(element: UiElement, text: String): Boolean = runCatching {
+        val raw = element.backend()
+        when (raw) {
             is ViewInteraction -> {
-                element.check(matches(hasSibling(withText(text))))
+                raw.check(matches(hasSibling(withText(text))))
                 true
             }
-            is UiObject -> element.getFromParent(UiSelector().text(text)).exists()
-            is UiObject2 -> element.parent?.findObject(By.text(text)) != null
+            is UiObject -> raw.getFromParent(UiSelector().text(text)).exists()
+            is UiObject2 -> raw.parent?.findObject(By.text(text)) != null
             is SemanticsNodeInteraction -> {
-                element.assert(hasAnySibling(hasText(text)))
+                raw.assert(hasAnySibling(hasText(text)))
                 true
             }
             else -> false
@@ -51,13 +57,94 @@ object Relations {
      * Espresso only. A resource-name substring plus checked state is a View-hierarchy question - Compose has no
      * resource names, and UiAutomator cannot ask "checked" of a sibling in one step.
      */
-    fun hasCheckedSiblingNamed(element: Any, resourceName: String): Boolean =
-        element is ViewInteraction &&
-            runCatching {
-                    element.check(
-                        matches(hasSibling(allOf(withResourceName(containsString(resourceName)), isChecked())))
-                    )
-                    true
-                }
-                .getOrDefault(false)
+    fun hasCheckedSiblingNamed(element: UiElement, resourceName: String): Boolean =
+        element.backend().let { raw ->
+            raw is ViewInteraction &&
+                runCatching {
+                        raw.check(
+                            matches(hasSibling(allOf(withResourceName(containsString(resourceName)), isChecked())))
+                        )
+                        true
+                    }
+                    .getOrDefault(false)
+        }
+
+    /**
+     * Does [element]'s preference row own a switch in the given [checked] state? A preference row nests the title and
+     * the switch in separate containers, so the switch is the title's *cousin*, not its sibling:
+     * `withParent(hasSibling(withChild(switch)))`. Anchoring on the title (unique by text) is how a specific row's
+     * switch is addressed, since the shared `switchWidget` id cannot single one out. Espresso only - a View-hierarchy
+     * question. Mirrors the legacy `hasCousin(allOf(withClassName(endsWith("Switch")), isChecked(...)))`.
+     */
+    fun hasCousinSwitch(element: UiElement, checked: Boolean): Boolean =
+        element.backend().let { raw ->
+            raw is ViewInteraction &&
+                runCatching {
+                        raw.check(
+                            matches(
+                                withParent(
+                                    hasSibling(
+                                        withChild(
+                                            allOf(
+                                                withClassName(endsWith("Switch")),
+                                                if (checked) isChecked() else isNotChecked(),
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                        true
+                    }
+                    .getOrDefault(false)
+        }
+
+    /**
+     * Does [element]'s preference row own a check box in the given [checked] state? Unlike a switch row, a
+     * `CheckBoxPreference` nests its title and the check box as siblings, so the check box is reached as the title's
+     * sibling's child: `hasSibling(withChild(checkBox))`. Espresso only - a View-hierarchy question. Mirrors the legacy
+     * `hasSibling(withChild(allOf(withClassName(endsWith("CheckBox")), isChecked(...))))`.
+     */
+    fun hasSiblingCheckBox(element: UiElement, checked: Boolean): Boolean =
+        element.backend().let { raw ->
+            raw is ViewInteraction &&
+                runCatching {
+                        raw.check(
+                            matches(
+                                hasSibling(
+                                    withChild(
+                                        allOf(
+                                            withClassName(endsWith("CheckBox")),
+                                            if (checked) isChecked() else isNotChecked(),
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                        true
+                    }
+                    .getOrDefault(false)
+        }
+
+    /**
+     * Does [upper] render above [lower]? Compares the top edge of each element's on-screen bounds, so it answers "A
+     * comes before B" for lists whose rows are not one queryable collection - the History screen's UiAutomator
+     * RecyclerView, where the Compose collection verbs cannot help. Espresso views have no cheap bounds query here and
+     * return false.
+     */
+    fun isAbove(upper: UiElement, lower: UiElement): Boolean {
+        val upperTop = topEdgeOf(upper.backend()) ?: return false
+        val lowerTop = topEdgeOf(lower.backend()) ?: return false
+        return upperTop < lowerTop
+    }
+
+    private fun topEdgeOf(raw: Any): Float? = runCatching {
+        when (raw) {
+            is UiObject -> raw.bounds.top.toFloat()
+            is UiObject2 -> raw.visibleBounds.top.toFloat()
+            is SemanticsNodeInteraction -> raw.fetchSemanticsNode().boundsInRoot.top
+            else -> null
+        }
+    }
+        .getOrNull()
 }

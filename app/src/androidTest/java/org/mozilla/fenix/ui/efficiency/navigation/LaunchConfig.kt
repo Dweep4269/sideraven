@@ -13,6 +13,7 @@ data class LaunchConfig(
     val skipOnboarding: Boolean = true,
     val isPageLoadTranslationsPromptEnabled: Boolean = false,
     val isPocketEnabled: Boolean = true,
+    val isBookmarksHomeFeatureEnabled: Boolean = true,
     val isRecentlyVisitedFeatureEnabled: Boolean = true,
     val shouldUseExpandedToolbar: Boolean = false,
     val isTabStripEnabled: Boolean = false,
@@ -22,6 +23,10 @@ data class LaunchConfig(
     // LaunchConfig() still equals the harness's normal launch. Declared explicitly here so a page
     // that depends on the "Page summaries" settings entry does not rely on that implicit default.
     val shakeToSummarizeFeatureFlagEnabled: Boolean = true,
+    // Disabled by default (matches HomeActivityIntentTestRule): gates the experimental homepage
+    // header (private-mode button, wordmark, and stories entry point). Enable it for tests that
+    // verify that header; the stories button within it additionally requires isPocketEnabled.
+    val isPrivateModeAndStoriesEntryPointEnabled: Boolean = false,
 ) {
     /** Flat map for the structured log, so a trace records the app the test actually launched. */
     fun asMeta(): Map<String, Any?> =
@@ -29,9 +34,11 @@ data class LaunchConfig(
             "skipOnboarding" to skipOnboarding,
             "isPageLoadTranslationsPromptEnabled" to isPageLoadTranslationsPromptEnabled,
             "isPocketEnabled" to isPocketEnabled,
+            "isBookmarksHomeFeatureEnabled" to isBookmarksHomeFeatureEnabled,
             "isRecentlyVisitedFeatureEnabled" to isRecentlyVisitedFeatureEnabled,
             "shouldUseExpandedToolbar" to shouldUseExpandedToolbar,
             "isTabStripEnabled" to isTabStripEnabled,
             "shakeToSummarizeFeatureFlagEnabled" to shakeToSummarizeFeatureFlagEnabled,
+            "isPrivateModeAndStoriesEntryPointEnabled" to isPrivateModeAndStoriesEntryPointEnabled,
         )
 }

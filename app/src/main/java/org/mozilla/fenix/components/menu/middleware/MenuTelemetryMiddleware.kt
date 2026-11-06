@@ -4,7 +4,9 @@
 
 package org.mozilla.fenix.components.menu.middleware
 
+import mozilla.components.lib.state.Action
 import mozilla.components.lib.state.Middleware
+import mozilla.components.lib.state.State
 import mozilla.components.lib.state.Store
 import mozilla.telemetry.glean.private.NoExtras
 import org.mozilla.fenix.GleanMetrics.AppMenu
@@ -14,21 +16,18 @@ import org.mozilla.fenix.GleanMetrics.ReaderMode
 import org.mozilla.fenix.GleanMetrics.Translations
 import org.mozilla.fenix.components.menu.MenuAccessPoint
 import org.mozilla.fenix.components.menu.store.MenuAction
-import org.mozilla.fenix.components.menu.store.MenuState
-import org.mozilla.fenix.components.menu.store.MenuStore
 
 /**
- * A [Middleware] for recording telemetry based on [MenuAction]s that are dispatch to the [MenuStore].
+ * A [Middleware] for recording telemetry based on [MenuAction]s dispatched to a menu store.
  *
  * @param accessPoint The [MenuAccessPoint] that was used to navigate to the menu dialog.
  */
-class MenuTelemetryMiddleware(private val accessPoint: MenuAccessPoint) : Middleware<MenuState, MenuAction> {
-
-    @Suppress("CyclomaticComplexMethod", "LongMethod", "CognitiveComplexMethod")
+@Suppress("CyclomaticComplexMethod", "LongMethod", "CognitiveComplexMethod")
+class MenuTelemetryMiddleware<S : State, A : Action>(private val accessPoint: MenuAccessPoint) : Middleware<S, A> {
     override fun invoke(
-        store: Store<MenuState, MenuAction>,
-        next: (MenuAction) -> Unit,
-        action: MenuAction,
+        store: Store<S, A>,
+        next: (A) -> Unit,
+        action: A,
     ) {
         next(action)
 
@@ -39,7 +38,7 @@ class MenuTelemetryMiddleware(private val accessPoint: MenuAccessPoint) : Middle
             MenuAction.AddBookmark ->
                 Events.browserMenuAction.record(Events.BrowserMenuActionExtra(item = "add_bookmark"))
 
-            MenuAction.Navigate.EditBookmark ->
+            is MenuAction.Navigate.EditBookmark ->
                 Events.browserMenuAction.record(Events.BrowserMenuActionExtra(item = "edit_bookmark"))
 
             MenuAction.AddShortcut ->
@@ -154,10 +153,10 @@ class MenuTelemetryMiddleware(private val accessPoint: MenuAccessPoint) : Middle
                     )
                 )
 
-            is MenuAction.MenuBanner ->
+            is MenuAction.DefaultBrowserMenuBannerClicked ->
                 Events.browserMenuAction.record(Events.BrowserMenuActionExtra(item = "menu_banner"))
 
-            MenuAction.DismissMenuBanner ->
+            MenuAction.DefaultBrowserMenuBannerDismissed ->
                 Events.browserMenuAction.record(Events.BrowserMenuActionExtra(item = "dismiss_menu_banner"))
 
             MenuAction.CustomizeReaderView -> ReaderMode.appearance.record(NoExtras())
@@ -203,8 +202,18 @@ class MenuTelemetryMiddleware(private val accessPoint: MenuAccessPoint) : Middle
                 Events.browserMenuAction.record(Events.BrowserMenuActionExtra(item = "installed_addon_details"))
             }
 
+            is MenuAction.WebExtensionActionClicked -> {
+                Events.browserMenuAction.record(
+                    Events.BrowserMenuActionExtra(item = "web_extension_browser_action_clicked")
+                )
+            }
+
             is MenuAction.Navigate.WebCompatReporter -> {
                 Events.browserMenuAction.record(Events.BrowserMenuActionExtra(item = "report_broken_site"))
+            }
+
+            is MenuAction.Navigate.OpenTabGroupFlow -> {
+                Events.browserMenuAction.record(Events.BrowserMenuActionExtra(item = action.entryPoint.telemetryName))
             }
 
             MenuAction.Navigate.Summarizer,
@@ -222,6 +231,7 @@ class MenuTelemetryMiddleware(private val accessPoint: MenuAccessPoint) : Middle
             is MenuAction.InitializeSummarizationMenuState,
             is MenuAction.UpdateIPProtectionMenuState,
             is MenuAction.OnMoreMenuClicked,
+            is MenuAction.OnExtensionsMenuClicked,
             is MenuAction.Navigate.IPProtectionSettings -> Unit
         }
     }

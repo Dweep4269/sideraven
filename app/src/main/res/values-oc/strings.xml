@@ -37,6 +37,8 @@
   <string name="tab_manager_empty_private_tabs_page_description">%1$s gardarà pas d\'istoric nimai de cookies, pasmens los marcapaginas novèls seràn servats.</string>
   <!-- Tab tray multi select title in app bar. %1$d is the number of tabs selected -->
   <string name="tab_tray_multi_select_title">%1$d seleccionats</string>
+  <!-- Tab tray multi select title in app bar when no tabs are selected -->
+  <string name="tab_tray_multi_select_title_empty">Seleccionar d’onglets</string>
   <!-- Label of button in create collection dialog for creating a new collection -->
   <string name="tab_tray_add_new_collection">Ajustar una colleccion nòva</string>
   <!-- Label of editable text in create collection dialog for naming a new collection -->
@@ -134,13 +136,11 @@
   <!--
     Recent Tabs
 
-    Header text for jumping back into the recent tab in the home screen
+    Header text on the homescreen for continuing to browse the most recent browser tab
   -->
-  <string name="recent_tabs_header">Tornar a aqueste onglet</string>
+  <string name="recent_tabs_header_2">Contunhar</string>
   <!-- Button text for showing all the tabs in the tabs tray -->
   <string name="recent_tabs_show_all">O afichar tot</string>
-  <!-- Content description for the button which navigates the user to show all recent tabs in the tabs tray. -->
-  <string name="recent_tabs_show_all_content_description_2">Afichar lo boton dels onglets recents</string>
   <!-- Text for button in synced tab card that opens synced tabs tray -->
   <string name="recent_tabs_see_all_synced_tabs_button_text">Veire totes los onglets sincronizats</string>
   <!-- Accessibility description for device icon used for recent synced tab -->
@@ -275,6 +275,8 @@
   <string name="browser_menu_summarize_page_badge">Nòu</string>
   <!-- Browser menu label for navigating to the Web Compat Reporter feature, which provides users the ability to send bug reports for broken sites. -->
   <string name="browser_menu_webcompat_reporter_2">Senhalar un site copat</string>
+  <!-- Browser menu label for adding a tab to a tab group -->
+  <string name="browser_menu_add_to_tab_group">Apondre al grop</string>
   <!-- Browser menu label that is displayed when the current page has been translated by the translation feature. -->
   <string name="browser_menu_translated">Traducha</string>
   <!-- Browser menu label for the print feature -->
@@ -303,6 +305,8 @@
     Content description for the translate page toolbar button that opens the translations dialog when no translation has occurred.
   -->
   <string name="browser_toolbar_translate">Traduire la pagina</string>
+  <!-- CFR description for the browser toolbar describing the "Shake to summarize feature" -->
+  <string name="browser_toolbar_summarize_cfr_description">Brandissètz l’aparelh per resumir aquesta pagina en d’unas segondas. ⚡️</string>
   <!--
     Translation Toolbar
 
@@ -315,10 +319,42 @@
   <string name="translation_toolbar_expand_action">Dobrir lo fuèlh de traduccion</string>
   <!-- Content description for the translate toolbar action that closes the translations toolbar. -->
   <string name="translation_toolbar_close_action">Ignorar lo messatge</string>
+  <!--
+    Page summaries
+
+    Toolbar title for the Page summaries settings fragment
+  -->
+  <string name="preferences_page_summaries">Resumits de paginas</string>
+  <!--
+    AI Controls settings
+
+    Title for the AI controls settings screen
+  -->
+  <string name="preferences_ai_controls">Contraròtles IA</string>
+  <!-- Headline text for the AI controls banner. %s is the name of the app (for example "Firefox"). -->
+  <string name="ai_controls_banner_headline">Amb %s avètz totjorn la libertat de decidir</string>
+  <!-- Supporting text for the AI controls banner. %s is a learn more link using ai_controls_learn_more as text. -->
+  <string name="ai_controls_banner_supporting_text_2">Aquò inclutz se cal utilizar o non las foncions melhoradas amb IA. %s</string>
   <!-- Link text for learning more about AI controls -->
   <string name="ai_controls_learn_more">Ne saber mai</string>
+  <!-- Title for the block AI enhancements toggle -->
+  <string name="ai_controls_block_ai_title">Blocar los melhoraments IA</string>
+  <!-- Description for the block AI enhancements toggle. %s is the name of the app (for example "Firefox"). -->
+  <string name="ai_controls_block_ai_description">Activar lo blocatge implica que veiretz pas los melhoraments basats sus l’IA (novèls o existents) dins %s, ni las fenèstras sorgissentas que i son associadas.</string>
+  <!-- Section header for the AI-powered features list -->
+  <string name="ai_controls_ai_powered_features">Foncionalitats basadas sus l’IA</string>
   <!-- Title for the translations AI feature toggle -->
   <string name="ai_controls_translations_title">Traduccions</string>
+  <!-- Description for the translations AI feature toggle -->
+  <string name="ai_controls_translations_description">Totas las traduccions son privadas e non sortisson pas de l’aparelh.</string>
+  <!-- Link text to navigate to more translations settings -->
+  <string name="ai_controls_more_translations_settings">Mai de paramètres de traduccion</string>
+  <!-- Link text to navigate to more page summary settings -->
+  <string name="ai_controls_more_page_summary_settings">Mai de paramètres de resumits de paginas</string>
+  <!-- Title for the voice search AI feature toggle -->
+  <string name="ai_controls_voice_search_title">Recèrca a la votz</string>
+  <!-- Description for the voice search AI feature toggle -->
+  <string name="ai_controls_voice_search_description">L’àudio es convertit en tèxt per Google Speech Services.</string>
   <!-- Cancel button text in the block AI enhancements confirmation dialog -->
   <string name="ai_controls_block_dialog_cancel">Anullar</string>
   <!-- Block button text in the block AI enhancements confirmation dialog -->
@@ -439,6 +475,8 @@
   <string name="onboarding_marketing_positive_button_1" tools:ignore="UnusedResources">Acceptar e començar de navegar</string>
   <!-- "Continue" onboarding button. -->
   <string name="nova_onboarding_continue_button">Contunhar</string>
+  <!-- "Continue browsing" onboarding button. -->
+  <string name="nova_onboarding_continue_browsing_button" tools:ignore="UnusedResources">Contunhar la navegacion</string>
   <!-- "Not now" onboarding button. -->
   <string name="nova_onboarding_negative_button">Pas ara</string>
   <!-- "Skip" onboarding button. -->
@@ -461,6 +499,8 @@
   <string name="nova_onboarding_marketing_primary_button_text" tools:ignore="BrandUsage,UnusedResources">Ajudar Firefox</string>
   <!-- Notifications onboarding button. -->
   <string name="nova_onboarding_notifications_button">Activar las notificacions</string>
+  <!-- App icon onboarding title. -->
+  <string name="nova_onboarding_app_icon_prompt_title" tools:ignore="UnusedResources">Causissètz una icòna d’aplicacion personalizada</string>
   <!--
     Widget Picker
 
@@ -503,6 +543,8 @@
   <string name="preferences_search">Recèrca</string>
   <!-- Preference for settings related to Search engines -->
   <string name="preferences_search_engines">Motors de recèrca</string>
+  <!-- Settings item to add a search widget on the device's homescreen. -->
+  <string name="preferences_add_search_widget_from_settings">Widget sus l’ecran d’acuèlh</string>
   <!-- Preference for settings related to Search engines suggestions -->
   <string name="preferences_search_engines_suggestions">Suggestions dels motors de recèrcas</string>
   <!-- Preference Category for settings related to Search address bar -->
@@ -578,12 +620,16 @@
   <string name="preferences_theme">Tèma</string>
   <!-- Preference for customizing the home screen -->
   <string name="preferences_home_2">Pagina d’acuèlh</string>
+  <!-- Preference for customizing the app icon -->
+  <string name="preferences_app_icon">Icòna d’aplicacion</string>
   <!-- Preference for showing the tab strip -->
   <string name="preferences_tab_strip">Afichatge de la barra d’onglets</string>
   <!-- Preference for gestures based actions -->
   <string name="preferences_toolbar_shortcut">Acorchi de la barra d’aisinas</string>
   <!-- Preference for gestures based actions -->
   <string name="preferences_toolbar_select_shortcut">Seleccionar un acorchi</string>
+  <!-- Title of a menu option allowing to change the shortcut button shown in the toolbar -->
+  <string name="toolbar_shortcut_menu_edit_option">Modificar l’acorchi</string>
   <!-- Preference for gestures based actions -->
   <string name="preferences_gestures">Gèstes</string>
   <!-- Preference for settings related to visual options -->
@@ -656,8 +702,19 @@
   <string name="preferences_open_links_in_apps_ask">Demandar abans dobertura</string>
   <!-- Preference for open links in third party apps never open in apps option -->
   <string name="preferences_open_links_in_apps_never">Pas jamai</string>
+  <!-- Preference category for file storage. -->
+  <string name="preferences_category_file_storage">Emmagazinatge de fichièrs</string>
+  <!-- Preference title for downloads default location. -->
+  <string name="preferences_downloads_default_location_title">Emplaçament de telecargament per defaut</string>
   <!-- Preference title for choosing an app to handle downloads -->
   <string name="preferences_choose_app_for_downloads">Gerir los telecargaments amb una autra aplicacion</string>
+  <!-- Preference category for deleting or removing downloads -->
+  <string name="preferences_category_delete_or_remove_downloads">Suprimir o tirar de telecargaments</string>
+  <string name="preferences_downloads_delete_from_device">Suprimir de l’aparelh</string>
+  <string name="preferences_downloads_delete_from_device_description">Lo fichièr es suprimit de vòstre aparelh e levat de l\'istoric dels telecargaments</string>
+  <string name="preferences_downloads_remove_from_download_history">Tirar de l’istoric dels telecargaments</string>
+  <string name="preferences_downloads_remove_from_download_history_description">Lo fichièr es suprimit de l’istoric dels telecargaments, mas es totjorn salvat sus vòstre aparelh</string>
+  <string name="preferences_downloads_ask_when_to_delete_files">Me demandar en suprimissent de fichièrs</string>
   <!-- Preference for downloads -->
   <string name="preferences_downloads_2">Paramètres de telecargament</string>
   <!-- Preference for enabling gecko engine logs -->
@@ -700,8 +757,14 @@
   <string name="customize_addon_collection_user_hint">Proprietari de la colleccion (ID utilizaire)</string>
   <!-- Toast shown after confirming the custom extension collection configuration -->
   <string name="toast_customize_extension_collection_done">Colleccion d’extensions modificada. Tampadura de l’aplicacion per aplicar las modificacions…</string>
-  <!-- Header text for jumping back into the recent tab in customize the home screen -->
-  <string name="customize_toggle_jump_back_in">Tornar a aqueste onglet</string>
+  <!--
+    Customize Home
+
+    Title for the customize home screen section with privacy report.
+  -->
+  <string name="customize_toggle_privacy_report">Rapòrt de confidencialitat</string>
+  <!-- Title for a customize home screen section. Continue is a section that displays the most recent browser tab, so users can continue browsing where they left off. -->
+  <string name="customize_toggle_continue">Contunhar</string>
   <!-- Title for the customize home screen section with bookmarks. -->
   <string name="customize_toggle_bookmarks">Marcapaginas</string>
   <!--
@@ -789,6 +852,8 @@
   <string name="alternative_app_icon_option_momo_subtitle">Creada per @heyheymodraws</string>
   <!-- Title for the "Solid colors" group of alternative app icon variants in the icon picker screen. This group contains icons with flat, uniform color backgrounds. -->
   <string name="alternative_app_icon_group_solid_colors">Colors unidas</string>
+  <!-- Title to show in alert when user selects an alternative app icon -->
+  <string name="restart_warning_dialog_title">Cambiar l’icòna d’aplicacion\u00a0?</string>
   <!-- Dialog button text for cancelling app icon change -->
   <string name="restart_warning_dialog_button_negative">Anullar</string>
   <!--
@@ -841,6 +906,10 @@
   <string name="preferences_sign_out">Desconnexion</string>
   <!-- Preference displays and allows changing current FxA device name -->
   <string name="preferences_sync_device_name">Nom del periferic</string>
+  <!-- Preference category for Device name -->
+  <string name="preferences_device_name_category">Nom del periferic</string>
+  <!-- Label for the Preference that displays and allows changing current device name on Mozilla Account -->
+  <string name="preferences_sync_change_device_name">Cambiar lo nom del periferic</string>
   <!-- Text shown when user enters empty device name -->
   <string name="empty_device_name_error">Lo nom del periferic pòt pas èsser void.</string>
   <!-- Label indicating that sync is in progress -->
@@ -1002,8 +1071,12 @@
   <string name="preference_gestures_website_pull_to_refresh">Tirar per actualizar</string>
   <!-- Preference for using the dynamic toolbar -->
   <string name="preference_gestures_dynamic_toolbar">Defilar per amagar la barra d’aisinas</string>
+  <!-- Preference for showing the opened tabs by swiping up on the toolbar -->
+  <string name="preference_gestures_swipe_toolbar_show_tabs_2">Fasètz lisar la barra d’aisinas verticalament per afichar los onglets dobèrts</string>
   <!-- Preference for switching tabs by swiping horizontally on the addressbar -->
   <string name="preference_gestures_swipe_toolbar_switch_tabs_2">Cambiatz d’onglet en lisant la barra d’adreça lateralament</string>
+  <!-- Preference for switching for the shake to summarize toggle in page summaries and customize settings -->
+  <string name="preferences_shake_to_summarize">Brandir per resumir</string>
   <!--
     Library
 
@@ -1072,8 +1145,6 @@
     Title of preference for tabs management
   -->
   <string name="preferences_tabs">Onglets</string>
-  <!-- Title of preference that allows a user to specify the tab view -->
-  <string name="preferences_tab_view">Vista onglet</string>
   <!-- Option for a list tab view -->
   <string name="tab_view_list">Lista</string>
   <!-- Option for a grid tab view -->
@@ -1118,14 +1189,18 @@
   <string name="opening_screen_last_tab_summary">Dobrir lo darrièr onglet</string>
   <!-- Summary for homepage preference indicating opening the homepage when re-opening the app after four hours of inactivity -->
   <string name="opening_screen_after_four_hours_of_inactivity_summary">Dobrir la pagina d’acuèlh après quatre oras</string>
-  <!--
-    Inactive tabs
-
-    Category header of a preference that allows a user to enable or disable the inactive tabs feature
-  -->
-  <string name="preferences_inactive_tabs">Passar los onglets ancians a inactius</string>
-  <!-- Title of inactive tabs preference -->
+  <!-- Summary of the preference that allows a user to enable or disable the inactive tabs feature. -->
   <string name="preferences_inactive_tabs_title">Los onglets qu’avètz pas consultats fa doas setmanas aniràn a la seccion dels inactius.</string>
+  <!-- Title of the preference that allows a user to enable or disable the tab groups feature -->
+  <string name="preferences_tab_groups_title">Grops d’onglets</string>
+  <!--
+    Privacy report
+
+    Category header of a preference that allows a user to enable or disable the privacy report feature
+  -->
+  <string name="preferences_privacy_report">Rapòrt de confidencialitat</string>
+  <!-- Title of the privacy report preference that allows a user to enable or disable the feature -->
+  <string name="preferences_privacy_report_title">Activar lo rapòrt de confidencialitat</string>
   <!--
     Studies
 
@@ -1166,8 +1241,12 @@
   <string name="add_tab">Apondre un onglet</string>
   <!-- Content description (not visible, for screen readers etc.): Add tab button. Adds a news tab when pressed -->
   <string name="add_private_tab">Dobrir onglet privat</string>
+  <!-- Content description (not visible, for screen readers etc.): Create tab group button. Opens the create tab group sheet when pressed -->
+  <string name="create_tab_group_content_description">Crear un grop d’onglets</string>
   <!-- Text shown in the menu to view recently closed tabs -->
   <string name="tab_tray_menu_recently_closed">Onglets tampats recentament</string>
+  <!-- Text shown in the menu to select all tabs. -->
+  <string name="tab_tray_menu_select_all_tabs">Tot seleccionar</string>
   <!-- Text shown in the menu to view account settings -->
   <string name="tab_tray_menu_account_settings">Paramètres del compte</string>
   <!-- Text shown in the menu to view tab settings -->
@@ -1188,6 +1267,8 @@
   <string name="tab_manager_multiselect_menu_item_share">Partejar</string>
   <!-- Text shown in the multiselect menu for adding selected tabs to collections. -->
   <string name="tab_manager_multiselect_menu_item_add_to_collection">Apondre a la colleccion</string>
+  <!-- Text shown in the multiselect menu for adding selected tabs to a tab group. -->
+  <string name="tab_manager_multiselect_menu_item_add_to_tab_group">Apondre al grop</string>
   <!-- Content description for tabs tray multiselect menu -->
   <string name="tab_tray_multiselect_menu_content_description">Menú dels onglets seleccionats</string>
   <!-- Title text displayed for a homepage tab in the tabs tray. -->
@@ -1218,13 +1299,48 @@
   <string name="delete_from_history">Suprimir de l’istoric</string>
   <!-- Postfix for private WebApp titles. %1$s is the name of the app (for example "Firefox"). -->
   <string name="pwa_site_controls_title_private">%1$s (mòde privat)</string>
+  <!-- Title for introducing tab groups via an onboarding card shown in the tab manager. -->
+  <string name="tab_group_onboarding_item_title">Crear un grop d’onglets</string>
+  <!-- Description for tab groups onboarding shown in the tab manager when in list view. -->
+  <string name="tab_group_onboarding_list_item_description">Seleccionatz mantun onglet per crear un grop.</string>
+  <!-- The description displayed on the tab groups page when no tab groups are open -->
+  <string name="tab_manager_empty_tab_groups_page_description">Seleccionatz d\'onglets per crear un grop. Son enregistrats aquí, prèstes a èsser utilizats quand o volètz.</string>
+  <!--
+    Tab Group
+
+    Title for the create tab group bottom sheet
+  -->
+  <string name="create_tab_group_title">Crear un grop d’onglets</string>
   <!-- Title for the edit tab group bottom sheet -->
   <string name="edit_tab_group_title">Modificar lo grop</string>
   <string name="create_tab_group_save_button">Enregistrar</string>
+  <!--
+    Default tab group name when creating a tab group
+    %d is the number of existing tab groups + 1.
+  -->
+  <string name="create_tab_group_form_default_name">Grop %d</string>
+  <!-- Label for the tab group name field in the bottom sheet to create or edit a tab group. -->
+  <string name="create_tab_group_name_label">Nom</string>
+  <!-- Content Description for closing the "Add to Tab Group" panel. -->
+  <string name="add_to_tab_group_bottom_sheet_grabber_content_description">Apondre a un grop d’onglets, replegar la ponhada de desplaçament</string>
+  <!-- Content Description for "New tab group" panel. -->
+  <string name="add_to_new_tab_group_content_description">Apondre a un grop d’onglets nòu</string>
+  <!-- Label for adding to a new tab group. -->
+  <string name="add_to_new_tab_group_title">Grop d’onglets nòu</string>
+  <!-- Text shown on the confirm button in the Delete tab group confirmation dialog. -->
+  <string name="delete_tab_group_confirmation_dialog_confirm">Suprimir lo grop</string>
   <!-- Text shown on the cancel button in the Delete tab group confirmation dialog. -->
   <string name="delete_tab_group_confirmation_dialog_cancel">Anullar</string>
+  <!-- Text shown on the confirm button in the Close last tab and delete tab group confirmation dialog. -->
+  <string name="close_tab_and_delete_group_confirmation_dialog_confirm">Suprimir lo grop</string>
   <!-- Text shown on the cancel button in the Close last tab and delete tab group confirmation dialog. -->
   <string name="close_tab_and_delete_group_confirmation_dialog_cancel">Anullar</string>
+  <!-- Text shown on the ungroup button for a tab group on the three dot menu -->
+  <string name="tab_group_three_dot_menu_ungroup">Dissociar</string>
+  <!-- Title for the Ungroup tab group confirmation dialog. -->
+  <string name="ungroup_tab_group_confirmation_dialog_title">Dissociar lo grop d’onglets ?</string>
+  <!-- Text shown on the confirm button in the Ungroup tab group confirmation dialog. -->
+  <string name="ungroup_tab_group_confirmation_dialog_confirm">Dissociar</string>
   <!--
     Color labels for tab groups, used for accessibility and selection UI.
 
@@ -1264,16 +1380,6 @@
     %1$d is the number of bookmarks selected
   -->
   <string name="history_multi_select_title">%1$d seleccionats</string>
-  <!-- Text for the header that groups the history for today -->
-  <string name="history_today">Uèi</string>
-  <!-- Text for the header that groups the history for yesterday -->
-  <string name="history_yesterday">Ièr</string>
-  <!-- Text for the header that groups the history the past 7 days -->
-  <string name="history_7_days">Los darrièrs 7 jorns</string>
-  <!-- Text for the header that groups the history the past 30 days -->
-  <string name="history_30_days">Los darrièrs 30 jorns</string>
-  <!-- Text for the header that groups the history older than the last month -->
-  <string name="history_older">Mai ancian</string>
   <!-- Text shown when no history exists -->
   <string name="history_empty_message">Cap d’istoric</string>
   <!--
@@ -1337,14 +1443,28 @@
   <string name="download_share_url">Partejar l’URL</string>
   <!-- Text for the button to share the download file -->
   <string name="download_share_file">Partejar lo fichièr</string>
+  <!-- Text for the button to rename the download file -->
+  <string name="download_rename_file">Renomenar lo fichièr</string>
   <!-- Alert dialog confirmation before deleting multiple download items, this is the title. -->
   <string name="download_delete_multi_select_dialog_confirmation">Volètz vertadièrament suprimir los elements seleccionats ?</string>
   <!-- Alert dialog confirmation before deleting multiple download items, this is the positive action. -->
   <string name="download_delete_multi_select_dialog_confirm">Suprimir</string>
   <!-- Alert dialog confirmation before deleting multiple download items, this is the negative action. -->
   <string name="download_delete_multi_select_dialog_cancel">Anullar</string>
+  <!-- Alert dialog confirmation before deleting a single download item or many download items, this is one of the radio buttons within the dialog box for the user to select. -->
+  <string name="download_delete_dialog_from_device">Suprimir de l’aparelh</string>
+  <!-- Alert dialog confirmation before deleting a single download item or many download items, this is one of the radio buttons within the dialog box for the user to select. -->
+  <string name="download_delete_dialog_from_history">Sonque tirar de l’istoric dels telecargaments</string>
   <!-- Alert dialog confirmation before deleting a single download item or many download items, this is the positive action. -->
   <string name="download_delete_dialog_confirm">Confirmar</string>
+  <!-- Title for the alert dialog confirmation before renaming a download item. -->
+  <string name="download_rename_dialog_title">Renomenar lo fichièr</string>
+  <!-- Label for the name field in the alert dialog confirmation before renaming a download item. -->
+  <string name="download_rename_dialog_label">Nom</string>
+  <!-- Title for the alert dialog when the file cannot be renamed. -->
+  <string name="download_rename_error_cannot_rename_title">Impossible de renomenar lo fichièr</string>
+  <!-- Description message for the alert dialog when the file cannot be renamed. -->
+  <string name="download_rename_error_cannot_rename_description">Aqueste fichièr pòt pas èsser renomenat a causa de restriccions ligadas al sistèma o a l\'emmagazinatge.</string>
   <string name="change_file_extension_cancel_button">Anullar</string>
   <!-- Text for the header of in progress downloads -->
   <string name="download_header_in_progress">En cors</string>
@@ -1498,6 +1618,8 @@
   <string name="bookmark_error_edit_bookmark">Modificacion del marcapagina impossibla</string>
   <!-- Snackbar edit button shown after a bookmark has been created. -->
   <string name="edit_bookmark_snackbar_action">MODIFICAR</string>
+  <!-- Bookmark menu select button -->
+  <string name="bookmark_menu_select_button">Seleccionar</string>
   <!-- Bookmark menu move button -->
   <string name="bookmark_menu_move_button">Desplaçar</string>
   <!-- Bookmark overflow menu edit button -->
@@ -1803,6 +1925,12 @@
   -->
   <string name="nimbus_notification_default_browser_text" tools:ignore="BrandUsage,UnusedResources">Far que Firefox siá lo navegador per defaut</string>
   <!--
+    Privacy report notification
+
+    Name of the weekly privacy report notification channel. Displayed in the "App notifications" system settings for the app.
+  -->
+  <string name="notification_privacy_report_channel_name">Rapòrt de confidencialitat</string>
+  <!--
     Survey
 
     Text shown in the fullscreen message that pops up to ask user to take a short survey.
@@ -1975,6 +2103,8 @@
     -->
     <item quantity="other">%d traçadors blocats</item>
   </plurals>
+  <!-- Text shown on the trackers blocked card when no trackers have been blocked yet -->
+  <string name="trackers_blocked_empty">Sètz protegit</string>
   <!-- Preference for enhanced tracking protection for the standard protection settings -->
   <string name="preference_enhanced_tracking_protection_standard_default_1">Estandarda (per defaut)</string>
   <!-- Preference description for enhanced tracking protection for the standard protection settings -->
@@ -2312,12 +2442,32 @@
   <string name="saved_logins_menu_dropdown_chevron_icon_content_description_2">Menú de tria dels senhals</string>
   <!-- Text that links to additional information about the Email Masks -->
   <string name="preferences_email_masks_suggest_learn_more">Ne saber mai</string>
+  <!--
+    Firefox browser VPN (a browser-only proxy, distinct from the Mozilla VPN service)
+
+    Title for the browser VPN entry in the settings list
+  -->
+  <string name="preferences_ip_protection_title_2">VPN integrat</string>
+  <!-- Title for the browser VPN settings screen (displayed in the app bar) -->
+  <string name="ip_protection_settings_title">VPN integrat</string>
+  <!-- Headline for the browser VPN promo card. %s is the name of the app (for example "Firefox"). -->
+  <string name="ip_protection_promo_headline">Lo VPN integrat de %s</string>
+  <!-- Body text for the browser VPN settings header, shown when no promo is running. %s is a learn more link using ip_protection_learn_more as text. -->
+  <string name="ip_protection_promo_body_2">Navegatz amb una proteccion suplementària en amagant vòstra localizacion, quitament sus un Wi-Fi public. %s</string>
   <!-- Link text that opens additional information about the browser VPN -->
   <string name="ip_protection_learn_more">Ne saber mai</string>
   <!-- Badge label shown in the menu item when the browser VPN is active -->
   <string name="preferences_ip_protection_on">Activat</string>
   <!-- Badge label shown in the menu item while the browser VPN is connecting -->
   <string name="ip_protection_menu_connecting">Connexion…</string>
+  <!-- Badge label shown in the VPN menu item when the user is eligible for the feature but needs to authenticate / authorize to enable it -->
+  <string name="ip_protection_menu_try_vpn_cta">Ensajar gratuitament</string>
+  <!-- Label for the button that starts the browser VPN authentication or authorization flow on the settings screen -->
+  <string name="ip_protection_get_started">Començar</string>
+  <!-- Headline for the browser VPN onboarding card. %s is the name of the app (for example "Firefox"). -->
+  <string name="ip_protection_onboarding_card_headline">Ensajatz lo VPN integrat de %s</string>
+  <!-- Used as text for a link in ip_protection_onboarding_body. Make sure to adapt capitalization if the link is in the middle of the sentence. -->
+  <string name="ip_protection_onboarding_body_link">Navigatz amb una proteccion suplementària</string>
   <!--
     Autofill
 
@@ -2591,6 +2741,16 @@
     which navigates the user to a screen displaying all the shortcuts.
   -->
   <string name="homepage_shortcuts_show_all_content_description">Veire totes los acorchis</string>
+  <!--
+    Label for the button in the shortcuts home screen section that expands the section to show
+    every shortcut.
+  -->
+  <string name="homepage_shortcuts_show_all">O afichar tot</string>
+  <!--
+    Label for the button in the shortcuts home screen section that collapses the section back
+    to showing only the first shortcuts.
+  -->
+  <string name="homepage_shortcuts_show_less">Ne veire mens</string>
   <!-- Title text displayed in the dialog when shortcuts limit is reached. -->
   <string name="shortcut_max_limit_title">Arribat a la limita dels acorchis</string>
   <!-- Content description text displayed in the dialog when shortcut limit is reached. -->
@@ -2811,6 +2971,8 @@
   <string name="translation_settings_download_language">Telecargar de lengas</string>
   <!-- Toggle switch title and description for the translation settings control. -->
   <string name="translation_settings_control_title">Traduccions</string>
+  <!-- Description for the translation settings toggle switch. -->
+  <string name="translation_settings_control_description">Totas las traduccions son privadas e non sortisson pas de l’aparelh.</string>
   <!-- Clickable text for the translations settings item that links to a website. -->
   <string name="translation_settings_control_learn_more">Ne saber mai</string>
   <!--
@@ -2977,6 +3139,11 @@
     -->
     <item quantity="other">%1$d traçadors blocats aquesta sus aqueste site.</item>
   </plurals>
+  <!--
+    Description text for the protection panel banner when privacy dashboard is enabled.
+    and there are no trackers blocked.
+  -->
+  <string name="protection_panel_banner_protected_no_blocked_trackers_description">Sètz protegit.</string>
   <!-- Label text for the Enhanced Tracking Protection toggle. -->
   <string name="protection_panel_etp_toggle_label">Proteccion renfortida contra lo seguiment</string>
   <!-- Toggle if Enhanced Tracking Protection is turned on -->
@@ -3002,6 +3169,34 @@
       %1$d is a placeholder for the number of trackers blocked.
     -->
     <item quantity="other">%1$d traçadors blocats aquesta sus aqueste site</item>
+  </plurals>
+  <plurals name="trackers_blocked_panel_num_social_media_trackers">
+    <!--
+      Text for displaying in the trackers blocked panel the total number of blocked social media trackers.
+      %1$d is a placeholder for the number of social media trackers blocked.
+    -->
+    <item quantity="other">%1$d\u00a0traçadors de malhums socials</item>
+  </plurals>
+  <plurals name="trackers_blocked_panel_num_cross_site_cookies">
+    <!--
+      Text for displaying in the trackers blocked panel the total number of blocked cross-site tracking cookies.
+      %1$d is a placeholder for the number of cross-site tracking cookies blocked.
+    -->
+    <item quantity="other">%1$d\u00a0cookies de seguiment intersites</item>
+  </plurals>
+  <plurals name="trackers_blocked_panel_num_fingerprinters">
+    <!--
+      Text for displaying in the trackers blocked panel the total number of blocked fingerprinter scripts.
+      %1$d is a placeholder for the number of fingerprinters blocked.
+    -->
+    <item quantity="other">%1$d\u00a0generadors d’emprentas numericas</item>
+  </plurals>
+  <plurals name="trackers_blocked_panel_num_trackers_2">
+    <!--
+      Text for displaying in the trackers blocked panel the total number of blocked generic tracking scripts.
+      %1$d is a placeholder for the number of trackers blocked.
+    -->
+    <item quantity="other">%1$d\u00a0contenguts utilizats pel seguiment</item>
   </plurals>
   <plurals name="trackers_blocked_panel_num_trackers_blocked_this_week_2">
     <!--
@@ -3411,4 +3606,20 @@
   <string name="terms_of_use_prompt_body_line_two_alternative_link" tools:ignore="UnusedResources">aicí</string>
   <!-- The second active link used in privacy_notice_updated_homepage_message -->
   <string name="privacy_notice_updated_homepage_message_learn_more" tools:ignore="UnusedResources">Ne saber mai</string>
+  <!-- Link text shown on the collections to tab groups migration card that opens the tab groups page in the tab manager. -->
+  <string name="collections_migration_homepage_card_link">Mostrar mos grops d’onglets</string>
+  <!-- Banner title text on the Firefox Labs screen. -->
+  <string name="firefox_labs_banner_title_2">Ensajatz nòstras foncions experimentalas\u00a0!</string>
+  <!-- The link text shown when a feedback URL for a Firefox Labs feature is available. The feedback URL page will allow users to provide opinions and suggestions. -->
+  <string name="firefox_labs_share_feedback">Donar vòstre vejaire</string>
+  <!-- Content description for the share feedback link on a Firefox Labs feature. This text will be used by screen readers to provide more context on the feedback link. %s is the name of the Firefox Labs feature. -->
+  <string name="firefox_labs_share_feedback_content_description">Donar vòstre vejaire per %s.</string>
+  <!-- Button text on the Firefox Labs screen for restoring all toggles back to the default settings. The button will turn off any experimental features. -->
+  <string name="firefox_labs_restore_default_button_text">Restablir los paramètres per defaut</string>
+  <!-- The description used in a confirmation dialog on the Firefox Labs screen when restoring the application to its defaults by turning "off" any experimental features. %s is the name of the app (for example "Firefox Nightly") -->
+  <string name="firefox_labs_restore_defaults_dialog_message">Per restablir los paramètres per defaut, reaviatz %s.</string>
+  <!-- Title of the Firefox Labs Sandboxing experiment. -->
+  <string name="firefox_labs_website_isolation_title" tools:ignore="UnusedResources">Isolacion de site</string>
+  <!-- Description of the Firefox Labs Sandboxing experiment. -->
+  <string name="firefox_labs_website_isolation_description" tools:ignore="UnusedResources">Una barrièra suplementària entre los sites web que contribuís a protegir vòstras donadas entre los onglets. Pòt afectar las performanças, l\'estabilitat, la compatibilitat dels sites web e la salvagarda de l\'istoric de navegacion.</string>
 </resources>

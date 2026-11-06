@@ -6,19 +6,30 @@ package org.mozilla.fenix.ui.efficiency.tests
 
 import org.junit.Ignore
 import org.junit.Test
+import org.mozilla.fenix.customannotations.Critical
 import org.mozilla.fenix.customannotations.SmokeTest
 import org.mozilla.fenix.helpers.TestAssetHelper.getGenericAsset
 import org.mozilla.fenix.ui.efficiency.helpers.BaseTest
+import org.mozilla.fenix.ui.efficiency.selectors.SettingsPrivateBrowsingSelectors
 
 class SettingsPrivateBrowsingTest : BaseTest() {
-
-    private val mockWebServer
-        get() = fenixTestRule.mockWebServer
 
     @Ignore("Covered by verifyNavigationReachability[1: SettingsPrivateBrowsingPage (TBD) — Navigation Reachability]")
     @Test
     fun verifyTheSettingsPrivateBrowsingTest() {
         on.settingsPrivateBrowsing.navigateToPage()
+    }
+
+    // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/555822
+    @Critical
+    @Test
+    fun verifyPrivateBrowsingMenuItemsTest() {
+        on.settingsPrivateBrowsing
+            .navigateToPage()
+            .mozVerifyElementsByGroup(SettingsPrivateBrowsingSelectors.Group.MENU_ITEMS_VIEW)
+            .mozVerifyOptionSwitchIsNotChecked(SettingsPrivateBrowsingSelectors.OPEN_LINKS_IN_PRIVATE_TAB)
+            .mozVerifyOptionSwitchIsNotChecked(SettingsPrivateBrowsingSelectors.ALLOW_SCREENSHOTS_IN_PRIVATE_BROWSING)
+            .mozVerifyOptionSwitchIsNotChecked(SettingsPrivateBrowsingSelectors.USE_SCREEN_LOCK_TO_HIDE_TABS)
     }
 
     // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/652556

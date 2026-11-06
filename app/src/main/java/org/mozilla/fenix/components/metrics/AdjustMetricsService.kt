@@ -60,6 +60,7 @@ class AdjustMetricsService(private val application: Application) : MetricsServic
             isUserMolocoAttributed: Boolean,
             isUserRakutenAttributed: Boolean,
             isUserSkyflagAttributed: Boolean,
+            isUserQuoraAttributed: Boolean,
             controller: ThirdPartySharingController = AdjustThirdPartySharingController(),
         ) {
             /* noop */

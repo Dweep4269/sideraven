@@ -141,16 +141,8 @@
   <string name="home_screen_shortcut_open_new_private_tab_2">Прыватная картка</string>
   <!-- Shortcut action to open Passwords screen -->
   <string name="home_screen_shortcut_passwords">Паролі</string>
-  <!--
-    Recent Tabs
-
-    Header text for jumping back into the recent tab in the home screen
-  -->
-  <string name="recent_tabs_header">Назад да</string>
   <!-- Button text for showing all the tabs in the tabs tray -->
   <string name="recent_tabs_show_all">Паказаць усе</string>
-  <!-- Content description for the button which navigates the user to show all recent tabs in the tabs tray. -->
-  <string name="recent_tabs_show_all_content_description_2">Кнопка паказу ўсіх нядаўніх картак</string>
   <!-- Text for button in synced tab card that opens synced tabs tray -->
   <string name="recent_tabs_see_all_synced_tabs_button_text">Усе сінхранізаваныя карткі</string>
   <!-- Accessibility description for device icon used for recent synced tab -->
@@ -301,8 +293,6 @@
   <string name="browser_menu_default_banner_title">Зрабіць %1$s прыладай па змаўчанні</string>
   <!-- Label text within the set as default banner -->
   <string name="browser_menu_default_banner_subtitle_2">Хуткі, прыватны, і створаны для вас.</string>
-  <!-- Content description (not visible, for screen readers etc.) for the button that dismisses the set as default banner in the menu -->
-  <string name="browser_menu_default_banner_dismiss_promotion">Адхіліць акцыю</string>
   <!-- Content description (not visible, for screen readers etc.) for recommended extensions in main menu -->
   <string name="browser_menu_recommended_extensions_content_description">Падрабязней</string>
   <!--
@@ -549,6 +539,8 @@
   <string name="nova_onboarding_marketing_body_link_text">Як мы ўжываем звесткі</string>
   <!-- Marketing onboarding body link text. -->
   <string name="nova_onboarding_marketing_body_link_text_1">Падрабязней</string>
+  <!-- Marketing onboarding primary button text. 'Firefox' is intentionally hardcoded. -->
+  <string name="nova_onboarding_marketing_primary_button_text" tools:ignore="BrandUsage,UnusedResources">Дапамагчы Firefox</string>
   <!-- Marketing onboarding primary button text. -->
   <string name="nova_onboarding_marketing_primary_button_text_3">Так</string>
   <!-- Marketing onboarding secondary button text. -->
@@ -674,6 +666,8 @@
   <string name="preferences_override_sync_tokenserver">Уласны сервер сінхранізацыі</string>
   <!-- Preference category for account information -->
   <string name="preferences_category_account">Уліковы запіс</string>
+  <!-- Preference category for sync controls. Sync can be translated, it's just short for ”Synchronization” in English. -->
+  <string name="preferences_category_sync_controls">Сінхранізацыя</string>
   <!-- Preference for changing where the AddressBar is positioned -->
   <string name="preferences_toolbar_2">Размяшчэнне адраснага радка</string>
   <!-- Preference for changing default theme to dark or light mode -->
@@ -823,8 +817,8 @@
     Title for the customize home screen section with privacy report.
   -->
   <string name="customize_toggle_privacy_report">Справаздача аб прыватнасці</string>
-  <!-- Header text for jumping back into the recent tab in customize the home screen -->
-  <string name="customize_toggle_jump_back_in">Пераход назад да</string>
+  <!-- Title for a customize home screen section. Continue is a section that displays the most recent browser tab, so users can continue browsing where they left off. -->
+  <string name="customize_toggle_continue">Працягнуць</string>
   <!-- Title for the customize home screen section with bookmarks. -->
   <string name="customize_toggle_bookmarks">Закладкі</string>
   <!--
@@ -980,6 +974,10 @@
   <string name="preferences_sign_out">Выйсці</string>
   <!-- Preference displays and allows changing current FxA device name -->
   <string name="preferences_sync_device_name">Назва прылады</string>
+  <!-- Preference category for Device name -->
+  <string name="preferences_device_name_category">Назва прылады</string>
+  <!-- Label for the Preference that displays and allows changing current device name on Mozilla Account -->
+  <string name="preferences_sync_change_device_name">Змяніць назву прылады</string>
   <!-- Text shown when user enters empty device name -->
   <string name="empty_device_name_error">Назва прылады не можа быць пустой.</string>
   <!-- Label indicating that sync is in progress -->
@@ -1200,8 +1198,6 @@
     Title of preference for tabs management
   -->
   <string name="preferences_tabs">Карткі</string>
-  <!-- Title of preference that allows a user to specify the tab view -->
-  <string name="preferences_tab_view">Выгляд карткі</string>
   <!-- Option for a list tab view -->
   <string name="tab_view_list">Спіс</string>
   <!-- Option for a grid tab view -->
@@ -1246,13 +1242,7 @@
   <string name="opening_screen_last_tab_summary">Адкрываць на апошняй картцы</string>
   <!-- Summary for homepage preference indicating opening the homepage when re-opening the app after four hours of inactivity -->
   <string name="opening_screen_after_four_hours_of_inactivity_summary">Адкрываць на хатняй старонцы праз чатыры гадзіны</string>
-  <!--
-    Inactive tabs
-
-    Category header of a preference that allows a user to enable or disable the inactive tabs feature
-  -->
-  <string name="preferences_inactive_tabs">Перамяшчаць старыя карткі ў неактыўныя</string>
-  <!-- Title of inactive tabs preference -->
+  <!-- Summary of the preference that allows a user to enable or disable the inactive tabs feature. -->
   <string name="preferences_inactive_tabs_title">Карткі, якія вы не праглядалі на працягу двух тыдняў, будуць перанесеныя ў раздзел неактыўных.</string>
   <!--
     Studies
@@ -1432,16 +1422,6 @@
     %1$d is the number of bookmarks selected
   -->
   <string name="history_multi_select_title">Выбрана: %1$d</string>
-  <!-- Text for the header that groups the history for today -->
-  <string name="history_today">Сёння</string>
-  <!-- Text for the header that groups the history for yesterday -->
-  <string name="history_yesterday">Учора</string>
-  <!-- Text for the header that groups the history the past 7 days -->
-  <string name="history_7_days">Апошнія 7 дзён</string>
-  <!-- Text for the header that groups the history the past 30 days -->
-  <string name="history_30_days">Апошнія 30 дзён</string>
-  <!-- Text for the header that groups the history older than the last month -->
-  <string name="history_older">Даўней</string>
   <!-- Text shown when no history exists -->
   <string name="history_empty_message">Няма гісторыі</string>
   <!-- Title for the dialog that prompts the user to choose an app for downloading a file. -->
@@ -2464,8 +2444,6 @@
   <string name="preferences_ip_protection_off">Выкл.</string>
   <!-- Badge label shown in the menu item when the browser VPN has an error -->
   <string name="ip_protection_menu_error">Памылка</string>
-  <!-- Badge label shown in the menu item when the user is eligible to use the browser VPN but should authenticate or authorize it first. -->
-  <string name="ip_protection_menu_auth_required">Паспрабаваць</string>
   <!--
     Subtitle shown below the VPN label in menus when the monthly data allowance is exhausted.
     %1$d is the total monthly allowance in GB (for example "50").
@@ -2475,8 +2453,6 @@
   <string name="ip_protection_toolbar_pill_label">VPN уключаны</string>
   <!-- Label for the dismiss button on the onboarding bottom sheet. -->
   <string name="ip_protection_onboarding_not_now_button">Не зараз</string>
-  <!-- Snackbar (in-app pop-up notification) action button text that takes the user to the VPN settings screen. -->
-  <string name="ip_protection_data_limit_reached_snackbar_action">Налады</string>
   <!--
     Autofill
 

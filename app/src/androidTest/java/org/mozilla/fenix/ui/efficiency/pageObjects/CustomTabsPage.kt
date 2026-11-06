@@ -14,30 +14,46 @@ import org.mozilla.fenix.helpers.HomeActivityIntentTestRule
 import org.mozilla.fenix.helpers.TestAssetHelper.waitingTime
 import org.mozilla.fenix.ui.efficiency.helpers.BasePage
 import org.mozilla.fenix.ui.efficiency.helpers.PageStateTracker
-import org.mozilla.fenix.ui.efficiency.helpers.Selector
-import org.mozilla.fenix.ui.efficiency.navigation.NavigationRegistry
+import org.mozilla.fenix.ui.efficiency.navigation.NavigationArrival
+import org.mozilla.fenix.ui.efficiency.navigation.NavigationGraph
+import org.mozilla.fenix.ui.efficiency.navigation.NavigationOptions
+import org.mozilla.fenix.ui.efficiency.navigation.NavigationRoutePurpose
+import org.mozilla.fenix.ui.efficiency.navigation.NavigationStep
 import org.mozilla.fenix.ui.efficiency.selectors.BrowserPageSelectors
 import org.mozilla.fenix.ui.efficiency.selectors.CustomTabsSelectors
 
 class CustomTabsPage(composeRule: AndroidComposeTestRule<HomeActivityIntentTestRule, *>) : BasePage(composeRule) {
     override val pageName = "CustomTabsPage"
 
-    // Custom tabs are LAUNCH-reached: they run in their own activity (CustomTabActivity), started by firing
-    // a custom-tabs intent at IntentReceiverActivity — not by navigating a click-path from HomePage. So there
-    // is no INBOUND NavigationRegistry edge; use launchCustomTab() as the entry point (it sets the page state).
+    internal override fun registerNavigation(builder: NavigationGraph.Builder) {
+        builder.register(
+            from = "AppEntry",
+            to = pageName,
+            steps = listOf(NavigationStep.LaunchCustomTab("about:blank")),
+            purpose = NavigationRoutePurpose.COVERAGE,
+        )
 
-    init {
         // Outbound 0-step edge for the "Open in Firefox" flow: the menu click that converts the custom tab
         // into a normal tab is performed by the test, and this edge only carries navigateToPage() past its
         // single-pass mozIsOnPageNow() check into the polling mozWaitForPageToLoad(). That poll is what
         // absorbs the ~1s CustomTabActivity -> HomeActivity transition, during which the engineView anchor
         // isn't in the tree yet — without the edge, a slow transition makes path-finding fail with
         // "No navigation path found to 'BrowserPage'" (intermittent). Mirrors MainMenuPage -> BrowserPage.
-        NavigationRegistry.register(
+        builder.register(
             from = pageName,
             to = "BrowserPage",
             steps = listOf(),
+            arrival = NavigationArrival.EDGE_COMPLETION,
         )
+    }
+
+    override fun navigateToPage(
+        url: String,
+        forceNavigation: Boolean,
+        navigationOptions: NavigationOptions,
+    ): CustomTabsPage {
+        super.navigateToPage(url, forceNavigation, navigationOptions)
+        return this
     }
 
     fun launchCustomTab(url: String, customMenuItemLabel: String = ""): CustomTabsPage {
@@ -64,9 +80,8 @@ class CustomTabsPage(composeRule: AndroidComposeTestRule<HomeActivityIntentTestR
      * hands over the existing tab — a test that means to exercise the external entry point cannot substitute one for
      * the other.
      *
-     * Not a NavigationRegistry edge for the same reason launchCustomTab is not: it is an intent rather than a
-     * click-path. Sets the page state to BrowserPage, since that is where it lands; the caller should then assert on
-     * `on.browserPage` rather than continuing to chain off the custom tab.
+     * This direct test helper is not a setup route. It sets the page state to BrowserPage, since that is where it
+     * lands; the caller should then assert on `on.browserPage` rather than continuing to chain off the custom tab.
      */
     fun openUrlFromExternalLink(url: String) {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
@@ -94,7 +109,21 @@ class CustomTabsPage(composeRule: AndroidComposeTestRule<HomeActivityIntentTestR
         return this
     }
 
-    override fun mozGetSelectorsByGroup(group: String): List<Selector> {
-        return CustomTabsSelectors.all.filter { it.groups.contains(group) }
+    // The custom-tab toolbar renders the page's host, not the full URL (as the legacy verifyCustomTabUrl
+    // asserted), so match on the host extracted from the URL.
+    fun verifyUrl(url: String): CustomTabsPage {
+        val host = url.toUri().host ?: url
+        mozVerify(CustomTabsSelectors.TOOLBAR_URL(host))
+        return this
     }
+
+    // Long-press the toolbar URL box to raise its contextual menu, then tap "Copy" to put the URL on the
+    // clipboard. Ports CustomTabRobot.longClickAndCopyToolbarUrl.
+    fun longClickAndCopyToolbarUrl(): CustomTabsPage {
+        mozLongClick(CustomTabsSelectors.TOOLBAR_URL_BOX)
+        mozClick(CustomTabsSelectors.LONG_PRESS_COPY)
+        return this
+    }
+
+    override val selectorCatalog = CustomTabsSelectors
 }

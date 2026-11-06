@@ -73,16 +73,8 @@
   <string name="home_screen_shortcut_open_new_tab_2">Cluaisín nua</string>
   <!-- Shortcut action to open new private tab -->
   <string name="home_screen_shortcut_open_new_private_tab_2">Cluaisín nua príobháideach</string>
-  <!--
-    Recent Tabs
-
-    Header text for jumping back into the recent tab in the home screen
-  -->
-  <string name="recent_tabs_header">Léim ar ais isteach</string>
   <!-- Button text for showing all the tabs in the tabs tray -->
   <string name="recent_tabs_show_all">Taispeáin gach ceann</string>
-  <!-- Content description for the button which navigates the user to show all recent tabs in the tabs tray. -->
-  <string name="recent_tabs_show_all_content_description_2">Taispeáin gach cluaisín le déanaí</string>
   <!-- Content description for the button which navigates the user to show all of their history. -->
   <string name="past_explorations_show_all_content_description_2">Taispeáin gach taiscéalaíocht san am atá caite</string>
   <!--
@@ -258,8 +250,6 @@
   <string name="preferences_account_settings">Socruithe cuntais</string>
   <!-- Preference for open links in third party apps -->
   <string name="preferences_open_links_in_apps">Oscail naisc in aipeanna</string>
-  <!-- Header text for jumping back into the recent tab in customize the home screen -->
-  <string name="customize_toggle_jump_back_in">Léim ar ais isteach</string>
   <!-- Preference for triggering sync -->
   <string name="preferences_sync_now">Sioncronaigh anois</string>
   <!-- Preference category for sync -->
@@ -379,12 +369,6 @@
     %1$d is the number of bookmarks selected
   -->
   <string name="history_multi_select_title">%1$d mír roghnaithe</string>
-  <!-- Text for the header that groups the history the past 7 days -->
-  <string name="history_7_days">Na 7 lá is déanaí</string>
-  <!-- Text for the header that groups the history the past 30 days -->
-  <string name="history_30_days">Na 30 lá is déanaí</string>
-  <!-- Text for the header that groups the history older than the last month -->
-  <string name="history_older">Nios sine</string>
   <!-- Text shown when no history exists -->
   <string name="history_empty_message">Níl aon stair anseo</string>
   <!--
@@ -757,8 +741,6 @@
   <string name="preference_accessibility_force_enable_zoom_summary">Cumasaigh chun pinseáil agus zúmáil a cheadú, fiú ar shuímh a chuireann cosc ar na gothaí seo.</string>
   <!-- Used as text for a link in ip_protection_onboarding_body. Make sure to adapt capitalization if the link is in the middle of the sentence. -->
   <string name="ip_protection_onboarding_body_link_promo">Tuilleadh eolais</string>
-  <!-- Snackbar (in-app pop-up notification) action button text that takes the user to the VPN settings screen. -->
-  <string name="ip_protection_data_limit_reached_snackbar_action">Socruithe</string>
   <!-- Title of the Add search engine screen -->
   <string name="search_engine_add_custom_search_engine_title">Cuir inneall cuardaigh leis</string>
   <!-- Title of the Edit search engine screen -->

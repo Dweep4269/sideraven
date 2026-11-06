@@ -6,8 +6,10 @@ package org.mozilla.fenix.components.menu.compose
 
 import androidx.compose.foundation.ScrollState
 import androidx.compose.ui.test.junit4.v2.createComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import mozilla.components.compose.base.theme.Theme
 import mozilla.components.service.fxa.manager.AccountState.AuthenticationProblem
 import mozilla.components.support.test.robolectric.testContext
 import org.junit.Rule
@@ -17,7 +19,6 @@ import org.mozilla.fenix.R
 import org.mozilla.fenix.components.menu.MenuAccessPoint
 import org.mozilla.fenix.components.menu.store.IPProtectionMenuState
 import org.mozilla.fenix.theme.FirefoxTheme
-import org.mozilla.fenix.theme.Theme
 
 @RunWith(AndroidJUnit4::class)
 class MainMenuTest {
@@ -25,6 +26,9 @@ class MainMenuTest {
 
     private val customizeHomepageLabel: String
         get() = testContext.getString(R.string.browser_menu_customize_homepage)
+
+    private val passwordsLabel: String
+        get() = testContext.getString(R.string.browser_menu_passwords)
 
     @Test
     fun `WHEN the access point is Home THEN the customize homepage menu item is displayed`() {
@@ -40,7 +44,21 @@ class MainMenuTest {
         composeTestRule.onNodeWithText(customizeHomepageLabel, useUnmergedTree = true).assertDoesNotExist()
     }
 
-    private fun setMainMenuContent(accessPoint: MenuAccessPoint) {
+    @Test
+    fun `WHEN passwords are shown THEN the passwords menu item is displayed`() {
+        setMainMenuContent(accessPoint = MenuAccessPoint.Browser, showPasswords = true)
+
+        composeTestRule.onNodeWithContentDescription(passwordsLabel, useUnmergedTree = true).assertExists()
+    }
+
+    @Test
+    fun `WHEN passwords are not shown THEN the passwords menu item is not displayed`() {
+        setMainMenuContent(accessPoint = MenuAccessPoint.Browser, showPasswords = false)
+
+        composeTestRule.onNodeWithContentDescription(passwordsLabel, useUnmergedTree = true).assertDoesNotExist()
+    }
+
+    private fun setMainMenuContent(accessPoint: MenuAccessPoint, showPasswords: Boolean = true) {
         composeTestRule.setContent {
             FirefoxTheme(theme = Theme.Light) {
                 MainMenu(
@@ -67,6 +85,7 @@ class MainMenuTest {
                     isDownloadHighlighted = false,
                     webExtensionMenuCount = 0,
                     showIPProtection = false,
+                    showPasswords = showPasswords,
                     ipProtectionMenuState = IPProtectionMenuState(),
                     onMoreMenuClick = {},
                     onCustomizeReaderViewMenuClick = {},

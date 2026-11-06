@@ -4,6 +4,8 @@
 
 package pt.dweep.sideraven.ui
 
+import android.view.KeyEvent
+
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
@@ -42,14 +44,12 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.rememberCoroutineScope
@@ -63,21 +63,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.KeyEventType
-import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.onPreviewKeyEvent
-import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.text.TextRange
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -221,6 +210,7 @@ fun SearchPopup(
     onDismiss: () -> Unit,
     onOpenHome: (() -> Unit)? = null,
     options: SearchOptions = SearchOptions(),
+    fieldController: (FieldController) -> Unit = {},
 ) {
     // Enter: the card grows out of its anchor (or centred) while the dim layer fades in; closing
     // fades both out first. Reduced: fades only; Off: instant.
@@ -275,7 +265,7 @@ fun SearchPopup(
                 tonalElevation = 6.dp,
                 shadowElevation = 12.dp,
             ) {
-                SearchPopupContent(request, providers, onSubmit, onSuggestion, close, onOpenHome, options)
+                SearchPopupContent(request, providers, onSubmit, onSuggestion, close, onOpenHome, options, fieldController)
             }
             }
         }
@@ -291,57 +281,80 @@ private fun SearchPopupContent(
     onDismiss: () -> Unit,
     onOpenHome: (() -> Unit)?,
     options: SearchOptions,
+    fieldController: (FieldController) -> Unit,
 ) {
     // Another engine or a scope, for this search only (null: the default engine).
     var chosen by remember(request) { mutableStateOf<SearchEngine?>(null) }
     val activeProviders = remember(chosen, providers) { chosen?.let(options.providersFor) ?: providers }
+    // The handle on the on-screen field, handed to whoever asked (tests drive it).
+    val controller = remember { FieldController() }
+    SideEffect { fieldController(controller) }
     // A scope (Bookmarks, History, Tabs) narrows the suggestions; Enter still goes through the default.
     val submit: (String) -> Unit = { text ->
         val engine = chosen?.takeUnless { it.type == SearchEngine.Type.APPLICATION }
         if (engine != null) options.onSubmitWith(text, engine) else onSubmit(text)
     }
-    // The current URL starts selected, so typing replaces it.
-    var field by remember(request) { mutableStateOf(TextFieldValue(request.initialText, TextRange(0, request.initialText.length))) }
-    // Inline autocomplete: the completed address after the typed text, the added part selected.
-    var completion by remember(request) { mutableStateOf<String?>(null) }
-    var lookups by remember(request) { mutableIntStateOf(0) }
-    LaunchedEffect(lookups) {
-        if (lookups == 0) return@LaunchedEffect
-        val typed = field.text
-        val found = options.autocomplete(typed, chosen)
-        if (field.text == typed && found != null && found.length > typed.length && found.startsWith(typed, ignoreCase = true)) {
-            completion = typed + found.substring(typed.length)
-        }
-    }
+    // The typed text, as the control reports it (the completion's tail included when it stands).
+    var field by remember(request) { mutableStateOf(request.initialText) }
     // Suggestions shown, top to bottom, for Up/Down; the highlighted one is previewed in the field.
     var visible by remember { mutableStateOf(emptyList<AwesomeBarConcept.SuggestionItem>()) }
     var highlighted by remember(request) { mutableIntStateOf(-1) }
     var hidden by remember(request) { mutableStateOf(emptySet<AwesomeBarConcept.GroupedSuggestion>()) }
     val preview = (visible.getOrNull(highlighted) as? AwesomeBarConcept.Suggestion)?.let { it.editSuggestion ?: it.title ?: it.description }
-    val shown =
-        preview?.let { TextFieldValue(it, TextRange(it.length)) }
-            ?: completion?.let { TextFieldValue(it, TextRange(field.text.length, it.length)) }
-            ?: field
-    val setField: (TextFieldValue) -> Unit = {
-        completion = null
+    // The on-screen field is the toolbar's control; when a suggestion is highlighted down the
+    // list it shows the suggestion instead, and the tail mechanics belong to the control itself.
+    val setField: (String, Boolean) -> Unit = { text, selectAll ->
         highlighted = -1
-        field = it
+        field = text
+        controller.apply(text, selectAll)
     }
-    // Enter: the highlighted suggestion, else the text.
+    // Enter: the highlighted suggestion, else the field with any completion tail.
     val go: () -> Unit = {
         val item = visible.getOrNull(highlighted)
+        val text = controller.text
         when {
             item != null -> onSuggestion(item)
-            shown.text.isNotBlank() -> submit(shown.text.trim())
+            !text.isNullOrBlank() -> submit(text.trim())
         }
     }
-    val focus = remember { FocusRequester() }
-    LaunchedEffect(Unit) { focus.requestFocus() }
+    LaunchedEffect(Unit) { controller.raiseKeyboard() }
+    // The pop-up's own keys; with a keyboard up they arrive through the pre-IME dispatch,
+    // without one through the plain one, so one hook serves both.
+    val onKey: (Int) -> Boolean = { keyCode ->
+        when (keyCode) {
+            KeyEvent.KEYCODE_ESCAPE -> {
+                onDismiss()
+                true
+            }
+            KeyEvent.KEYCODE_DPAD_DOWN ->
+                if (visible.isNotEmpty()) {
+                    highlighted = (highlighted + 1).coerceAtMost(visible.size - 1)
+                    true
+                } else {
+                    false
+                }
+            KeyEvent.KEYCODE_DPAD_UP ->
+                if (highlighted >= 0) {
+                    highlighted -= 1
+                    true
+                } else {
+                    false
+                }
+            KeyEvent.KEYCODE_ENTER, KeyEvent.KEYCODE_NUMPAD_ENTER ->
+                if (highlighted >= 0 || !controller.text.isNullOrBlank()) {
+                    go()
+                    true
+                } else {
+                    false
+                }
+            else -> false
+        }
+    }
     // Hiding the keyboard closes the pop-up while nothing has been typed; with a query, the
     // suggestions stay to be read.
     val imeShown = WindowInsets.ime.getBottom(LocalDensity.current) > 0
     var imeWasShown by remember { mutableStateOf(false) }
-    val untouched = field.text.isBlank() || field.text == request.initialText
+    val untouched = field.isBlank() || field == request.initialText
     var promptAnswered by remember(request) { mutableStateOf(false) }
     // The camera or the voice prompt hides the keyboard: that isn't the user closing the pop-up.
     var awaitingExtra by remember(request) { mutableStateOf(false) }
@@ -358,25 +371,19 @@ private fun SearchPopupContent(
     // Rising from a bottom toolbar, the field sits at the bottom, nearest the toolbar and the thumb.
     val fieldAtBottom = (request.placement as? SearchPlacement.Anchored)?.toolbarAtTop == false
     StackColumn(reversed = fieldAtBottom, modifier = Modifier.padding(12.dp)) {
-        OutlinedTextField(
-            value = shown,
-            onValueChange = { value ->
-                when {
-                    // Editing a previewed suggestion makes it the text.
-                    preview != null -> setField(value)
-                    // Backspace on a completion removes only the completion.
-                    completion != null && value.text == field.text -> setField(field.copy(selection = TextRange(field.text.length)))
-                    else -> {
-                        // Typing at the end looks for a completion; editing elsewhere or deleting doesn't.
-                        val grew = value.text.length > field.text.length && value.selection.collapsed && value.selection.end == value.text.length
-                        setField(value)
-                        if (grew) lookups++
-                    }
-                }
+        InlineCompletingField(
+            query = field,
+            preview = preview,
+            placeholder = stringResource(R.string.sideraven_address_placeholder),
+            autocomplete = { text -> options.autocomplete(text, chosen) },
+            onTextMirror = {
+                field = it
+                highlighted = -1
             },
-            singleLine = true,
-            placeholder = { Text(stringResource(R.string.sideraven_address_placeholder)) },
-            leadingIcon = {
+            onCommit = go,
+            onKey = onKey,
+            controller = controller,
+            leading = {
                 if (options.engines.isEmpty()) {
                     Icon(painter = painterResource(iconsR.drawable.mozac_ic_search_24), contentDescription = null)
                 } else {
@@ -388,17 +395,18 @@ private fun SearchPopupContent(
                     )
                 }
             },
-            trailingIcon = {
+            trailing = {
                 val extras = options.extras
-                if (field.text.isEmpty() && extras != null && (extras.canScanQr || extras.canUseVoice)) {
+                if (field.isEmpty() && extras != null && (extras.canScanQr || extras.canUseVoice)) {
                     Row {
                         if (extras.canScanQr) {
                             FieldButton(iconsR.drawable.mozac_ic_qr_code_24, stringResource(R.string.sideraven_search_qr), SidebarTestTag.SEARCH_QR) {
                                 awaitingExtra = true
                                 extras.scanQr { scanned ->
                                     awaitingExtra = false
-                                    // In the field, all selected: seen before it is opened.
-                                    setField(TextFieldValue(scanned, TextRange(0, scanned.length)))
+                                    // (selectAll = the second flag.) In the field, all selected:
+                                    // seen before it is opened.
+                                    setField(scanned, true)
                                 }
                             }
                         }
@@ -413,14 +421,14 @@ private fun SearchPopupContent(
                         }
                     }
                 }
-                if (field.text.isNotEmpty()) {
+                if (field.isNotEmpty()) {
                     val clearLabel = stringResource(R.string.sideraven_search_clear)
                     Box(
                         modifier =
                             Modifier
                                 .size(40.dp)
                                 .clip(MaterialTheme.shapes.small)
-                                .clickable(role = Role.Button) { setField(TextFieldValue("")) }
+                                .clickable(role = Role.Button) { setField("", false) }
                                 .semantics { contentDescription = clearLabel }
                                 .testTag(SidebarTestTag.SEARCH_CLEAR),
                         contentAlignment = Alignment.Center,
@@ -429,42 +437,13 @@ private fun SearchPopupContent(
                     }
                 }
             },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri, imeAction = ImeAction.Go),
-            keyboardActions = KeyboardActions(onGo = { go() }),
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .focusRequester(focus)
-                    .onPreviewKeyEvent { event ->
-                        when {
-                            event.type != KeyEventType.KeyDown -> false
-                            event.key == Key.Escape -> {
-                                onDismiss()
-                                true
-                            }
-                            event.key == Key.DirectionDown && visible.isNotEmpty() -> {
-                                highlighted = (highlighted + 1).coerceAtMost(visible.size - 1)
-                                true
-                            }
-                            event.key == Key.DirectionUp && highlighted >= 0 -> {
-                                highlighted -= 1
-                                true
-                            }
-                            (event.key == Key.Enter || event.key == Key.NumPadEnter) && (highlighted >= 0 || shown.text.isNotBlank()) -> {
-                                go()
-                                true
-                            }
-                            else -> false
-                        }
-                    }
-                    .testTag(SidebarTestTag.SEARCH_FIELD),
         )
         options.clipboardLink?.let { link ->
-            ClipboardChip(link, onPaste = { setField(TextFieldValue(link, TextRange(link.length))) }, onGo = { onSubmit(link) })
+            ClipboardChip(link, onPaste = { setField(link, false) }, onGo = { onSubmit(link) })
         }
         // Asked once something is typed, as Fenix does; answered, it doesn't come back.
         val prompt = options.privatePrompt
-        if (prompt != null && prompt.needed && !promptAnswered && field.text.isNotBlank() && field.text != request.initialText) {
+        if (prompt != null && prompt.needed && !promptAnswered && field.isNotBlank() && field != request.initialText) {
             org.mozilla.fenix.search.awesomebar.PrivateSuggestionsCard(
                 onSearchSuggestionsInPrivateModeAllowed = {
                     promptAnswered = true
@@ -494,7 +473,7 @@ private fun SearchPopupContent(
         }
         Box(modifier = Modifier.fillMaxWidth().heightIn(max = 420.dp)) {
             AwesomeBar(
-                text = field.text,
+                text = field,
                 colors =
                     AwesomeBarDefaults.colors(
                         background = Color.Transparent,
@@ -503,7 +482,7 @@ private fun SearchPopupContent(
                 providers = activeProviders,
                 onSuggestionClicked = { item -> onSuggestion(item) },
                 // Autocomplete fills the field with the suggestion's text.
-                onAutoComplete = { suggestion -> suggestion.editSuggestion?.let { setField(TextFieldValue(it, TextRange(it.length))) } },
+                onAutoComplete = { suggestion -> suggestion.editSuggestion?.let { setField(it, false) } },
                 hiddenSuggestions = hidden,
                 // Removing a history suggestion hides it here and deletes it from history.
                 onRemoveClicked = { item ->
@@ -515,8 +494,6 @@ private fun SearchPopupContent(
         }
     }
 }
-
-private const val SCRIM_ALPHA = 0.4f
 
 /** The pop-up's entrance and exit (a popover, opened many times a day: short). */
 private const val ENTER_MS = 180
@@ -692,3 +669,5 @@ private fun ClipboardChip(
         }
     }
 }
+
+private const val SCRIM_ALPHA = 0.4f

@@ -13,7 +13,6 @@ import org.json.JSONArray
 import org.json.JSONObject
 
 /** Pinned Tabs per Space; the same rule as the Essentials Cap. */
-const val PINNED_TABS_CAP = 12
 
 /**
  * A URL pinned to one Space. Like an Essential it keeps the URL it was
@@ -113,6 +112,21 @@ data class SpacesData(
 
     /** [spaceId]'s Pinned Tabs, in order. */
     fun pinnedIn(spaceId: String): List<PinnedTab> = pinned.filter { it.spaceId == spaceId }
+
+    /** The ids of [spaceId]'s tabs among [tabs]: its Tab List and its Pinned Tabs' tabs, not Essential Tabs. */
+    fun tabsIn(
+        spaceId: String,
+        tabs: List<TabSessionState>,
+        essentialTabs: Set<String>,
+    ): List<String> = tabs.filter { !it.content.private && it.id !in essentialTabs && spaceOf(it.id) == spaceId }.map { it.id }
+
+    /** [tabsIn] without the Pinned Tabs' tabs ([pinnedTabs]): the Space's Tab List. */
+    fun unpinnedTabsIn(
+        spaceId: String,
+        tabs: List<TabSessionState>,
+        essentialTabs: Set<String>,
+        pinnedTabs: Set<String>,
+    ): List<String> = tabsIn(spaceId, tabs, essentialTabs).filter { it !in pinnedTabs }
 
     val current: Space get() = spaces.firstOrNull { it.id == currentSpaceId } ?: spaces.first()
 
@@ -414,7 +428,6 @@ class Spaces(
         val pins = data.pinnedIn(data.current.id)
         return when {
             pins.any { it.url == tab.content.url } -> PinResult.AlreadyPinned
-            pins.size >= PINNED_TABS_CAP -> PinResult.Full
             else -> PinResult.Pinned
         }
     }
@@ -451,7 +464,6 @@ class Spaces(
         val spaceId = data.current.id
         val pins = data.pinnedIn(spaceId)
         if (pins.any { it.url == url }) return PinResult.AlreadyPinned
-        if (pins.size >= PINNED_TABS_CAP) return PinResult.Full
         val pin = PinnedTab(newPinId(), spaceId, url, title, customName = customName)
         update { data ->
             val assignments = tabId?.let { data.assignments + (it to spaceId) } ?: data.assignments

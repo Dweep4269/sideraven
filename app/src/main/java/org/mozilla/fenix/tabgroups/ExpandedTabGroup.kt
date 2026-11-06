@@ -37,8 +37,8 @@ import mozilla.components.compose.base.button.IconButton
 import mozilla.components.ui.icons.R as iconsR
 import org.mozilla.fenix.R
 import org.mozilla.fenix.tabstray.TabsTrayTestTag
-import org.mozilla.fenix.tabstray.controller.NoOpTabInteractionHandler
-import org.mozilla.fenix.tabstray.controller.TabInteractionHandler
+import org.mozilla.fenix.tabstray.controller.ItemInteractionHandler
+import org.mozilla.fenix.tabstray.controller.NoOpItemInteractionHandler
 import org.mozilla.fenix.tabstray.data.TabGroupTheme
 import org.mozilla.fenix.tabstray.data.TabsTrayItem
 import org.mozilla.fenix.tabstray.data.createTab
@@ -55,7 +55,7 @@ import org.mozilla.fenix.theme.FirefoxTheme
  * @param group [TabsTrayItem.TabGroup] item rendered by the card.
  * @param actions [ExpandedTabGroupActions] invoked in response to user interactions.
  * @param displayTabsInGrid Whether the group's tabs are displayed in a grid (vs a list).
- * @param tabInteractionHandler Handler for tab interactions.
+ * @param itemInteractionHandler Handler for tab interactions.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -63,7 +63,7 @@ fun ExpandedTabGroup(
     group: TabsTrayItem.TabGroup,
     actions: ExpandedTabGroupActions,
     displayTabsInGrid: Boolean,
-    tabInteractionHandler: TabInteractionHandler,
+    itemInteractionHandler: ItemInteractionHandler,
 ) {
     Column(
         modifier =
@@ -89,7 +89,7 @@ fun ExpandedTabGroup(
             liveReorderEnabled = true,
             selectedItemIndex = group.initialScrollIndex,
             selectionMode = TabsTrayState.Mode.Normal,
-            tabInteractionHandler = tabInteractionHandler,
+            itemInteractionHandler = itemInteractionHandler,
             modifier = Modifier,
             onTabClose = actions.onTabClose,
             onItemClick = actions.onItemClick,
@@ -98,6 +98,7 @@ fun ExpandedTabGroup(
             onCloseTabGroupClick = {}, // Ignore tab group closes
             onShareTabGroupClick = {}, // Ignore tab group shares
             onDeleteTabGroupClick = {}, // Ignore tab group deletes
+            onUngroupTabGroupClick = {}, // Ignore tab group ungroups
             onTabGroupOnboardingDismiss = {}, // Ignore onboarding dismissals - onboarding is not shown in this layout
             contentPadding = PaddingValues(0.dp), // TabLayout should not have its own content padding inside this view
             listHorizontalPadding = 0.dp, // The list layout should not add its own horizontal padding inside this view
@@ -170,7 +171,7 @@ private fun ViewTabGroupHeader(
             onEditTabGroupClick = actions.onEditTabGroupClick,
             onCloseTabGroupClick = actions.onCloseTabGroupClick,
             onShareTabGroupClick = actions.onShareTabGroupClick,
-            onUngroupTabGroupClick = {},
+            onUngroupTabGroupClick = actions.onUngroupTabGroupClick,
         )
     }
 }
@@ -209,11 +210,12 @@ private fun ExpandedTabGroupPreview(
                         onDeleteTabGroupClick = {},
                         onEditTabGroupClick = {},
                         onCloseTabGroupClick = {},
+                        onUngroupTabGroupClick = {},
                         onAddNewTabClick = {},
                         onShareTabGroupClick = {},
                     ),
                 displayTabsInGrid = previewState.displayTabsInGrid,
-                tabInteractionHandler = NoOpTabInteractionHandler,
+                itemInteractionHandler = NoOpItemInteractionHandler,
             )
         }
     }
@@ -328,6 +330,7 @@ private class ExpandedTabGroupPreviewProvider : PreviewParameterProvider<Expande
  * @property onDeleteTabGroupClick Invoked when the user clicks on delete tab group.
  * @property onEditTabGroupClick Invoked when the user clicks to edit the group.
  * @property onCloseTabGroupClick Invoked when the user clicks to close a tab group.
+ * @property onUngroupTabGroupClick Invoked when the user clicks to ungroup a tab group.
  * @property onAddNewTabClick Invoked when the user clicks to add a new tab to the group. When null, the add-tab button
  *   is hidden.
  * @property onShareTabGroupClick Invoked when the user clicks to share the group.
@@ -338,6 +341,7 @@ data class ExpandedTabGroupActions(
     val onDeleteTabGroupClick: () -> Unit,
     val onEditTabGroupClick: () -> Unit,
     val onCloseTabGroupClick: () -> Unit,
+    val onUngroupTabGroupClick: () -> Unit,
     val onAddNewTabClick: (() -> Unit)?,
     val onShareTabGroupClick: () -> Unit,
 )

@@ -70,7 +70,7 @@
   -->
   <string name="home_bookmarks_title">북마크</string>
   <!-- Content description for the button which navigates the user to show all of their bookmarks. -->
-  <string name="home_bookmarks_show_all_content_description">모든 북마크 표시</string>
+  <string name="home_bookmarks_show_all_content_description">모든 북마크 보기</string>
   <!-- Text for the menu button to remove a recently saved bookmark from the user's home screen -->
   <string name="home_bookmarks_menu_item_remove">제거</string>
   <!-- About content. %1$s is the name of the app (for example "Firefox"). -->
@@ -150,17 +150,9 @@
 
     Header text on the homescreen for continuing to browse the most recent browser tab
   -->
-  <string name="recent_tabs_header_2">계속</string>
-  <!--
-    Recent Tabs
-
-    Header text for jumping back into the recent tab in the home screen
-  -->
-  <string name="recent_tabs_header">최근 탭</string>
+  <string name="recent_tabs_header_2">이어하기</string>
   <!-- Button text for showing all the tabs in the tabs tray -->
-  <string name="recent_tabs_show_all">모두 표시</string>
-  <!-- Content description for the button which navigates the user to show all recent tabs in the tabs tray. -->
-  <string name="recent_tabs_show_all_content_description_2">모든 최근 탭 표시 버튼</string>
+  <string name="recent_tabs_show_all">모두 보기</string>
   <!-- Text for button in synced tab card that opens synced tabs tray -->
   <string name="recent_tabs_see_all_synced_tabs_button_text">동기화된 탭 모두 보기</string>
   <!-- Accessibility description for device icon used for recent synced tab -->
@@ -185,7 +177,7 @@
   -->
   <string name="recently_visited_menu_item_remove">삭제</string>
   <!-- Content description for the button which navigates the user to show all of their history. -->
-  <string name="past_explorations_show_all_content_description_2">모든 지난 탐색 표시</string>
+  <string name="past_explorations_show_all_content_description_2">모든 지난 탐색 보기</string>
   <!--
     Browser Fragment
 
@@ -254,13 +246,13 @@
   -->
   <string name="browser_menu_powered_by2">%1$s 제공</string>
   <!-- Browser menu button to put the current page in reader mode -->
-  <string name="browser_menu_read">리더뷰</string>
+  <string name="browser_menu_read">읽기 모드</string>
   <!-- Browser menu button content description to close reader mode and return the user to the regular browser -->
-  <string name="browser_menu_read_close">리더뷰 닫기</string>
+  <string name="browser_menu_read_close">읽기 모드 닫기</string>
   <!-- Browser menu button to open the current page in an external app -->
   <string name="browser_menu_open_app_link">앱에서 열기</string>
   <!-- Browser menu button to show reader view appearance controls e.g. the used font type and size -->
-  <string name="browser_menu_customize_reader_view_2">리더뷰 사용자 지정</string>
+  <string name="browser_menu_customize_reader_view_2">읽기 모드 사용자 지정</string>
   <!-- Browser menu label to sign in to sync on the device using Mozilla accounts -->
   <string name="browser_menu_sign_in">로그인</string>
   <!-- Browser menu caption label for the "Sign in" browser menu item described in `browser_menu_sign_in` -->
@@ -281,6 +273,10 @@
   <string name="browser_main_menu_content_description_navigation_header">네비게이션</string>
   <!-- Content description (not visible, for screen readers etc.) for bottom sheet handlebar custom tab menu. -->
   <string name="browser_custom_tab_menu_handlebar_content_description">사용자 지정 탭 메뉴 시트 닫기</string>
+  <!-- URL bar indicator shown on a cached version of the website, when the tab is reloading, but the content is not live yet -->
+  <string name="browser_toolbar_cached_page_indicator">캐시됨</string>
+  <!-- Message shown when a cached website has finished reloading and the tab is now showing the live version of the page -->
+  <string name="browser_toolbar_live_page_toast">실시간 페이지</string>
   <!-- Browser menu label that bookmarks the currently visited page -->
   <string name="browser_menu_bookmark_this_page_2">페이지 북마크</string>
   <!-- Browser menu label that navigates to the edit bookmark screen for the current bookmarked page -->
@@ -295,8 +291,12 @@
   <string name="browser_menu_summarize_page">페이지 요약</string>
   <!-- Browser menu badge text for summarization feature -->
   <string name="browser_menu_summarize_page_badge">신규</string>
+  <!-- Browser menu badge text for new, highlighted feature -->
+  <string name="browser_menu_page_badge_text">신규</string>
   <!-- Browser menu label for navigating to the Web Compat Reporter feature, which provides users the ability to send bug reports for broken sites. -->
   <string name="browser_menu_webcompat_reporter_2">깨진 사이트 신고</string>
+  <!-- Browser menu label for adding a tab to a tab group -->
+  <string name="browser_menu_add_to_tab_group">그룹에 추가</string>
   <!-- Browser menu label that is displayed when the current page has been translated by the translation feature. -->
   <string name="browser_menu_translated">번역됨</string>
   <!-- Browser menu label for the print feature -->
@@ -708,6 +708,14 @@
   <string name="search_widget_text_long">웹 검색</string>
   <!-- Content description (not visible, for screen readers etc.): Voice search -->
   <string name="search_widget_voice">음성 검색</string>
+  <!-- Content description (not visible, for screen readers etc.): Button in the search widget that starts a search in a private tab -->
+  <string name="search_widget_private_search">사생활 보호 검색</string>
+  <!-- Widget description in the widget picker screen for the search bar widget that includes buttons for private search and for voice search -->
+  <string name="search_bar_widget_description">사생활 보호 및 음성 검색의 검색 창</string>
+  <!-- Widget description in the widget picker screen for the search bar widget that includes buttons for image search, private search and voice search -->
+  <string name="search_bar_with_lens_widget_description">이미지, 사생활 보호 및 음성 검색의 검색 창</string>
+  <!-- Widget description in the widget picker screen for the compact search bar widget -->
+  <string name="compact_search_bar_widget_description">간단한 검색 창</string>
   <!--
     Preferences
 
@@ -805,6 +813,8 @@
   <string name="preferences_override_sync_tokenserver">사용자 지정 동기화 서버</string>
   <!-- Preference category for account information -->
   <string name="preferences_category_account">계정</string>
+  <!-- Preference category for sync controls. Sync can be translated, it's just short for ”Synchronization” in English. -->
+  <string name="preferences_category_sync_controls">동기화</string>
   <!-- Preference for changing where the AddressBar is positioned -->
   <string name="preferences_toolbar_2">주소 표시줄 위치</string>
   <!-- Preference for changing toolbar layout -->
@@ -861,6 +871,8 @@
   <string name="preferences_search_synced_tabs">동기화된 탭 검색</string>
   <!-- Preference for account settings -->
   <string name="preferences_account_settings">계정 설정</string>
+  <!-- Preference for account and sync settings -->
+  <string name="preferences_account_and_sync_settings">계정 및 동기화</string>
   <!-- Preference for enabling url autocomplete -->
   <string name="preferences_enable_autocomplete_urls">URL 자동 완성</string>
   <!-- Preference title for switch preference to show sponsored Firefox Suggest search suggestions -->
@@ -908,6 +920,8 @@
   <string name="preference_downloads_folder_permission_lost" tools:ignore="UnusedResources">이 폴더를 사용할 권한이 없습니다. 다른 폴더를 선택해 보세요.</string>
   <!-- Preference title for choosing an app to handle downloads -->
   <string name="preferences_choose_app_for_downloads">다른 앱으로 다운로드 관리</string>
+  <!-- Message shown when no app is available to let the user pick a download folder. -->
+  <string name="preferences_downloads_no_folder_picker_available">이 기기에서 폴더 선택기를 열 수 없습니다.</string>
   <!-- Preference category for deleting or removing downloads -->
   <string name="preferences_category_delete_or_remove_downloads">다운로드 삭제</string>
   <string name="preferences_downloads_delete_from_device">기기에서 삭제</string>
@@ -982,9 +996,7 @@
   -->
   <string name="customize_toggle_privacy_report">개인정보 보호 보고서</string>
   <!-- Title for a customize home screen section. Continue is a section that displays the most recent browser tab, so users can continue browsing where they left off. -->
-  <string name="customize_toggle_continue">계속</string>
-  <!-- Header text for jumping back into the recent tab in customize the home screen -->
-  <string name="customize_toggle_jump_back_in">최근 탭</string>
+  <string name="customize_toggle_continue">이어하기</string>
   <!-- Title for the customize home screen section with bookmarks. -->
   <string name="customize_toggle_bookmarks">북마크</string>
   <!--
@@ -1140,6 +1152,12 @@
   <string name="preferences_sync_now">지금 동기화</string>
   <!-- Preference category for sync -->
   <string name="preferences_sync_category">동기화할 대상 선택</string>
+  <!-- Preference category for sync controls -->
+  <string name="preferences_category_sync">동기화된 데이터</string>
+  <!-- Summary for the sync preference category. -->
+  <string name="preferences_sync_category_summary">연결된 모든 기기에서 동기화 할 항목 관리</string>
+  <!-- Summary for the sync preference category, when user has disabled all synchronisation items. -->
+  <string name="preferences_sync_category_no_engine_selected_summary">동기화 중인 항목이 없습니다. 기기 간에 동기화를 유지할 항목을 선택하세요.</string>
   <!-- Preference for syncing history -->
   <string name="preferences_sync_history">기록</string>
   <!-- Preference for syncing bookmarks -->
@@ -1152,6 +1170,10 @@
   <string name="preferences_sign_out">로그아웃</string>
   <!-- Preference displays and allows changing current FxA device name -->
   <string name="preferences_sync_device_name">기기 이름</string>
+  <!-- Preference category for Device name -->
+  <string name="preferences_device_name_category">기기 이름</string>
+  <!-- Label for the Preference that displays and allows changing current device name on Mozilla Account -->
+  <string name="preferences_sync_change_device_name">기기 이름 변경</string>
   <!-- Text shown when user enters empty device name -->
   <string name="empty_device_name_error">기기 이름은 비워둘 수 없습니다.</string>
   <!-- Label indicating that sync is in progress -->
@@ -1270,9 +1292,7 @@
   <!-- Preference for using simple toolbar -->
   <string name="preference_simple_toolbar">단순</string>
   <!-- Preference for using expanded toolbar -->
-  <string name="preference_expanded_toolbar">확장됨</string>
-  <!-- Preference description indicating the toolbar location preference is disabled when the tab strip is enabled -->
-  <string name="preference_toolbar_pref_disabled_explanation">탭 표시줄이 표시될 때는 주소 표시줄이 위에 있습니다.</string>
+  <string name="preference_expanded_toolbar">확장</string>
   <!-- New tab shortcut in toolbar customization -->
   <string name="toolbar_customize_shortcut_new_tab">새 탭 열기</string>
   <!-- Share shortcut in toolbar customization -->
@@ -1316,6 +1336,12 @@
     Preferences for showing tab strip
   -->
   <string name="preference_tab_strip_show">탭 표시줄 표시</string>
+  <!-- Preference for tab bar placement (top or bottom of the screen) -->
+  <string name="preference_tab_strip_location_header">탭 표시줄 위치</string>
+  <!-- Preference for using top tab strip -->
+  <string name="preference_top_tab_strip">위쪽</string>
+  <!-- Preference for using bottom tab strip -->
+  <string name="preference_bottom_tab_strip">아래쪽</string>
   <!--
     Gestures Preferences
 
@@ -1348,6 +1374,8 @@
   <string name="library_desktop_bookmarks_unfiled">기타 북마크</string>
   <!-- Option in Library to open History page -->
   <string name="library_history">기록</string>
+  <!-- Content description (not visible, for screen readers etc.) for the check mark that replaces a site's icon in History and Recently closed tabs when the item is selected -->
+  <string name="library_item_selected_content_description">선택됨</string>
   <!-- Settings Page Title -->
   <string name="settings_title">설정</string>
   <!-- Content description (not visible, for screen readers etc.): "Close button for library settings" -->
@@ -1398,8 +1426,8 @@
     Title of preference for tabs management
   -->
   <string name="preferences_tabs">탭</string>
-  <!-- Title of preference that allows a user to specify the tab view -->
-  <string name="preferences_tab_view">탭 보기</string>
+  <!-- Title of preference that allows a user to specify the tab layout -->
+  <string name="preferences_tab_layout">탭 레이아웃</string>
   <!-- Option for a list tab view -->
   <string name="tab_view_list">목록</string>
   <!-- Option for a grid tab view -->
@@ -1418,6 +1446,8 @@
   <string name="preference_auto_close_tabs" tools:ignore="UnusedResources">열린 탭 자동 닫기</string>
   <!-- Content description (not visible, for screen readers etc.): Close tab button -->
   <string name="tab_manager_close_tabs">닫기</string>
+  <!-- Content description for the media playback indicator in the tabs tray. -->
+  <string name="tab_indicator_media_playing">미디어 재생 중</string>
   <!--
     Opening screen
 
@@ -1445,15 +1475,19 @@
   <!-- Summary for homepage preference indicating opening the homepage when re-opening the app after four hours of inactivity -->
   <string name="opening_screen_after_four_hours_of_inactivity_summary">4시간 후에는 홈페이지 열기</string>
   <!--
-    Inactive tabs
+    Tab organization
 
-    Category header of a preference that allows a user to enable or disable the inactive tabs feature
+    Category header for the preferences that control how tabs are organized
   -->
-  <string name="preferences_inactive_tabs">이전 탭을 비활성으로 이동</string>
-  <!-- Title of inactive tabs preference -->
+  <string name="preferences_tab_organization">탭 구성</string>
+  <!-- Title of the preference that allows a user to enable or disable the inactive tabs feature -->
+  <string name="preferences_inactive_tabs_toggle_title">비활성 탭</string>
+  <!-- Summary of the preference that allows a user to enable or disable the inactive tabs feature. -->
   <string name="preferences_inactive_tabs_title">2주 동안 보지 않은 탭은 비활동 섹션으로 이동</string>
-  <!-- Title for the preference to enable or disable the tab groups feature -->
-  <string name="preferences_tab_groups_feature">탭 그룹 활성화</string>
+  <!-- Title of the preference that allows a user to enable or disable the tab groups feature -->
+  <string name="preferences_tab_groups_title">탭 그룹</string>
+  <!-- Summary of the preference that allows a user to enable or disable the tab groups feature -->
+  <string name="preferences_tab_groups_description">이름을 지정하고 저장할 수 있는 그룹으로 탭을 구성합니다.</string>
   <!--
     Privacy report
 
@@ -1665,6 +1699,11 @@
   <string name="close_tab_and_delete_group_confirmation_dialog_cancel">취소</string>
   <!-- Content description for the three dot button next to a tab group" -->
   <string name="tab_group_three_dot_button_content_description">옵션 더보기</string>
+  <!--
+    Content description for the Expand button on the contracted menu for a tab group:
+    when tapped, tabs are displayed in an expanded grid or list view, taking up the full screen.
+  -->
+  <string name="tab_groups_strip_expand_group_content_description">전체 화면으로 탭 보기</string>
   <!-- Text shown on the edit button for a tab group on the three dot menu -->
   <string name="tab_group_three_dot_menu_edit">편집</string>
   <!-- Text shown on the ungroup button for a tab group on the three dot menu -->
@@ -1732,16 +1771,6 @@
     %1$d is the number of bookmarks selected
   -->
   <string name="history_multi_select_title">%1$d개 선택됨</string>
-  <!-- Text for the header that groups the history for today -->
-  <string name="history_today">오늘</string>
-  <!-- Text for the header that groups the history for yesterday -->
-  <string name="history_yesterday">어제</string>
-  <!-- Text for the header that groups the history the past 7 days -->
-  <string name="history_7_days">최근 7일</string>
-  <!-- Text for the header that groups the history the past 30 days -->
-  <string name="history_30_days">최근 30일</string>
-  <!-- Text for the header that groups the history older than the last month -->
-  <string name="history_older">이전</string>
   <!-- Text shown when no history exists -->
   <string name="history_empty_message">기록 없음</string>
   <!--
@@ -1764,7 +1793,7 @@
   <!-- Text for the snackbar action button to open a completed download. -->
   <string name="download_completed_snackbar_action_open">열기</string>
   <!-- Text for the snackbar action button to undo deleting a download. -->
-  <string name="download_undo_delete_snackbar_action">실행 취소</string>
+  <string name="download_undo_delete_snackbar_action">실행취소</string>
   <!-- Text shown when no download exists -->
   <string name="download_empty_message_2">다운로드 없음</string>
   <!-- Text description shown when no download exists -->
@@ -2369,12 +2398,12 @@
   <string name="sync_sign_in">Sync에 로그인</string>
   <!-- An option from the share dialog to send link to all other sync devices -->
   <string name="sync_send_to_all">모든 기기에 보내기</string>
-  <!-- Text displayed when no other sync devices are available for link sharing -->
-  <string name="sync_no_devices_available">기기 없음</string>
-  <!-- Text displayed when no other sync devices are available for link sharing. -->
-  <string name="sync_no_devices_available_description">이 계정에 로그인하고 동기화한 모든 기기가 여기에 나타납니다.</string>
   <!-- An option from the share dialog to reconnect to sync -->
   <string name="sync_reconnect">Sync에 다시 연결</string>
+  <!-- Label for the button in the share dialog that sends the tab to the selected sync devices -->
+  <string name="sync_send_to_selected_devices">보내기</string>
+  <!-- Content description announced when a device is selected in the share dialog -->
+  <string name="send_to_devices_device_selected_content_description">선택됨</string>
   <!-- Text displayed when sync is offline and cannot be accessed -->
   <string name="sync_offline">오프라인</string>
   <!-- An option to connect additional devices -->
@@ -2407,10 +2436,14 @@
   <string name="sync_send_tab_empty_state_title">연결된 기기 없음</string>
   <!-- Send tab to synced devices: Empty state message - Displayed when the user has no synced devices -->
   <string name="sync_send_tab_empty_state_description" tools:ignore="BrandUsage">탭을 보내려면 하나 이상의 다른 기기에서 Firefox에 로그인하세요.</string>
+  <!-- Send tab to synced devices: Empty state link - Displayed when the user has no synced devices -->
+  <string name="sync_send_tab_empty_state_link">기기 연결 방법 알아보기</string>
   <!-- Send tab to synced devices: Connectivity Error title -->
   <string name="sync_send_tab_error_connection_title">인터넷 연결을 확인하세요</string>
   <!-- Send tab to synced devices: Connectivity Error message - Suggested user action after internet connection has been established -->
   <string name="sync_send_tab_error_connection_text">그리고 탭을 다시 전송해 보세요.</string>
+  <!-- Send tab to synced devices: Connectivity Error button - When tapped, refreshes the list of connected devices. -->
+  <string name="sync_send_tab_error_connection_button">다시 시도</string>
   <!--
     Notifications
 
@@ -2472,7 +2505,7 @@
   <!-- Text shown in snackbar when user closes a private tab -->
   <string name="snackbar_private_tab_closed">사생활 보호 탭 닫음</string>
   <!-- Text shown in snackbar to undo deleting a tab, top site or collection -->
-  <string name="snackbar_deleted_undo">실행 취소</string>
+  <string name="snackbar_deleted_undo">실행취소</string>
   <!--
     QR code scanner prompt which appears after scanning a code, but before navigating to it
     %1$s is the name of the app (for example "Firefox"), %2$s is the URL or text scanned
@@ -2593,6 +2626,12 @@
   <string name="sign_in_create_account_text" tools:ignore="BrandUsage"><![CDATA[계정이 없습니까? 여러 기기 간에 Firefox를 동기화하려면 <u>계정을 만드세요</u>.]]></string>
   <!-- Text shown in confirmation dialog to sign out of account. %s is the name of the app (for example "Firefox"). -->
   <string name="sign_out_confirmation_message_2">%s가 계정과의 동기화를 중단하지만 이 기기의 사용자 탐색 데이터는 삭제하지 않습니다.</string>
+  <!-- Title of the confirmation dialog shown when the user signs out of their account -->
+  <string name="sign_out_dialog_title">계정에서 로그아웃하시겠습니까?</string>
+  <!-- Body of the confirmation dialog shown when the user signs out of their account -->
+  <string name="sign_out_dialog_message">동기화된 데이터는 계정에 저장된 상태로 유지됩니다.</string>
+  <!-- Text for the primary action button of the confirmation dialog shown when the user signs out of their account -->
+  <string name="sign_out_dialog_confirm_button">로그아웃</string>
   <!-- Option to continue signing out of account shown in confirmation dialog to sign out of account -->
   <string name="sign_out_disconnect">연결 끊기</string>
   <!-- Option to cancel signing out shown in confirmation dialog to sign out of account -->
@@ -3011,14 +3050,14 @@
   <!-- Label for the BETA badge for the browser VPN entry in the settings list -->
   <string name="preferences_ip_protection_beta_badge_label">베타</string>
   <!-- Title for the browser VPN settings screen (displayed in the app bar) -->
-  <string name="ip_protection_title">VPN</string>
+  <string name="ip_protection_settings_title">내장 VPN</string>
   <!-- Label for the browser VPN toggle on the settings screen -->
   <string name="ip_protection_toggle_label">VPN</string>
   <!-- Content description for the browser VPN settings screen top bar back button -->
   <string name="ip_protection_navigate_back_button_content_description">뒤로</string>
   <!-- Headline for the browser VPN promo card. %s is the name of the app (for example "Firefox"). -->
   <string name="ip_protection_promo_headline">%s에 내장된 VPN</string>
-  <!-- Body text for the browser VPN promo card . %s is a learn more link using ip_protection_learn_more as text. -->
+  <!-- Body text for the browser VPN settings header, shown when no promo is running. %s is a learn more link using ip_protection_learn_more as text. -->
   <string name="ip_protection_promo_body_2">공용 Wi-Fi에서도 위치를 숨겨 탐색을 추가 보호합니다. %s</string>
   <!-- Link text that opens additional information about the browser VPN -->
   <string name="ip_protection_learn_more">더 알아보기</string>
@@ -3051,8 +3090,6 @@
   <string name="ip_protection_menu_error">오류</string>
   <!-- Badge label shown in the VPN menu item when the user is eligible for the feature but needs to authenticate / authorize to enable it -->
   <string name="ip_protection_menu_try_vpn_cta">무료 체험하기</string>
-  <!-- Badge label shown in the menu item when the user is eligible to use the browser VPN but should authenticate or authorize it first. -->
-  <string name="ip_protection_menu_auth_required">사용해 보기</string>
   <!-- Content description for the chevron button that opens the browser VPN settings screen -->
   <string name="ip_protection_navigate_settings">VPN 설정 열기</string>
   <!--
@@ -3107,7 +3144,7 @@
   -->
   <string name="ip_protection_data_limit_reached_snackbar">%1$d GB의 VPN 데이터가 사용되었습니다. 다음 달에 초기화됩니다.</string>
   <!-- Snackbar (in-app pop-up notification) action button text that takes the user to the VPN settings screen. -->
-  <string name="ip_protection_data_limit_reached_snackbar_action">설정</string>
+  <string name="ip_protection_open_settings_snackbar_action">설정</string>
   <!-- Description shown on the browser VPN settings screen prompting the user to turn the VPN on. -->
   <string name="ip_protection_settings_description" tools:ignore="UnusedResources">탐색을 더 안전하고 추적하기 어렵게 만들려면 VPN을 켜세요.</string>
   <!-- Title shown on the browser VPN settings screen for location selection section. -->
@@ -4473,6 +4510,16 @@
   <string name="lens_camera_mode_qr">QR 스캐너</string>
   <!-- Toast shown when the user picks an image from the gallery in QR mode but no QR code is found in it -->
   <string name="lens_camera_qr_no_code_found">이미지에서 QR 코드를 찾을 수 없음</string>
+  <!-- Status shown under an image picked from the gallery while it is being sent to Google Lens for a visual search -->
+  <string name="lens_camera_loading_status">검색 중…</string>
+  <!-- Button shown under an image picked from the gallery while it is being sent to Google Lens. Tapping it stops the search and returns to the camera. -->
+  <string name="lens_camera_loading_cancel_button">취소</string>
+  <!-- Snackbar message shown when an image picked from the gallery could not be opened or read, so it was never sent to Google Lens. Shown after returning to the camera. -->
+  <string name="lens_camera_image_load_failed">이미지를 로드할 수 없습니다. 다른 이미지를 시도해 보세요.</string>
+  <!-- Snackbar message shown when an image picked from the gallery could not be searched because of a network problem or an error from Google Lens. Shown after returning to the camera, next to the lens_camera_upload_failed_retry_button action. -->
+  <string name="lens_camera_upload_failed">Google 렌즈에서 결과를 얻을 수 없음</string>
+  <!-- Action in the snackbar shown when an image picked from the gallery could not be searched with Google Lens. Tapping it searches the same image again. -->
+  <string name="lens_camera_upload_failed_retry_button">다시 시도</string>
   <!-- Title of the bottom sheet shown the first time the user opens the Google Lens camera screen -->
   <string name="lens_opt_out_title">Google 렌즈로 찾기</string>
   <!-- Description of the bottom sheet shown the first time the user opens the Google Lens camera screen -->
@@ -4553,4 +4600,14 @@
   <string name="pdf_tools_signature_clear_button">지우기</string>
   <!-- The text for the button that adds the signature the user has typed to the PDF. -->
   <string name="pdf_tools_signature_add_button">추가</string>
+  <!--
+    Listen to page
+
+    Content description for the reader mode panel: a group of buttons floating over the content
+  -->
+  <string name="reader_mode_panel_content_description">읽기 모드 옵션</string>
+  <!-- Content description for the button in reader mode panel that turns on the read aloud feature (playback of content begins when button is pressed) -->
+  <string name="reader_mode_panel_listen_content_description">소리내어 읽기</string>
+  <!-- Content description for media player displayed in Reader Mode when the Listen to Page (Read Aloud) feature is selected -->
+  <string name="reader_mode_panel_media_player_content_description">미디어 플레이어</string>
 </resources>

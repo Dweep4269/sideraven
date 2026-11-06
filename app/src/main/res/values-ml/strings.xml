@@ -139,16 +139,8 @@
   <string name="home_screen_shortcut_open_new_private_tab_2">പുതിയ സ്വകാര്യ ടാബ്</string>
   <!-- Shortcut action to open Passwords screen -->
   <string name="home_screen_shortcut_passwords">ഒളിവാക്കുകൾ</string>
-  <!--
-    Recent Tabs
-
-    Header text for jumping back into the recent tab in the home screen
-  -->
-  <string name="recent_tabs_header">തിരികെ കയറുക</string>
   <!-- Button text for showing all the tabs in the tabs tray -->
   <string name="recent_tabs_show_all">എല്ലാം കാണിക്കുക</string>
-  <!-- Content description for the button which navigates the user to show all recent tabs in the tabs tray. -->
-  <string name="recent_tabs_show_all_content_description_2">അടുത്തിടെയുള്ള എല്ലാ ടാബുകളും കാണിക്കുന്നതിനുള്ള ബട്ടൺ</string>
   <!-- Text for button in synced tab card that opens synced tabs tray -->
   <string name="recent_tabs_see_all_synced_tabs_button_text">എല്ല സമന്വയിപ്പിച്ച ടാബുകൾ കാണുക</string>
   <!-- Accessibility description for device icon used for recent synced tab -->
@@ -301,8 +293,6 @@
   <string name="browser_menu_default_banner_title">%1$s-നെ തനിമട്ടാക്കുക</string>
   <!-- Label text within the set as default banner -->
   <string name="browser_menu_default_banner_subtitle_2">ഉടൻ, സ്വകാര്യം, താങ്ങൾക്കുവേണ്ടി\u0020</string>
-  <!-- Content description (not visible, for screen readers etc.) for the button that dismisses the set as default banner in the menu -->
-  <string name="browser_menu_default_banner_dismiss_promotion">പ്രചരണം നിരസിക്കുക</string>
   <!-- Content description (not visible, for screen readers etc.) for recommended extensions in main menu -->
   <string name="browser_menu_recommended_extensions_content_description">കൂടുതൽ വിവരങ്ങൾ</string>
   <!--
@@ -811,8 +801,6 @@
     Title for the customize home screen section with privacy report.
   -->
   <string name="customize_toggle_privacy_report">സ്വകാര്യത അറിയിപ്പു്</string>
-  <!-- Header text for jumping back into the recent tab in customize the home screen -->
-  <string name="customize_toggle_jump_back_in">തിരികെ കയറുക</string>
   <!-- Title for the customize home screen section with bookmarks. -->
   <string name="customize_toggle_bookmarks">അടയാളക്കുറിപ്പുകള്‍</string>
   <!--
@@ -1066,8 +1054,6 @@
   <string name="preference_simple_toolbar">എളുപ്പം</string>
   <!-- Preference for using expanded toolbar -->
   <string name="preference_expanded_toolbar">വലുതാക്കിയതു്</string>
-  <!-- Preference description indicating the toolbar location preference is disabled when the tab strip is enabled -->
-  <string name="preference_toolbar_pref_disabled_explanation">ടാബു പട്ട കാണിക്കുമ്പോൾ വിലാസപ്പട്ട മുകളിലുണ്ടാവണം.</string>
   <!-- New tab shortcut in toolbar customization -->
   <string name="toolbar_customize_shortcut_new_tab">പുതിയ ടാവു തുറക്കുക</string>
   <!-- Share shortcut in toolbar customization -->
@@ -1184,8 +1170,6 @@
     Title of preference for tabs management
   -->
   <string name="preferences_tabs">ടാബുകള്‍</string>
-  <!-- Title of preference that allows a user to specify the tab view -->
-  <string name="preferences_tab_view">ടാബ് കാഴ്ച</string>
   <!-- Option for a list tab view -->
   <string name="tab_view_list">പട്ടിക</string>
   <!-- Option for a grid tab view -->
@@ -1230,13 +1214,7 @@
   <string name="opening_screen_last_tab_summary">അവസാന ടാബിൽ തുറക്കുക</string>
   <!-- Summary for homepage preference indicating opening the homepage when re-opening the app after four hours of inactivity -->
   <string name="opening_screen_after_four_hours_of_inactivity_summary">നാലു മണിക്കൂർ ശേഷം ആമുഖതാളിൽ തുറക്കുക</string>
-  <!--
-    Inactive tabs
-
-    Category header of a preference that allows a user to enable or disable the inactive tabs feature
-  -->
-  <string name="preferences_inactive_tabs">പഴയ ടാബുകൾ നിഷ്ക്രിയത അറായിലേക്കു് മാറ്റുക</string>
-  <!-- Title of inactive tabs preference -->
+  <!-- Summary of the preference that allows a user to enable or disable the inactive tabs feature. -->
   <string name="preferences_inactive_tabs_title">രണ്ടാഴ്ചയായി താങ്ങൾ കാണാത്ത ടാബുകൾ നിഷ്ക്രിയ വിഭാഗത്തിലേക്കു് മാറ്റും.</string>
   <!--
     Studies
@@ -1446,16 +1424,6 @@
     %1$d is the number of bookmarks selected
   -->
   <string name="history_multi_select_title">%1$d തിരഞ്ഞെടുത്തിരിക്കുന്നു</string>
-  <!-- Text for the header that groups the history for today -->
-  <string name="history_today">ഇന്ന്</string>
-  <!-- Text for the header that groups the history for yesterday -->
-  <string name="history_yesterday">ഇന്നലെ</string>
-  <!-- Text for the header that groups the history the past 7 days -->
-  <string name="history_7_days">കഴിഞ്ഞ 7 ദിവസം</string>
-  <!-- Text for the header that groups the history the past 30 days -->
-  <string name="history_30_days">കഴിഞ്ഞ 30 ദിവസം</string>
-  <!-- Text for the header that groups the history older than the last month -->
-  <string name="history_older">പഴയത്</string>
   <!-- Text shown when no history exists -->
   <string name="history_empty_message">ഇവിടെ നാൾവഴിയൊന്നുമില്ല</string>
   <!--
@@ -2613,8 +2581,6 @@
   <string name="preferences_ip_protection_title_2">ഉൾപ്പണിഞ്ഞ വി.പി.എൻ</string>
   <!-- Label for the BETA badge for the browser VPN entry in the settings list -->
   <string name="preferences_ip_protection_beta_badge_label">ബീറ്റ</string>
-  <!-- Title for the browser VPN settings screen (displayed in the app bar) -->
-  <string name="ip_protection_title">വി.പി.എൻ</string>
   <!-- Label for the browser VPN toggle on the settings screen -->
   <string name="ip_protection_toggle_label">വി.പി.എൻ</string>
   <!-- Content description for the browser VPN settings screen top bar back button -->
@@ -2650,8 +2616,6 @@
   <string name="ip_protection_menu_paused">നിറുത്തി</string>
   <!-- Badge label shown in the menu item when the browser VPN has an error -->
   <string name="ip_protection_menu_error">പിഴവു്</string>
-  <!-- Badge label shown in the menu item when the user is eligible to use the browser VPN but should authenticate or authorize it first. -->
-  <string name="ip_protection_menu_auth_required">ഉപയോഗിച്ചു നോക്കൂ</string>
   <!-- Content description for the chevron button that opens the browser VPN settings screen -->
   <string name="ip_protection_navigate_settings">വി.പി.എൻ ക്രമീകരണങ്ങൾ</string>
   <!--
@@ -2671,8 +2635,6 @@
   <string name="ip_protection_onboarding_body_link_promo">കൂടുതലറിയുക</string>
   <!-- Label for the dismiss button on the onboarding bottom sheet. -->
   <string name="ip_protection_onboarding_not_now_button">ഇപ്പോഴല്ല</string>
-  <!-- Snackbar (in-app pop-up notification) action button text that takes the user to the VPN settings screen. -->
-  <string name="ip_protection_data_limit_reached_snackbar_action">ക്രമീകരണങ്ങള്‍</string>
   <!--
     Autofill
 

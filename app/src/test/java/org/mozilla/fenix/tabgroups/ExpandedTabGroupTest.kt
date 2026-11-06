@@ -12,6 +12,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import junit.framework.TestCase.assertTrue
+import mozilla.components.compose.base.theme.Theme
 import mozilla.components.compose.base.utils.LocalUnderTest
 import org.junit.Rule
 import org.junit.Test
@@ -19,12 +20,11 @@ import org.junit.runner.RunWith
 import org.mozilla.fenix.tabstray.LocalTabManagementFeatureHelper
 import org.mozilla.fenix.tabstray.TabManagementFeatureHelper
 import org.mozilla.fenix.tabstray.TabsTrayTestTag
-import org.mozilla.fenix.tabstray.controller.NoOpTabInteractionHandler
+import org.mozilla.fenix.tabstray.controller.NoOpItemInteractionHandler
 import org.mozilla.fenix.tabstray.data.TabsTrayItem
 import org.mozilla.fenix.tabstray.data.createTab
 import org.mozilla.fenix.tabstray.data.createTabGroup
 import org.mozilla.fenix.theme.FirefoxTheme
-import org.mozilla.fenix.theme.Theme
 
 @RunWith(AndroidJUnit4::class)
 class ExpandedTabGroupTest {
@@ -39,6 +39,8 @@ class ExpandedTabGroupTest {
             override val ungroupTabGroupEnabled: Boolean = true
             override val tabGroupsOnboardingEnabled: Boolean = false
             override val tabGroupsLiveReorderEnabled: Boolean = false
+            override val tabGroupsStripEnabled: Boolean = false
+            override val showTabGroupsInMenu: Boolean = false
         }
 
     @Test
@@ -51,7 +53,7 @@ class ExpandedTabGroupTest {
                             group = fakeTabGroup(),
                             actions = expandedTabGroupActions(),
                             displayTabsInGrid = true,
-                            tabInteractionHandler = NoOpTabInteractionHandler,
+                            itemInteractionHandler = NoOpItemInteractionHandler,
                         )
                     }
                 }
@@ -78,7 +80,7 @@ class ExpandedTabGroupTest {
                             group = fakeTabGroup(),
                             actions = expandedTabGroupActions(),
                             displayTabsInGrid = true,
-                            tabInteractionHandler = NoOpTabInteractionHandler,
+                            itemInteractionHandler = NoOpItemInteractionHandler,
                         )
                     }
                 }
@@ -103,7 +105,7 @@ class ExpandedTabGroupTest {
                             group = fakeTabGroup(tabs = mutableListOf(tab)),
                             actions = expandedTabGroupActions(),
                             displayTabsInGrid = true,
-                            tabInteractionHandler = NoOpTabInteractionHandler,
+                            itemInteractionHandler = NoOpItemInteractionHandler,
                         )
                     }
                 }
@@ -125,7 +127,7 @@ class ExpandedTabGroupTest {
                             group = fakeTabGroup(tabs = mutableListOf(tab)),
                             actions = expandedTabGroupActions(),
                             displayTabsInGrid = false,
-                            tabInteractionHandler = NoOpTabInteractionHandler,
+                            itemInteractionHandler = NoOpItemInteractionHandler,
                         )
                     }
                 }
@@ -148,7 +150,7 @@ class ExpandedTabGroupTest {
                             group = fakeTabGroup(tabs = mutableListOf(tab)),
                             actions = expandedTabGroupActions(onItemClick = { if (it == tab) itemClicked = true }),
                             displayTabsInGrid = true,
-                            tabInteractionHandler = NoOpTabInteractionHandler,
+                            itemInteractionHandler = NoOpItemInteractionHandler,
                         )
                     }
                 }
@@ -172,7 +174,7 @@ class ExpandedTabGroupTest {
                             group = fakeTabGroup(tabs = mutableListOf(tab)),
                             actions = expandedTabGroupActions(onTabClose = { if (it == tab) itemClosed = true }),
                             displayTabsInGrid = true,
-                            tabInteractionHandler = NoOpTabInteractionHandler,
+                            itemInteractionHandler = NoOpItemInteractionHandler,
                         )
                     }
                 }
@@ -196,7 +198,7 @@ class ExpandedTabGroupTest {
                             group = group,
                             actions = expandedTabGroupActions(onDeleteTabGroupClick = { deleteClicked = true }),
                             displayTabsInGrid = true,
-                            tabInteractionHandler = NoOpTabInteractionHandler,
+                            itemInteractionHandler = NoOpItemInteractionHandler,
                         )
                     }
                 }
@@ -221,7 +223,7 @@ class ExpandedTabGroupTest {
                             group = fakeTabGroup(),
                             actions = expandedTabGroupActions(onEditTabGroupClick = { editClicked = true }),
                             displayTabsInGrid = true,
-                            tabInteractionHandler = NoOpTabInteractionHandler,
+                            itemInteractionHandler = NoOpItemInteractionHandler,
                         )
                     }
                 }
@@ -246,7 +248,7 @@ class ExpandedTabGroupTest {
                             group = fakeTabGroup(),
                             actions = expandedTabGroupActions(onCloseTabGroupClick = { closeClicked = true }),
                             displayTabsInGrid = true,
-                            tabInteractionHandler = NoOpTabInteractionHandler,
+                            itemInteractionHandler = NoOpItemInteractionHandler,
                         )
                     }
                 }
@@ -257,6 +259,31 @@ class ExpandedTabGroupTest {
         composeTestRule.onNodeWithTag(TabsTrayTestTag.CLOSE_TAB_GROUP).performClick()
 
         assertTrue(closeClicked)
+    }
+
+    @Test
+    fun verifyUngroupTabGroupClick() {
+        var ungroupClicked = false
+
+        composeTestRule.setContent {
+            CompositionLocalProvider(LocalTabManagementFeatureHelper provides tabManagementFeatureHelper) {
+                FirefoxTheme(theme = Theme.Light) {
+                    Surface {
+                        ExpandedTabGroup(
+                            group = fakeTabGroup(),
+                            actions = expandedTabGroupActions(onUngroupTabGroupClick = { ungroupClicked = true }),
+                            displayTabsInGrid = true,
+                            itemInteractionHandler = NoOpItemInteractionHandler,
+                        )
+                    }
+                }
+            }
+        }
+
+        composeTestRule.onNodeWithTag(TabsTrayTestTag.TAB_GROUP_THREE_DOT_BUTTON).performClick()
+        composeTestRule.onNodeWithTag(TabsTrayTestTag.UNGROUP_TAB_GROUP).performClick()
+
+        assertTrue(ungroupClicked)
     }
 
     @Test
@@ -271,7 +298,7 @@ class ExpandedTabGroupTest {
                             group = fakeTabGroup(),
                             actions = expandedTabGroupActions(onAddNewTabClick = { addNewTabClicked = true }),
                             displayTabsInGrid = true,
-                            tabInteractionHandler = NoOpTabInteractionHandler,
+                            itemInteractionHandler = NoOpItemInteractionHandler,
                         )
                     }
                 }
@@ -296,6 +323,7 @@ class ExpandedTabGroupTest {
         onDeleteTabGroupClick: () -> Unit = {},
         onEditTabGroupClick: () -> Unit = {},
         onCloseTabGroupClick: () -> Unit = {},
+        onUngroupTabGroupClick: () -> Unit = {},
         onAddNewTabClick: (() -> Unit)? = {},
         onShareTabGroupClick: () -> Unit = {},
     ) =
@@ -305,6 +333,7 @@ class ExpandedTabGroupTest {
             onDeleteTabGroupClick = onDeleteTabGroupClick,
             onEditTabGroupClick = onEditTabGroupClick,
             onCloseTabGroupClick = onCloseTabGroupClick,
+            onUngroupTabGroupClick = onUngroupTabGroupClick,
             onAddNewTabClick = onAddNewTabClick,
             onShareTabGroupClick = onShareTabGroupClick,
         )

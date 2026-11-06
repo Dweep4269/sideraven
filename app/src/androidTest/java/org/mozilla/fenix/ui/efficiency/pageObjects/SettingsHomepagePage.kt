@@ -7,8 +7,7 @@ package org.mozilla.fenix.ui.efficiency.pageObjects
 import androidx.compose.ui.test.junit4.AndroidComposeTestRule
 import org.mozilla.fenix.helpers.HomeActivityIntentTestRule
 import org.mozilla.fenix.ui.efficiency.helpers.BasePage
-import org.mozilla.fenix.ui.efficiency.helpers.Selector
-import org.mozilla.fenix.ui.efficiency.navigation.NavigationRegistry
+import org.mozilla.fenix.ui.efficiency.navigation.NavigationGraph
 import org.mozilla.fenix.ui.efficiency.navigation.NavigationStep
 import org.mozilla.fenix.ui.efficiency.selectors.SettingsHomepageSelectors
 import org.mozilla.fenix.ui.efficiency.selectors.SettingsSelectors
@@ -16,25 +15,22 @@ import org.mozilla.fenix.ui.efficiency.selectors.SettingsSelectors
 class SettingsHomepagePage(composeRule: AndroidComposeTestRule<HomeActivityIntentTestRule, *>) : BasePage(composeRule) {
     override val pageName = "SettingsHomepagePage"
 
-    init {
-        NavigationRegistry.register(
+    internal override fun registerNavigation(builder: NavigationGraph.Builder) {
+        builder.register(
             from = pageName,
             to = "SettingsPage",
             steps = listOf(NavigationStep.Click(SettingsSelectors.GO_BACK_BUTTON)),
         )
 
-        NavigationRegistry.register(
+        // Depth-independent: this screen can be reached one level deep (home menu -> Customize homepage) or two
+        // levels deep (Settings -> Homepage), so back out until the settings toolbar is gone rather than pressing
+        // back a fixed number of times.
+        builder.register(
             from = pageName,
             to = "HomePage",
-            steps =
-                listOf(
-                    NavigationStep.Click(SettingsSelectors.GO_BACK_BUTTON),
-                    NavigationStep.Click(SettingsSelectors.GO_BACK_BUTTON),
-                ),
+            steps = listOf(NavigationStep.PressBackUntilGone(SettingsSelectors.NAVIGATION_TOOLBAR)),
         )
     }
 
-    override fun mozGetSelectorsByGroup(group: String): List<Selector> {
-        return SettingsHomepageSelectors.all.filter { it.groups.contains(group) }
-    }
+    override val selectorCatalog = SettingsHomepageSelectors
 }

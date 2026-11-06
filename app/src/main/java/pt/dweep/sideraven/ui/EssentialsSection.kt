@@ -400,7 +400,7 @@ private fun EssentialTile(
                         else -> 1f
                     },
                 ),
-            )
+            ).greyWhenSleeping(essential.sleeping)
         val icon = essential.icon
         if (icon != null) {
             Image(

@@ -19,6 +19,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mozilla.fenix.R
 import org.mozilla.fenix.customannotations.Converted
+import org.mozilla.fenix.customannotations.Critical
 import org.mozilla.fenix.customannotations.SkipLeaks
 import org.mozilla.fenix.customannotations.SmokeTest
 import org.mozilla.fenix.ext.components
@@ -79,6 +80,7 @@ class SearchTest {
                 skipOnboarding = true,
                 isPocketEnabled = false,
                 isRecentTabsFeatureEnabled = false,
+                isRecentlyVisitedFeatureEnabled = true,
                 isWallpaperOnboardingEnabled = false,
                 isLocationPermissionEnabled = SitePermissionsRules.Action.BLOCKED,
                 // workaround for toolbar at top position by default
@@ -312,6 +314,12 @@ class SearchTest {
     }
 
     // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/522918
+    @Converted(
+        replacedBy = ["org.mozilla.fenix.ui.efficiency.tests.SearchTest#verifyClearSearchButtonTest"],
+        bug = 2071309,
+        since = "2026-09",
+    )
+    @Critical
     @Test
     fun verifyClearSearchButtonTest() {
         homeScreen(composeTestRule) {}
@@ -760,9 +768,14 @@ class SearchTest {
 
     // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/1232638
     // Default search code for DuckDuckGo-US
-    @Ignore("Failing, see https://bugzilla.mozilla.org/show_bug.cgi?id=1858878")
+    @Converted(
+        replacedBy = ["org.mozilla.fenix.ui.efficiency.tests.SearchTest#defaultSearchCodeDuckDuckGoUSTest"],
+        bug = 2078576,
+        since = "2026-10",
+    )
+    @Critical
     @Test
-    fun defaultSearchCodeDuckDuckGoUS() {
+    fun defaultSearchCodeDuckDuckGoUSTest() {
         homeScreen(composeTestRule) {}
             .openThreeDotMenu {}
             .clickSettingsButton {}
@@ -774,18 +787,13 @@ class SearchTest {
         homeScreen(composeTestRule) {}
             .openSearch {}
             .submitQuery(queryString) {
-                verifyPageContent("duckduckgo")
+                verifyUrl(queryString)
             }
             .openThreeDotMenu {}
-            .clickHistoryButton {
-                // Full URL no longer visible in the nav bar, so we'll check the history record
-                // A search group is sometimes created when searching with DuckDuckGo
-                try {
-                    verifyHistoryItemExists(shouldExist = true, item = Constants.searchEngineCodes["DuckDuckGo"]!!)
-                } catch (e: AssertionError) {
-                    openSearchGroup(queryString)
-                    verifyHistoryItemExists(shouldExist = true, item = Constants.searchEngineCodes["DuckDuckGo"]!!)
-                }
+            .clickBookmarkThisPageButton {}
+            .openThreeDotMenu {}
+            .clickBookmarksButton {
+                verifyBookmarkedURL("https://duckduckgo.com/?t=fpas&q=firefox")
             }
     }
 

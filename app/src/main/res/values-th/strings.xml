@@ -146,13 +146,11 @@
   <!--
     Recent Tabs
 
-    Header text for jumping back into the recent tab in the home screen
+    Header text on the homescreen for continuing to browse the most recent browser tab
   -->
-  <string name="recent_tabs_header">กลับเข้าไป</string>
+  <string name="recent_tabs_header_2">ดำเนินการต่อ</string>
   <!-- Button text for showing all the tabs in the tabs tray -->
   <string name="recent_tabs_show_all">แสดงหมด</string>
-  <!-- Content description for the button which navigates the user to show all recent tabs in the tabs tray. -->
-  <string name="recent_tabs_show_all_content_description_2">แสดงปุ่มแท็บล่าสุดทั้งหมด</string>
   <!-- Text for button in synced tab card that opens synced tabs tray -->
   <string name="recent_tabs_see_all_synced_tabs_button_text">ดูแท็บที่ซิงค์ทั้งหมด</string>
   <!-- Accessibility description for device icon used for recent synced tab -->
@@ -273,6 +271,8 @@
   <string name="browser_main_menu_content_description_navigation_header">การนำทาง</string>
   <!-- Content description (not visible, for screen readers etc.) for bottom sheet handlebar custom tab menu. -->
   <string name="browser_custom_tab_menu_handlebar_content_description">ปิดแผ่นเมนูแท็บกำหนดเอง</string>
+  <!-- URL bar indicator shown on a cached version of the website, when the tab is reloading, but the content is not live yet -->
+  <string name="browser_toolbar_cached_page_indicator">ถูกแคช</string>
   <!-- Browser menu label that bookmarks the currently visited page -->
   <string name="browser_menu_bookmark_this_page_2">เพิ่มที่คั่นหน้าสำหรับหน้า</string>
   <!-- Browser menu label that navigates to the edit bookmark screen for the current bookmarked page -->
@@ -287,8 +287,12 @@
   <string name="browser_menu_summarize_page">สรุปหน้า</string>
   <!-- Browser menu badge text for summarization feature -->
   <string name="browser_menu_summarize_page_badge">ใหม่</string>
+  <!-- Browser menu badge text for new, highlighted feature -->
+  <string name="browser_menu_page_badge_text">ใหม่</string>
   <!-- Browser menu label for navigating to the Web Compat Reporter feature, which provides users the ability to send bug reports for broken sites. -->
   <string name="browser_menu_webcompat_reporter_2">รายงานไซต์ที่ใช้งานไม่ได้</string>
+  <!-- Browser menu label for adding a tab to a tab group -->
+  <string name="browser_menu_add_to_tab_group">เพิ่มไปยังกลุ่ม</string>
   <!-- Browser menu label that is displayed when the current page has been translated by the translation feature. -->
   <string name="browser_menu_translated">แปลแล้ว</string>
   <!-- Browser menu label for the print feature -->
@@ -305,8 +309,6 @@
   <string name="browser_menu_default_banner_title">เลือก %1$s เป็นค่าเริ่มต้น</string>
   <!-- Label text within the set as default banner -->
   <string name="browser_menu_default_banner_subtitle_2">รวดเร็ว เป็นส่วนตัว และตอบโจทย์คุณ</string>
-  <!-- Content description (not visible, for screen readers etc.) for the button that dismisses the set as default banner in the menu -->
-  <string name="browser_menu_default_banner_dismiss_promotion">ปิดโปรโมชัน</string>
   <!-- Content description (not visible, for screen readers etc.) for recommended extensions in main menu -->
   <string name="browser_menu_recommended_extensions_content_description">ข้อมูลเพิ่มเติม</string>
   <!--
@@ -797,6 +799,8 @@
   <string name="preferences_override_sync_tokenserver">เซิร์ฟเวอร์ Sync ที่กำหนดเอง</string>
   <!-- Preference category for account information -->
   <string name="preferences_category_account">บัญชี</string>
+  <!-- Preference category for sync controls. Sync can be translated, it's just short for ”Synchronization” in English. -->
+  <string name="preferences_category_sync_controls">Sync</string>
   <!-- Preference for changing where the AddressBar is positioned -->
   <string name="preferences_toolbar_2">ตำแหน่งของแถบที่อยู่</string>
   <!-- Preference for changing toolbar layout -->
@@ -853,6 +857,8 @@
   <string name="preferences_search_synced_tabs">ค้นหาแท็บที่ซิงค์</string>
   <!-- Preference for account settings -->
   <string name="preferences_account_settings">การตั้งค่าบัญชี</string>
+  <!-- Preference for account and sync settings -->
+  <string name="preferences_account_and_sync_settings">บัญชีและการซิงค์</string>
   <!-- Preference for enabling url autocomplete -->
   <string name="preferences_enable_autocomplete_urls">เติม URL อัตโนมัติ</string>
   <!-- Preference title for switch preference to show sponsored Firefox Suggest search suggestions -->
@@ -971,8 +977,8 @@
     Title for the customize home screen section with privacy report.
   -->
   <string name="customize_toggle_privacy_report">รายงานความเป็นส่วนตัว</string>
-  <!-- Header text for jumping back into the recent tab in customize the home screen -->
-  <string name="customize_toggle_jump_back_in">กลับเข้าไป</string>
+  <!-- Title for a customize home screen section. Continue is a section that displays the most recent browser tab, so users can continue browsing where they left off. -->
+  <string name="customize_toggle_continue">ดำเนินการต่อ</string>
   <!-- Title for the customize home screen section with bookmarks. -->
   <string name="customize_toggle_bookmarks">ที่คั่นหน้า</string>
   <!--
@@ -1140,6 +1146,10 @@
   <string name="preferences_sign_out">ลงชื่อออก</string>
   <!-- Preference displays and allows changing current FxA device name -->
   <string name="preferences_sync_device_name">ชื่ออุปกรณ์</string>
+  <!-- Preference category for Device name -->
+  <string name="preferences_device_name_category">ชื่ออุปกรณ์</string>
+  <!-- Label for the Preference that displays and allows changing current device name on Mozilla Account -->
+  <string name="preferences_sync_change_device_name">เปลี่ยนชื่ออุปกรณ์</string>
   <!-- Text shown when user enters empty device name -->
   <string name="empty_device_name_error">ชื่ออุปกรณ์ต้องไม่ว่างเปล่า</string>
   <!-- Label indicating that sync is in progress -->
@@ -1259,8 +1269,6 @@
   <string name="preference_simple_toolbar">ธรรมดา</string>
   <!-- Preference for using expanded toolbar -->
   <string name="preference_expanded_toolbar">ขยาย</string>
-  <!-- Preference description indicating the toolbar location preference is disabled when the tab strip is enabled -->
-  <string name="preference_toolbar_pref_disabled_explanation">แถบที่อยู่ต้องอยู่ด้านบนเมื่อแสดงแถบแท็บ</string>
   <!-- New tab shortcut in toolbar customization -->
   <string name="toolbar_customize_shortcut_new_tab">เปิดแท็บใหม่</string>
   <!-- Share shortcut in toolbar customization -->
@@ -1299,6 +1307,10 @@
     Preferences for showing tab strip
   -->
   <string name="preference_tab_strip_show">แสดงแถบแท็บ</string>
+  <!-- Preference for using top tab strip -->
+  <string name="preference_top_tab_strip">ด้านบน</string>
+  <!-- Preference for using bottom tab strip -->
+  <string name="preference_bottom_tab_strip">ด้านล่าง</string>
   <!--
     Gestures Preferences
 
@@ -1381,8 +1393,6 @@
     Title of preference for tabs management
   -->
   <string name="preferences_tabs">แท็บ</string>
-  <!-- Title of preference that allows a user to specify the tab view -->
-  <string name="preferences_tab_view">มุมมองแท็บ</string>
   <!-- Option for a list tab view -->
   <string name="tab_view_list">รายการ</string>
   <!-- Option for a grid tab view -->
@@ -1427,20 +1437,20 @@
   <string name="opening_screen_last_tab_summary">เปิดบนแท็บสุดท้าย</string>
   <!-- Summary for homepage preference indicating opening the homepage when re-opening the app after four hours of inactivity -->
   <string name="opening_screen_after_four_hours_of_inactivity_summary">เปิดหน้าแรกหลังจากสี่ชั่วโมง</string>
-  <!--
-    Inactive tabs
-
-    Category header of a preference that allows a user to enable or disable the inactive tabs feature
-  -->
-  <string name="preferences_inactive_tabs">ย้ายแท็บเก่าไปยังส่วนที่ไม่ได้ใช้งาน</string>
-  <!-- Title of inactive tabs preference -->
+  <!-- Title of the preference that allows a user to enable or disable the inactive tabs feature -->
+  <string name="preferences_inactive_tabs_toggle_title">แท็บที่ไม่ได้ใช้งาน</string>
+  <!-- Summary of the preference that allows a user to enable or disable the inactive tabs feature. -->
   <string name="preferences_inactive_tabs_title">แท็บที่คุณไม่ได้ดูเป็นเวลา 2 สัปดาห์จะถูกย้ายไปยังส่วนที่ไม่ได้ใช้งาน</string>
+  <!-- Title of the preference that allows a user to enable or disable the tab groups feature -->
+  <string name="preferences_tab_groups_title">กลุ่มแท็บ</string>
   <!--
     Privacy report
 
     Category header of a preference that allows a user to enable or disable the privacy report feature
   -->
   <string name="preferences_privacy_report">รายงานความเป็นส่วนตัว</string>
+  <!-- Title of the privacy report preference that allows a user to enable or disable the feature -->
+  <string name="preferences_privacy_report_title">เปิดใช้งานรายงานความเป็นส่วนตัว</string>
   <!--
     Studies
 
@@ -1703,16 +1713,6 @@
     %1$d is the number of bookmarks selected
   -->
   <string name="history_multi_select_title">เลือกอยู่ %1$d</string>
-  <!-- Text for the header that groups the history for today -->
-  <string name="history_today">วันนี้</string>
-  <!-- Text for the header that groups the history for yesterday -->
-  <string name="history_yesterday">เมื่อวาน</string>
-  <!-- Text for the header that groups the history the past 7 days -->
-  <string name="history_7_days">7 วันที่ผ่านมา</string>
-  <!-- Text for the header that groups the history the past 30 days -->
-  <string name="history_30_days">30 วันที่ผ่านมา</string>
-  <!-- Text for the header that groups the history older than the last month -->
-  <string name="history_older">เก่ากว่า</string>
   <!-- Text shown when no history exists -->
   <string name="history_empty_message">ไม่มีประวัติที่นี่</string>
   <!--
@@ -2342,6 +2342,8 @@
   <string name="sync_send_to_all">ส่งไปยังอุปกรณ์ทั้งหมด</string>
   <!-- An option from the share dialog to reconnect to sync -->
   <string name="sync_reconnect">เชื่อมต่อกับ Sync ใหม่</string>
+  <!-- Label for the button in the share dialog that sends the tab to the selected sync devices -->
+  <string name="sync_send_to_selected_devices">ส่ง</string>
   <!-- Text displayed when sync is offline and cannot be accessed -->
   <string name="sync_offline">ออฟไลน์</string>
   <!-- An option to connect additional devices -->
@@ -2364,6 +2366,14 @@
   <string name="sent_from_firefox_template" tools:ignore="UnusedResources">%1$s\n\nส่งจาก %2$s 🦊 ลองใช้เบราว์เซอร์มือถือ: %3$s</string>
   <!-- A short message template for the shared link with a footer. %1$s is the shared link, %2$s is the app name (e.g. Firefox) and %3$s is a download link for the app. -->
   <string name="sent_from_firefox_template_short" tools:ignore="UnusedResources">%1$s\n\nส่งจาก %2$s 🦊 %3$s</string>
+  <!-- Send tab to synced devices: Authentication error button - Allows user to re-authenticate -->
+  <string name="sync_send_tab_error_auth_button">ลงชื่อเข้า</string>
+  <!-- Send tab to synced devices: Authentication error button - Allows user to remove the currently connected account -->
+  <string name="sync_send_tab_error_auth_remove_account">เอาบัญชีออก</string>
+  <!-- Send tab to synced devices: Connectivity Error title -->
+  <string name="sync_send_tab_error_connection_title">ตรวจสอบการเชื่อมต่ออินเทอร์เน็ตของคุณ</string>
+  <!-- Send tab to synced devices: Connectivity Error button - When tapped, refreshes the list of connected devices. -->
+  <string name="sync_send_tab_error_connection_button">ลองใหม่</string>
   <!--
     Notifications
 
@@ -2385,6 +2395,12 @@
     The app name is in the text, due to limitations with localizing Nimbus experiments
   -->
   <string name="nimbus_notification_default_browser_text" tools:ignore="BrandUsage,UnusedResources">ทำให้ Firefox เป็นเบราว์เซอร์เริ่มต้นของคุณ</string>
+  <!--
+    Privacy report notification
+
+    Name of the weekly privacy report notification channel. Displayed in the "App notifications" system settings for the app.
+  -->
+  <string name="notification_privacy_report_channel_name">รายงานความเป็นส่วนตัว</string>
   <!--
     Survey
 
@@ -2532,6 +2548,10 @@
   <string name="sign_in_create_account_text" tools:ignore="BrandUsage"><![CDATA[ไม่มีบัญชีใช่หรือไม่? <u>สร้างบัญชี</u>เพื่อซิงค์ Firefox ระหว่างอุปกรณ์]]></string>
   <!-- Text shown in confirmation dialog to sign out of account. %s is the name of the app (for example "Firefox"). -->
   <string name="sign_out_confirmation_message_2">%s จะหยุดซิงค์กับบัญชีของคุณ แต่จะไม่ลบข้อมูลการท่องเว็บใด ๆ ของคุณบนอุปกรณ์นี้</string>
+  <!-- Title of the confirmation dialog shown when the user signs out of their account -->
+  <string name="sign_out_dialog_title">ออกจากระบบบัญชีของคุณหรือไม่?</string>
+  <!-- Text for the primary action button of the confirmation dialog shown when the user signs out of their account -->
+  <string name="sign_out_dialog_confirm_button">ลงชื่อออก</string>
   <!-- Option to continue signing out of account shown in confirmation dialog to sign out of account -->
   <string name="sign_out_disconnect">ตัดการเชื่อมต่อ</string>
   <!-- Option to cancel signing out shown in confirmation dialog to sign out of account -->
@@ -2950,14 +2970,14 @@
   <!-- Label for the BETA badge for the browser VPN entry in the settings list -->
   <string name="preferences_ip_protection_beta_badge_label">BETA</string>
   <!-- Title for the browser VPN settings screen (displayed in the app bar) -->
-  <string name="ip_protection_title">VPN</string>
+  <string name="ip_protection_settings_title">VPN ในตัว</string>
   <!-- Label for the browser VPN toggle on the settings screen -->
   <string name="ip_protection_toggle_label">VPN</string>
   <!-- Content description for the browser VPN settings screen top bar back button -->
   <string name="ip_protection_navigate_back_button_content_description">นำทางย้อนกลับ</string>
   <!-- Headline for the browser VPN promo card. %s is the name of the app (for example "Firefox"). -->
   <string name="ip_protection_promo_headline">VPN ในตัวของ %s</string>
-  <!-- Body text for the browser VPN promo card . %s is a learn more link using ip_protection_learn_more as text. -->
+  <!-- Body text for the browser VPN settings header, shown when no promo is running. %s is a learn more link using ip_protection_learn_more as text. -->
   <string name="ip_protection_promo_body_2">ท่องเว็บได้อย่างปลอดภัยยิ่งขึ้นด้วยการซ่อนตำแหน่งที่ตั้งของคุณ แม้ว่าจะใช้ Wi-Fi สาธารณะก็ตาม %s</string>
   <!-- Link text that opens additional information about the browser VPN -->
   <string name="ip_protection_learn_more">เรียนรู้เพิ่มเติม</string>
@@ -2988,8 +3008,8 @@
   <string name="ip_protection_menu_paused">หยุดชั่วคราว</string>
   <!-- Badge label shown in the menu item when the browser VPN has an error -->
   <string name="ip_protection_menu_error">ข้อผิดพลาด</string>
-  <!-- Badge label shown in the menu item when the user is eligible to use the browser VPN but should authenticate or authorize it first. -->
-  <string name="ip_protection_menu_auth_required">ลองดู</string>
+  <!-- Badge label shown in the VPN menu item when the user is eligible for the feature but needs to authenticate / authorize to enable it -->
+  <string name="ip_protection_menu_try_vpn_cta">ลองใช้ฟรี</string>
   <!-- Content description for the chevron button that opens the browser VPN settings screen -->
   <string name="ip_protection_navigate_settings">เปิดการตั้งค่า VPN</string>
   <!--
@@ -3006,6 +3026,8 @@
   <string name="ip_protection_toolbar_pill_label">VPN เปิดอยู่</string>
   <!-- Accessibility description for the browser VPN pill in the address bar when the VPN has been activated -->
   <string name="ip_protection_toolbar_pill_description">VPN เปิดใช้งานอยู่</string>
+  <!-- Label shown next to the browser protection icon in the address bar when the browser VPN turns off -->
+  <string name="ip_protection_toolbar_pill_label_off">VPN ปิดอยู่</string>
   <!-- Accessibility description for the browser VPN pill in the address bar when the VPN has turned off -->
   <string name="ip_protection_toolbar_pill_description_off">VPN ปิดอยู่</string>
   <!-- Label for the button that starts the browser VPN authentication or authorization flow on the settings screen -->
@@ -3034,7 +3056,7 @@
   -->
   <string name="ip_protection_data_limit_reached_snackbar">ใช้ข้อมูล VPN ครบ %1$d GB แล้ว การเข้าถึงจะถูกรีเซ็ตในเดือนหน้า</string>
   <!-- Snackbar (in-app pop-up notification) action button text that takes the user to the VPN settings screen. -->
-  <string name="ip_protection_data_limit_reached_snackbar_action">การตั้งค่า</string>
+  <string name="ip_protection_open_settings_snackbar_action">การตั้งค่า</string>
   <!-- Title shown on the browser VPN settings screen for location selection section. -->
   <string name="ip_protection_location_title" tools:ignore="UnusedResources">ตำแหน่งที่ตั้ง</string>
   <!-- Label for the Recommended server location option which is automatically selected by the browser. -->
@@ -3043,6 +3065,8 @@
   <string name="ip_protection_mozilla_vpn_upsell_button" tools:ignore="UnusedResources,BrandUsage">รับ Mozilla VPN</string>
   <!-- Description for an unavailable VPN location in the location list. -->
   <string name="ip_protection_location_unavailable_description">ไม่พร้อมใช้งาน</string>
+  <!-- Content description for the browser VPN location selection screen top bar back button -->
+  <string name="ip_protection_locations_navigate_back_button_content_description">นำทางย้อนกลับ</string>
   <!--
     Autofill
 
@@ -3326,6 +3350,16 @@
     which navigates the user to a screen displaying all the shortcuts.
   -->
   <string name="homepage_shortcuts_show_all_content_description">แสดงทางลัดทั้งหมด</string>
+  <!--
+    Label for the button in the shortcuts home screen section that expands the section to show
+    every shortcut.
+  -->
+  <string name="homepage_shortcuts_show_all">แสดงทั้งหมด</string>
+  <!--
+    Label for the button in the shortcuts home screen section that collapses the section back
+    to showing only the first shortcuts.
+  -->
+  <string name="homepage_shortcuts_show_less">แสดงน้อยลง</string>
   <!-- Label for the "Add shortcut" button displayed as a tile. -->
   <string name="homepage_shortcuts_add_shortcut">เพิ่มทางลัด</string>
   <!-- Title for the "Add to homepage" bottom sheet. -->
@@ -4331,4 +4365,16 @@
   <string name="pdf_tools_print_content_description">พิมพ์ PDF</string>
   <!-- Content description for accessibility (used by screen readers): Description for the button that opens the sharing options for the PDF being displayed on the screen. -->
   <string name="pdf_tools_share_content_description">แบ่งปัน PDF</string>
+  <!--
+    PDF viewer add a signature dialog
+
+    The title of the dialog for adding a signature to a PDF.
+  -->
+  <string name="pdf_tools_signature_title">เพิ่มลายเซ็น</string>
+  <!-- The text for the button that erases the text the user entered in the "add a signature" field. -->
+  <string name="pdf_tools_signature_clear_button">ล้าง</string>
+  <!-- The text for the button that adds the signature the user has typed to the PDF. -->
+  <string name="pdf_tools_signature_add_button">เพิ่ม</string>
+  <!-- Content description for the button in reader mode panel that turns on the read aloud feature (playback of content begins when button is pressed) -->
+  <string name="reader_mode_panel_listen_content_description">อ่านออกเสียง</string>
 </resources>

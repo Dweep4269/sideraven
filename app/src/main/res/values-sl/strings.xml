@@ -151,16 +151,8 @@
     Header text on the homescreen for continuing to browse the most recent browser tab
   -->
   <string name="recent_tabs_header_2">Nadaljuj</string>
-  <!--
-    Recent Tabs
-
-    Header text for jumping back into the recent tab in the home screen
-  -->
-  <string name="recent_tabs_header">Skoči nazaj</string>
   <!-- Button text for showing all the tabs in the tabs tray -->
   <string name="recent_tabs_show_all">Prikaži vse</string>
-  <!-- Content description for the button which navigates the user to show all recent tabs in the tabs tray. -->
-  <string name="recent_tabs_show_all_content_description_2">Gumb za prikaz vseh nedavnih zavihkov</string>
   <!-- Text for button in synced tab card that opens synced tabs tray -->
   <string name="recent_tabs_see_all_synced_tabs_button_text">Prikaži vse sinhronizirane zavihke</string>
   <!-- Accessibility description for device icon used for recent synced tab -->
@@ -281,6 +273,8 @@
   <string name="browser_main_menu_content_description_navigation_header">Krmarjenje</string>
   <!-- Content description (not visible, for screen readers etc.) for bottom sheet handlebar custom tab menu. -->
   <string name="browser_custom_tab_menu_handlebar_content_description">Zapri meni zavihkov po meri</string>
+  <!-- URL bar indicator shown on a cached version of the website, when the tab is reloading, but the content is not live yet -->
+  <string name="browser_toolbar_cached_page_indicator">Predpomnjeno</string>
   <!-- Browser menu label that bookmarks the currently visited page -->
   <string name="browser_menu_bookmark_this_page_2">Dodaj stran med zaznamke</string>
   <!-- Browser menu label that navigates to the edit bookmark screen for the current bookmarked page -->
@@ -295,8 +289,12 @@
   <string name="browser_menu_summarize_page">Povzemi stran</string>
   <!-- Browser menu badge text for summarization feature -->
   <string name="browser_menu_summarize_page_badge">Novo</string>
+  <!-- Browser menu badge text for new, highlighted feature -->
+  <string name="browser_menu_page_badge_text">Novo</string>
   <!-- Browser menu label for navigating to the Web Compat Reporter feature, which provides users the ability to send bug reports for broken sites. -->
   <string name="browser_menu_webcompat_reporter_2">Prijavi nedelujočo stran</string>
+  <!-- Browser menu label for adding a tab to a tab group -->
+  <string name="browser_menu_add_to_tab_group">Dodaj skupini</string>
   <!-- Browser menu label that is displayed when the current page has been translated by the translation feature. -->
   <string name="browser_menu_translated">Prevedeno</string>
   <!-- Browser menu label for the print feature -->
@@ -313,8 +311,6 @@
   <string name="browser_menu_default_banner_title">Nastavite %1$s za privzeti brskalnik</string>
   <!-- Label text within the set as default banner -->
   <string name="browser_menu_default_banner_subtitle_2">Hiter, zaseben in ustvarjen za vas.</string>
-  <!-- Content description (not visible, for screen readers etc.) for the button that dismisses the set as default banner in the menu -->
-  <string name="browser_menu_default_banner_dismiss_promotion">Skrij promocijo</string>
   <!-- Content description (not visible, for screen readers etc.) for recommended extensions in main menu -->
   <string name="browser_menu_recommended_extensions_content_description">Več informacij</string>
   <!--
@@ -808,6 +804,8 @@
   <string name="preferences_override_sync_tokenserver">Sinhronizacijski strežnik po meri</string>
   <!-- Preference category for account information -->
   <string name="preferences_category_account">Račun</string>
+  <!-- Preference category for sync controls. Sync can be translated, it's just short for ”Synchronization” in English. -->
+  <string name="preferences_category_sync_controls">Sync</string>
   <!-- Preference for changing where the AddressBar is positioned -->
   <string name="preferences_toolbar_2">Mesto naslovne vrstice</string>
   <!-- Preference for changing toolbar layout -->
@@ -864,6 +862,8 @@
   <string name="preferences_search_synced_tabs">Iskanje po sinhroniziranih zavihkih</string>
   <!-- Preference for account settings -->
   <string name="preferences_account_settings">Nastavitve računa</string>
+  <!-- Preference for account and sync settings -->
+  <string name="preferences_account_and_sync_settings">Račun in sinhronizacija</string>
   <!-- Preference for enabling url autocomplete -->
   <string name="preferences_enable_autocomplete_urls">Samodokončaj spletne naslove</string>
   <!-- Preference title for switch preference to show sponsored Firefox Suggest search suggestions -->
@@ -986,8 +986,6 @@
   <string name="customize_toggle_privacy_report">Poročilo o zasebnosti</string>
   <!-- Title for a customize home screen section. Continue is a section that displays the most recent browser tab, so users can continue browsing where they left off. -->
   <string name="customize_toggle_continue">Nadaljuj</string>
-  <!-- Header text for jumping back into the recent tab in customize the home screen -->
-  <string name="customize_toggle_jump_back_in">Skoči nazaj</string>
   <!-- Title for the customize home screen section with bookmarks. -->
   <string name="customize_toggle_bookmarks">Zaznamki</string>
   <!--
@@ -1143,6 +1141,12 @@
   <string name="preferences_sync_now">Sinhroniziraj zdaj</string>
   <!-- Preference category for sync -->
   <string name="preferences_sync_category">Izberite, kaj želite sinhronizirati</string>
+  <!-- Preference category for sync controls -->
+  <string name="preferences_category_sync">Sinhronizirani podatki</string>
+  <!-- Summary for the sync preference category. -->
+  <string name="preferences_sync_category_summary">Upravljajte, kaj se sinhronizira med povezanimi napravami</string>
+  <!-- Summary for the sync preference category, when user has disabled all synchronisation items. -->
+  <string name="preferences_sync_category_no_engine_selected_summary">Trenutno ne sinhronizirate ničesar. Izberite, kaj želite sinhronizirati med napravami.</string>
   <!-- Preference for syncing history -->
   <string name="preferences_sync_history">Zgodovina</string>
   <!-- Preference for syncing bookmarks -->
@@ -1155,6 +1159,10 @@
   <string name="preferences_sign_out">Odjava</string>
   <!-- Preference displays and allows changing current FxA device name -->
   <string name="preferences_sync_device_name">Ime naprave</string>
+  <!-- Preference category for Device name -->
+  <string name="preferences_device_name_category">Ime naprave</string>
+  <!-- Label for the Preference that displays and allows changing current device name on Mozilla Account -->
+  <string name="preferences_sync_change_device_name">Spremeni ime naprave</string>
   <!-- Text shown when user enters empty device name -->
   <string name="empty_device_name_error">Ime naprave ne sme ostati prazno.</string>
   <!-- Label indicating that sync is in progress -->
@@ -1274,8 +1282,6 @@
   <string name="preference_simple_toolbar">Preprosto</string>
   <!-- Preference for using expanded toolbar -->
   <string name="preference_expanded_toolbar">Razširjeno</string>
-  <!-- Preference description indicating the toolbar location preference is disabled when the tab strip is enabled -->
-  <string name="preference_toolbar_pref_disabled_explanation">Ko je prikazana vrstica z zavihki, mora biti naslovna vrstica na vrhu.</string>
   <!-- New tab shortcut in toolbar customization -->
   <string name="toolbar_customize_shortcut_new_tab">Odpri nov zavihek</string>
   <!-- Share shortcut in toolbar customization -->
@@ -1319,6 +1325,12 @@
     Preferences for showing tab strip
   -->
   <string name="preference_tab_strip_show">Prikaži vrstico z zavihki</string>
+  <!-- Preference for tab bar placement (top or bottom of the screen) -->
+  <string name="preference_tab_strip_location_header">Položaj vrstice z zavihki</string>
+  <!-- Preference for using top tab strip -->
+  <string name="preference_top_tab_strip">Na vrhu</string>
+  <!-- Preference for using bottom tab strip -->
+  <string name="preference_bottom_tab_strip">Na dnu</string>
   <!--
     Gestures Preferences
 
@@ -1351,6 +1363,8 @@
   <string name="library_desktop_bookmarks_unfiled">Drugi zaznamki</string>
   <!-- Option in Library to open History page -->
   <string name="library_history">Zgodovina</string>
+  <!-- Content description (not visible, for screen readers etc.) for the check mark that replaces a site's icon in History and Recently closed tabs when the item is selected -->
+  <string name="library_item_selected_content_description">Izbrano</string>
   <!-- Settings Page Title -->
   <string name="settings_title">Nastavitve</string>
   <!-- Content description (not visible, for screen readers etc.): "Close button for library settings" -->
@@ -1401,8 +1415,8 @@
     Title of preference for tabs management
   -->
   <string name="preferences_tabs">Zavihki</string>
-  <!-- Title of preference that allows a user to specify the tab view -->
-  <string name="preferences_tab_view">Pogled zavihkov</string>
+  <!-- Title of preference that allows a user to specify the tab layout -->
+  <string name="preferences_tab_layout">Postavitev zavihkov</string>
   <!-- Option for a list tab view -->
   <string name="tab_view_list">Seznam</string>
   <!-- Option for a grid tab view -->
@@ -1421,6 +1435,8 @@
   <string name="preference_auto_close_tabs" tools:ignore="UnusedResources">Samodejno zapiraj odprte zavihke</string>
   <!-- Content description (not visible, for screen readers etc.): Close tab button -->
   <string name="tab_manager_close_tabs">Zapri</string>
+  <!-- Content description for the media playback indicator in the tabs tray. -->
+  <string name="tab_indicator_media_playing">Predvaja predstavnost</string>
   <!--
     Opening screen
 
@@ -1448,15 +1464,19 @@
   <!-- Summary for homepage preference indicating opening the homepage when re-opening the app after four hours of inactivity -->
   <string name="opening_screen_after_four_hours_of_inactivity_summary">Po štirih urah odpri na domači strani</string>
   <!--
-    Inactive tabs
+    Tab organization
 
-    Category header of a preference that allows a user to enable or disable the inactive tabs feature
+    Category header for the preferences that control how tabs are organized
   -->
-  <string name="preferences_inactive_tabs">Premakni stare zavihke med nedejavne</string>
-  <!-- Title of inactive tabs preference -->
+  <string name="preferences_tab_organization">Organiziranost zavihkov</string>
+  <!-- Title of the preference that allows a user to enable or disable the inactive tabs feature -->
+  <string name="preferences_inactive_tabs_toggle_title">Nedejavni zavihki</string>
+  <!-- Summary of the preference that allows a user to enable or disable the inactive tabs feature. -->
   <string name="preferences_inactive_tabs_title">Zavihki, ki jih dva tedna niste odprli, se premaknejo v razdelek nedejavnih.</string>
-  <!-- Title for the preference to enable or disable the tab groups feature -->
-  <string name="preferences_tab_groups_feature">Omogoči skupine zavihkov</string>
+  <!-- Title of the preference that allows a user to enable or disable the tab groups feature -->
+  <string name="preferences_tab_groups_title">Skupine zavihkov</string>
+  <!-- Summary of the preference that allows a user to enable or disable the tab groups feature -->
+  <string name="preferences_tab_groups_description">Razporedite si zavihke po skupinah, ki jih lahko poimenujete in shranite.</string>
   <!--
     Privacy report
 
@@ -1747,16 +1767,6 @@
     %1$d is the number of bookmarks selected
   -->
   <string name="history_multi_select_title">%1$d izbranih</string>
-  <!-- Text for the header that groups the history for today -->
-  <string name="history_today">Danes</string>
-  <!-- Text for the header that groups the history for yesterday -->
-  <string name="history_yesterday">Včeraj</string>
-  <!-- Text for the header that groups the history the past 7 days -->
-  <string name="history_7_days">Zadnjih 7 dni</string>
-  <!-- Text for the header that groups the history the past 30 days -->
-  <string name="history_30_days">Zadnjih 30 dni</string>
-  <!-- Text for the header that groups the history older than the last month -->
-  <string name="history_older">Starejše</string>
   <!-- Text shown when no history exists -->
   <string name="history_empty_message">Ni zgodovine</string>
   <!--
@@ -2387,12 +2397,12 @@
   <string name="sync_sign_in">Prijava v Sync</string>
   <!-- An option from the share dialog to send link to all other sync devices -->
   <string name="sync_send_to_all">Pošlji na vse naprave</string>
-  <!-- Text displayed when no other sync devices are available for link sharing -->
-  <string name="sync_no_devices_available">Nobena naprava ni na voljo</string>
-  <!-- Text displayed when no other sync devices are available for link sharing. -->
-  <string name="sync_no_devices_available_description">Vse naprave, ki so prijavljene in sinhronizirane s tem računom, bodo prikazane tukaj.</string>
   <!-- An option from the share dialog to reconnect to sync -->
   <string name="sync_reconnect">Ponovno se poveži v Sync</string>
+  <!-- Label for the button in the share dialog that sends the tab to the selected sync devices -->
+  <string name="sync_send_to_selected_devices">Pošlji</string>
+  <!-- Content description announced when a device is selected in the share dialog -->
+  <string name="send_to_devices_device_selected_content_description">Izbrano</string>
   <!-- Text displayed when sync is offline and cannot be accessed -->
   <string name="sync_offline">Brez povezave</string>
   <!-- An option to connect additional devices -->
@@ -2415,6 +2425,8 @@
   <string name="sent_from_firefox_template" tools:ignore="UnusedResources">%1$s\n\nPoslano iz %2$sa 🦊 Preizkusite mobilni brskalnik: %3$s</string>
   <!-- A short message template for the shared link with a footer. %1$s is the shared link, %2$s is the app name (e.g. Firefox) and %3$s is a download link for the app. -->
   <string name="sent_from_firefox_template_short" tools:ignore="UnusedResources">%1$s\n\nPoslano iz %2$sa 🦊 %3$s</string>
+  <!-- Send tab to synced devices: Authentication error title - Message asking the user to re-authenticate -->
+  <string name="sync_send_tab_error_auth_title">Za pošiljanje zavihkov med napravami se ponovno prijavite</string>
   <!-- Send tab to synced devices: Authentication error button - Allows user to re-authenticate -->
   <string name="sync_send_tab_error_auth_button">Prijava</string>
   <!-- Send tab to synced devices: Authentication error button - Allows user to remove the currently connected account -->
@@ -2423,10 +2435,14 @@
   <string name="sync_send_tab_empty_state_title">Ni povezanih naprav</string>
   <!-- Send tab to synced devices: Empty state message - Displayed when the user has no synced devices -->
   <string name="sync_send_tab_empty_state_description" tools:ignore="BrandUsage">Če želite poslati zavihek, se v Firefox prijavite v vsaj še eni napravi.</string>
+  <!-- Send tab to synced devices: Empty state link - Displayed when the user has no synced devices -->
+  <string name="sync_send_tab_empty_state_link">Preberite, kako povezati napravo</string>
   <!-- Send tab to synced devices: Connectivity Error title -->
   <string name="sync_send_tab_error_connection_title">Preverite svojo povezavo z internetom</string>
   <!-- Send tab to synced devices: Connectivity Error message - Suggested user action after internet connection has been established -->
   <string name="sync_send_tab_error_connection_text">Nato poskusite zavihek znova poslati.</string>
+  <!-- Send tab to synced devices: Connectivity Error button - When tapped, refreshes the list of connected devices. -->
+  <string name="sync_send_tab_error_connection_button">Poskusi znova</string>
   <!--
     Notifications
 
@@ -2454,6 +2470,8 @@
     Name of the weekly privacy report notification channel. Displayed in the "App notifications" system settings for the app.
   -->
   <string name="notification_privacy_report_channel_name">Poročilo o zasebnosti</string>
+  <!-- Description of the weekly privacy report notification channel. Displayed in the "App notifications" system settings for the app. %1$s is the app name (e.g. Firefox) -->
+  <string name="notification_privacy_report_channel_description">%1$s prikazuje, koliko sledilcev je bilo blokiranih, medtem ko ste brskali.</string>
   <!-- Body text for the weekly privacy report notification for when trackers have been blocked. %1$s is the app name (e.g. Firefox) -->
   <string name="notification_privacy_report_body_has_trackers">Brskajte dalje, %1$s pa bo še naprej blokiral sledilce.</string>
   <!-- Headline text of the weekly privacy report notification for when no trackers have been blocked. %1$s is the app name (e.g. Firefox) -->
@@ -2607,6 +2625,12 @@
   <string name="sign_in_create_account_text" tools:ignore="BrandUsage"><![CDATA[Nimate računa? <u>Ustvarite ga</u> za sinhronizacijo Firefoxa med napravami.]]></string>
   <!-- Text shown in confirmation dialog to sign out of account. %s is the name of the app (for example "Firefox"). -->
   <string name="sign_out_confirmation_message_2">%s se bo prenehal sinhronizirati z vašim računom, vendar ne bo izbrisal podatkov o brskanju na tej napravi.</string>
+  <!-- Title of the confirmation dialog shown when the user signs out of their account -->
+  <string name="sign_out_dialog_title">Se želite odjaviti iz računa?</string>
+  <!-- Body of the confirmation dialog shown when the user signs out of their account -->
+  <string name="sign_out_dialog_message">Sinhronizirani podatki ostanejo shranjeni v vašem računu.</string>
+  <!-- Text for the primary action button of the confirmation dialog shown when the user signs out of their account -->
+  <string name="sign_out_dialog_confirm_button">Odjava</string>
   <!-- Option to continue signing out of account shown in confirmation dialog to sign out of account -->
   <string name="sign_out_disconnect">Prekini povezavo</string>
   <!-- Option to cancel signing out shown in confirmation dialog to sign out of account -->
@@ -2643,7 +2667,7 @@
   <!-- Preference for enhanced tracking protection for the standard protection settings -->
   <string name="preference_enhanced_tracking_protection_standard_default_1">Običajno (privzeto)</string>
   <!-- Preference description for enhanced tracking protection for the standard protection settings -->
-  <string name="preference_enhanced_tracking_protection_standard_description_5">Strani se bodo nalagale normalno, vendar bo zavrnjenih manj sledilcev.</string>
+  <string name="preference_enhanced_tracking_protection_standard_description_5">Strani se bodo nalagale normalno, vendar bo blokiranih manj sledilcev.</string>
   <!-- Accessibility text for the Standard protection information icon -->
   <string name="preference_enhanced_tracking_protection_standard_info_button">Kaj blokira običajna zaščita pred sledenjem</string>
   <!-- Preference for enhanced tracking protection for the strict protection settings -->
@@ -2673,13 +2697,13 @@
   <!-- Cancel button text for the dialog that appears after disabling the baseline exceptions preference under Strict or Custom tracking protection. This dismisses the dialog and re-enables the preference. -->
   <string name="preference_enhanced_tracking_protection_allow_list_dialog_cancel">Ohrani popravke vklopljene</string>
   <!-- Accessibility text for the Strict protection information icon -->
-  <string name="preference_enhanced_tracking_protection_strict_info_button">Kaj je zavrnjeno s strogo zaščito pred sledenjem</string>
+  <string name="preference_enhanced_tracking_protection_strict_info_button">Kaj blokira stroga zaščita pred sledenjem</string>
   <!-- Preference for enhanced tracking protection for the custom protection settings -->
   <string name="preference_enhanced_tracking_protection_custom">Po meri</string>
   <!-- Preference description for enhanced tracking protection for the strict protection settings -->
-  <string name="preference_enhanced_tracking_protection_custom_description_2">Izberite, katere sledilce in skripte želite zavračati.</string>
+  <string name="preference_enhanced_tracking_protection_custom_description_2">Izberite, katere sledilce in skripte želite blokirati.</string>
   <!-- Accessibility text for the Strict protection information icon -->
-  <string name="preference_enhanced_tracking_protection_custom_info_button">Kaj je zavrnjeno z zaščito pred sledenjem po meri</string>
+  <string name="preference_enhanced_tracking_protection_custom_info_button">Kaj blokira zaščita pred sledenjem po meri</string>
   <!--
     Header for categories that are being blocked by current Enhanced Tracking Protection settings
 
@@ -3028,14 +3052,14 @@
   <!-- Label for the BETA badge for the browser VPN entry in the settings list -->
   <string name="preferences_ip_protection_beta_badge_label">BETA</string>
   <!-- Title for the browser VPN settings screen (displayed in the app bar) -->
-  <string name="ip_protection_title">VPN</string>
+  <string name="ip_protection_settings_title">Vgrajeni VPN</string>
   <!-- Label for the browser VPN toggle on the settings screen -->
   <string name="ip_protection_toggle_label">VPN</string>
   <!-- Content description for the browser VPN settings screen top bar back button -->
   <string name="ip_protection_navigate_back_button_content_description">Pojdi nazaj</string>
   <!-- Headline for the browser VPN promo card. %s is the name of the app (for example "Firefox"). -->
   <string name="ip_protection_promo_headline">%sov vgrajeni VPN</string>
-  <!-- Body text for the browser VPN promo card . %s is a learn more link using ip_protection_learn_more as text. -->
+  <!-- Body text for the browser VPN settings header, shown when no promo is running. %s is a learn more link using ip_protection_learn_more as text. -->
   <string name="ip_protection_promo_body_2">Brskajte z dodatno zaščito s skrivanjem vaše lokacije, tudi na javnem omrežju Wi-Fi. %s</string>
   <!-- Link text that opens additional information about the browser VPN -->
   <string name="ip_protection_learn_more">Več o tem</string>
@@ -3068,8 +3092,6 @@
   <string name="ip_protection_menu_error">Napaka</string>
   <!-- Badge label shown in the VPN menu item when the user is eligible for the feature but needs to authenticate / authorize to enable it -->
   <string name="ip_protection_menu_try_vpn_cta">Preizkusite brezplačno</string>
-  <!-- Badge label shown in the menu item when the user is eligible to use the browser VPN but should authenticate or authorize it first. -->
-  <string name="ip_protection_menu_auth_required">Preizkusite ga</string>
   <!-- Content description for the chevron button that opens the browser VPN settings screen -->
   <string name="ip_protection_navigate_settings">Odpri nastavitve VPN</string>
   <!--
@@ -3124,7 +3146,7 @@
   -->
   <string name="ip_protection_data_limit_reached_snackbar">Porabili ste %1$d GB podatkov VPN. Dostop bo ponovno omogočen prihodnji mesec.</string>
   <!-- Snackbar (in-app pop-up notification) action button text that takes the user to the VPN settings screen. -->
-  <string name="ip_protection_data_limit_reached_snackbar_action">Nastavitve</string>
+  <string name="ip_protection_open_settings_snackbar_action">Nastavitve</string>
   <!-- Description shown on the browser VPN settings screen prompting the user to turn the VPN on. -->
   <string name="ip_protection_settings_description" tools:ignore="UnusedResources">Vklopite VPN, da bo vaše brskanje bolj zasebno in težje sledljivo.</string>
   <!-- Title shown on the browser VPN settings screen for location selection section. -->
@@ -4514,6 +4536,16 @@
   <string name="lens_camera_mode_qr">Bralnik QR</string>
   <!-- Toast shown when the user picks an image from the gallery in QR mode but no QR code is found in it -->
   <string name="lens_camera_qr_no_code_found">Na sliki ni bilo mogoče najti QR-kode</string>
+  <!-- Status shown under an image picked from the gallery while it is being sent to Google Lens for a visual search -->
+  <string name="lens_camera_loading_status">Iskanje</string>
+  <!-- Button shown under an image picked from the gallery while it is being sent to Google Lens. Tapping it stops the search and returns to the camera. -->
+  <string name="lens_camera_loading_cancel_button">Prekliči</string>
+  <!-- Snackbar message shown when an image picked from the gallery could not be opened or read, so it was never sent to Google Lens. Shown after returning to the camera. -->
+  <string name="lens_camera_image_load_failed">Te slike ni bilo mogoče naložiti. Poskusite z drugo.</string>
+  <!-- Snackbar message shown when an image picked from the gallery could not be searched because of a network problem or an error from Google Lens. Shown after returning to the camera, next to the lens_camera_upload_failed_retry_button action. -->
+  <string name="lens_camera_upload_failed">Rezultatov Google Lens ni bilo mogoče pridobiti</string>
+  <!-- Action in the snackbar shown when an image picked from the gallery could not be searched with Google Lens. Tapping it searches the same image again. -->
+  <string name="lens_camera_upload_failed_retry_button">Poskusi znova</string>
   <!-- Title of the bottom sheet shown the first time the user opens the Google Lens camera screen -->
   <string name="lens_opt_out_title">Poiščite z Google Lens</string>
   <!-- Description of the bottom sheet shown the first time the user opens the Google Lens camera screen -->
@@ -4594,4 +4626,14 @@
   <string name="pdf_tools_signature_clear_button">Izbriši</string>
   <!-- The text for the button that adds the signature the user has typed to the PDF. -->
   <string name="pdf_tools_signature_add_button">Dodaj</string>
+  <!--
+    Listen to page
+
+    Content description for the reader mode panel: a group of buttons floating over the content
+  -->
+  <string name="reader_mode_panel_content_description">Možnosti bralnega načina</string>
+  <!-- Content description for the button in reader mode panel that turns on the read aloud feature (playback of content begins when button is pressed) -->
+  <string name="reader_mode_panel_listen_content_description">Preberi naglas</string>
+  <!-- Content description for media player displayed in Reader Mode when the Listen to Page (Read Aloud) feature is selected -->
+  <string name="reader_mode_panel_media_player_content_description">Predvajalnik predstavnosti</string>
 </resources>

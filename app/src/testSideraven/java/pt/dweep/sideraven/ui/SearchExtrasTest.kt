@@ -4,16 +4,13 @@
 
 package pt.dweep.sideraven.ui
 
-import androidx.compose.ui.semantics.SemanticsProperties
-import androidx.compose.ui.test.SemanticsMatcher
-import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.text.AnnotatedString
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import mozilla.components.ui.autocomplete.InlineAutocompleteEditText
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -21,7 +18,7 @@ import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 import pt.dweep.sideraven.theme.SideravenTheme
 
-/** QR and voice in the Search Pop-up. */
+/** QR and voice in the Search Pop-up; the field is the toolbar's control. */
 @RunWith(AndroidJUnit4::class)
 @Config(qualifiers = "w1280dp-h800dp")
 class SearchExtrasTest {
@@ -30,6 +27,7 @@ class SearchExtrasTest {
 
     private val submitted = mutableListOf<String>()
     private val asked = mutableListOf<String>()
+    private var controller: FieldController? = null
 
     private inner class FakeExtras(
         override val canScanQr: Boolean = true,
@@ -56,19 +54,22 @@ class SearchExtrasTest {
                     onSuggestion = {},
                     onDismiss = {},
                     options = SearchOptions(extras = extras),
+                    fieldController = { controller = it },
                 )
             }
         }
 
     @Test
-    fun `WHEN a QR code is scanned THEN its text fills the field, ready to go but not gone`() {
+    fun `WHEN a QR code is scanned THEN its text fills the field, all selected and not gone`() {
         show(FakeExtras())
 
         composeRule.onNodeWithTag(SidebarTestTag.SEARCH_QR).performClick()
 
         assertEquals(listOf("qr"), asked)
-        composeRule.onNodeWithTag(SidebarTestTag.SEARCH_FIELD)
-            .assert(SemanticsMatcher.expectValue(SemanticsProperties.EditableText, AnnotatedString("https://scanned.example/page")))
+        assertEquals("https://scanned.example/page", controller?.text)
+        val view = requireNotNull(controller?.view) as InlineAutocompleteEditText
+        assertEquals(0, view.selectionStart)
+        assertEquals("https://scanned.example/page".length, view.selectionEnd)
         assertEquals(emptyList<String>(), submitted)
     }
 

@@ -40,6 +40,7 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
@@ -106,6 +107,7 @@ internal data class SidebarInputs(
     val sidebarWidth: SidebarWidth = SidebarWidth.Standard,
     val sidebarSide: SidebarSide = SidebarSide.Left,
     val sleepingTabIds: Set<String> = emptySet(),
+    val foldedSpaces: String = "",
     val pinnedLinks: Map<String, String> = emptyMap(),
     val pinnedIcons: Map<String, Bitmap> = emptyMap(),
     val desktopTabs: Map<String, List<pt.dweep.sideraven.sync.DesktopTab>> = emptyMap(),
@@ -149,6 +151,7 @@ internal fun rememberSidebarUiState(
                 sidebarWidth = sidebarWidth,
                 sidebarSide = sidebarSide,
                 sleepingTabIds = sleepingTabIds,
+                foldedSpaces = foldedSpaces,
                 pinnedLinks = pinnedLinks,
                 pinnedIcons = pinnedIcons,
                 desktopTabs = desktopTabs,
@@ -350,8 +353,11 @@ private fun SidebarRoot(
     val addressSwipeNewTab by modeStore.addressSwipeNewTab.collectAsState()
     val tabListDirection by modeStore.tabListDirection.collectAsState()
     val addressSwipeTabs by modeStore.addressSwipeTabs.collectAsState()
+    val spacesShown by modeStore.spacesShown.collectAsState()
     val essentialsPerRow by modeStore.essentialsPerRow.collectAsState()
     val haptics by modeStore.haptics.collectAsState()
+    RunAutoSleep(activity)
+    val foldedSpaces by modeStore.foldedSpaces.collectAsState()
     val animations by modeStore.animations.collectAsState()
     val roundedFrame by modeStore.roundedFrame.collectAsState()
     val pinnedIcons = rememberItemIcons(activity, spacesData?.pinned.orEmpty().map { it.url })
@@ -359,11 +365,15 @@ private fun SidebarRoot(
     LaunchedEffect(browserState.tabs, essentialLinks, pinnedLinks) {
         val byId = browserState.tabs.associateBy { it.id }
         val pinUrls = spaces.data.pinned.associate { it.id to it.url }
-        // Only while the tab is on the pinned page: browsed elsewhere, its icon is another site's.
-        fun iconAt(
+        val suffixes = activity.components.publicSuffixList
+        // Only while the tab is on the pin's site: browsed elsewhere, its icon is another site's.
+        suspend fun iconAt(
             url: String,
             tabId: String,
-        ) = byId[tabId]?.content?.takeIf { it.url == url }?.icon
+        ) = byId[tabId]?.content?.takeIf { content ->
+            content.icon != null &&
+                SidebarIcons.onPinSite(url, content.url, atFirstPage = content.history.currentIndex == 0) { host -> suffixes.getPublicSuffixPlusOne(host).await() }
+        }?.icon
         val seen =
             essentialLinks.mapNotNull { (url, tabId) -> iconAt(url, tabId)?.let { url to it } } +
                 pinnedLinks.mapNotNull { (pinId, tabId) -> pinUrls[pinId]?.let { url -> iconAt(url, tabId)?.let { url to it } } }
@@ -413,6 +423,7 @@ private fun SidebarRoot(
                 addressBarLayout = addressBarLayout,
                 sidebarWidth = sidebarWidthChoice,
                 sidebarSide = sidebarSideChoice,
+                foldedSpaces = foldedSpaces,
                 sleepingTabIds = sleepingTabIds,
                 pinnedLinks = pinnedLinks,
                 pinnedIcons = pinnedIcons.toMap(),
@@ -432,6 +443,7 @@ private fun SidebarRoot(
                         haptics = haptics,
                         animations = animations,
                         roundedFrame = roundedFrame,
+                        spacesShown = spacesShown,
                     ),
                 animateModeChanges = animateModeChanges,
                 syncProblem = zenStatus.problem != null,
@@ -578,10 +590,10 @@ private fun SidebarRoot(
                 onSpacePinRefused = { result ->
                     val message =
                         when (result) {
-                            PinResult.Full -> activity.getString(R.string.sideraven_space_pins_full, PINNED_TABS_CAP)
                             PinResult.PrivateRefused -> activity.getString(R.string.sideraven_space_pin_private)
                             PinResult.AlreadyPinned -> activity.getString(R.string.sideraven_space_pin_already)
-                            PinResult.Pinned -> null
+                            // Full is the Essentials Cap; Pinned Tabs have none.
+                            PinResult.Pinned, PinResult.Full -> null
                         }
                     message?.let { Toast.makeText(activity, it, Toast.LENGTH_SHORT).show() }
                 },
@@ -613,10 +625,11 @@ private fun SidebarRoot(
                     }
                 },
                 sleepTabs = { ids -> sleepTabs(activity, ids) },
+                closeUnpinnedTabs = { spaceId -> closeUnpinnedTabs(activity, snackbarParent, spaces, essentials, spaceId) },
+                toggleFold = modeStore::toggleFold,
                 unloadSpace = { spaceId ->
-                    val links = spaces.pinnedLinks.value
-                    val selected = components.core.store.state.selectedTabId
-                    sleepTabs(activity, spaces.data.pinnedIn(spaceId).mapNotNull { links[it.id] }.filter { it != selected })
+                    val browser = components.core.store.state
+                    sleepTabs(activity, spaces.data.tabsIn(spaceId, browser.tabs, essentials.linkedTabs.value.values.toSet()).filter { it != browser.selectedTabId })
                 },
                 moveTabToSpace = { tabId, spaceId ->
                     val wasSelected = components.core.store.state.selectedTabId == tabId
@@ -669,7 +682,8 @@ private fun SidebarRoot(
 
     val chosenAccent by modeStore.accent.collectAsState()
     val spaceThemes by modeStore.spaceThemes.collectAsState()
-    val pureBlack by modeStore.pureBlack.collectAsState()
+    // Fenix's Darkest theme blackens the Sidebar too; the Space colour stays as the accent.
+    val pureBlack by pt.dweep.sideraven.theme.DarkestTheme.rememberIsOn(remember(activity) { activity.components.settings })
     val dark = androidx.compose.foundation.isSystemInDarkTheme()
     SideravenTheme(isPrivate = state.isPrivate, spaceAccent = pt.dweep.sideraven.theme.effectiveAccent(state.currentSpace?.accent, chosenAccent), pureBlack = pureBlack) {
         // Space themes: the current Space's Zen gradient, or its accent, tints the frame. Not in Private
@@ -781,6 +795,43 @@ private fun SidebarRoot(
 }
 
 /**
+ * Close unpinned tabs: closes a Space's Tab List, keeping its Pinned Tabs and the Essentials, and
+ * offers Undo. If the tab on screen closed, lands on what's left of the Space.
+ */
+private fun closeUnpinnedTabs(
+    activity: HomeActivity,
+    snackbarParent: View,
+    spaces: Spaces,
+    essentials: Essentials,
+    spaceId: String,
+) {
+    val components = activity.components
+    val store = components.core.store
+    val essentialTabs = essentials.linkedTabs.value.values.toSet()
+    val tabIds = spaces.data.unpinnedTabsIn(spaceId, store.state.tabs, essentialTabs, spaces.pinnedLinks.value.values.toSet())
+    if (tabIds.isEmpty()) return
+    val snapshot = spaces.data
+    val closedSelected = store.state.selectedTabId in tabIds
+    components.useCases.tabsUseCases.removeTabs(tabIds)
+    if (closedSelected && spaces.data.currentSpaceId == spaceId) {
+        val target = spaces.data.switchTarget(spaceId, store.state.tabs, essentialTabs)
+        if (target != null) components.useCases.tabsUseCases.selectTab(target) else openNewTab(activity, private = false, focus = false)
+    }
+    activity.lifecycleScope.allowUndo(
+        view = snackbarParent,
+        settings = components.settings,
+        message = activity.resources.getQuantityString(R.plurals.sideraven_closed_tabs, tabIds.size, tabIds.size),
+        undoActionTitle = activity.getString(R.string.snackbar_deleted_undo),
+        onCancel = {
+            // The tabs come back in their Space.
+            spaces.restore(snapshot)
+            components.useCases.tabsUseCases.undo.invoke()
+        },
+        operation = {},
+    )
+}
+
+/**
  * Deletes a Space: closes its tabs, lands on the neighbouring Space, and offers Undo (which brings
  * back the Space and its tabs).
  */
@@ -882,6 +933,26 @@ private fun searchRequestFor(
 /** Fenix's main navigation controller, for Sideraven code that navigates. */
 internal fun sidebarNavController(activity: HomeActivity): NavController? =
     (activity.supportFragmentManager.findFragmentById(R.id.container) as? NavHostFragment)?.navController
+
+/**
+ * Auto-Sleep, while the app is in the foreground: looks when it comes back and every minute after,
+ * and puts to sleep the tabs unused for the Sleep Timer.
+ */
+@Composable
+private fun RunAutoSleep(activity: HomeActivity) {
+    val timer by PreferencesSidebarModeStore.get(activity).sleepTimer.collectAsState()
+    LaunchedEffect(activity, timer) {
+        if (timer == SleepTimer.Off) return@LaunchedEffect
+        activity.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            while (true) {
+                val state = activity.components.core.store.state
+                val due = AutoSleep.due(state.tabs, state.selectedTabId, SidebarGate.sleepingTabs.value, timer, System.currentTimeMillis())
+                if (due.isNotEmpty()) sleepTabs(activity, due)
+                kotlinx.coroutines.delay(AutoSleep.CHECK_EVERY_MS)
+            }
+        }
+    }
+}
 
 /** Unload: the tabs sleep (their engine sessions are suspended); they reload when opened. */
 private fun sleepTabs(

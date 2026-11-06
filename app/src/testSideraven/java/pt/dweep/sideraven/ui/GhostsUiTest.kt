@@ -10,6 +10,7 @@ import androidx.compose.ui.test.longClick
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
@@ -35,7 +36,10 @@ class GhostsUiTest {
 
     private val intents = mutableListOf<SidebarIntent>()
 
-    private fun render(pin: SidebarPinnedTab) {
+    private fun render(
+        pin: SidebarPinnedTab,
+        unpinned: Int = 0,
+    ) {
         val state =
             SidebarUiState(
                 isVisible = true,
@@ -44,7 +48,7 @@ class GhostsUiTest {
                 mode = SidebarMode.Persistent,
                 spaces =
                     listOf(
-                        SidebarSpace("h", "Home", "🏠", "ember", isCurrent = true, pinnedCount = 1),
+                        SidebarSpace("h", "Home", "🏠", "ember", isCurrent = true, pinnedCount = 1, unpinnedCount = unpinned),
                         SidebarSpace("w", "Work", "💼", "blue", isCurrent = false),
                     ),
                 pinned = listOf(pin),
@@ -82,12 +86,30 @@ class GhostsUiTest {
     }
 
     @Test
-    fun `WHEN Unload all is chosen from a Space's menu THEN its Pinned Tabs are Unloaded`() {
+    fun `WHEN Unload space is chosen from a Space's menu THEN the Space is Unloaded`() {
         render(open)
 
         composeRule.onNodeWithContentDescription("Home").performTouchInput { longClick() }
-        composeRule.onNodeWithText("Unload all").performClick()
+        composeRule.onNodeWithText("Unload space").performClick()
 
         assertEquals(listOf<SidebarIntent>(SidebarIntent.UnloadSpace("h")), intents)
+    }
+
+    @Test
+    fun `WHEN Close unpinned tabs is chosen from a Space's menu THEN the Space's Tab List closes`() {
+        render(open, unpinned = 3)
+
+        composeRule.onNodeWithContentDescription("Home").performTouchInput { longClick() }
+        composeRule.onNodeWithText("Close unpinned tabs").performClick()
+
+        assertEquals(listOf<SidebarIntent>(SidebarIntent.CloseUnpinnedTabs("h")), intents)
+    }
+
+    @Test
+    fun `GIVEN a Space with no unpinned tabs THEN its menu doesn't offer to close them`() {
+        render(open, unpinned = 0)
+
+        composeRule.onNodeWithContentDescription("Home").performTouchInput { longClick() }
+        composeRule.onAllNodesWithText("Close unpinned tabs").assertCountEquals(0)
     }
 }

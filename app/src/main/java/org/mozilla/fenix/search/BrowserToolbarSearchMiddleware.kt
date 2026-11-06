@@ -153,7 +153,6 @@ internal sealed class EditPageEndActionsInteractions : BrowserToolbarEvent {
  * @param scope [CoroutineScope] used for running long running operations in background.
  * @param autocompleteDispatcher [CoroutineContext] used for querying autocomplete suggestions.
  */
-@Suppress("LongParameterList")
 class BrowserToolbarSearchMiddleware(
     private val uiContext: Context,
     private val appStore: AppStore,
@@ -207,10 +206,6 @@ class BrowserToolbarSearchMiddleware(
                     appStore.dispatch(AppAction.QrScannerAction.QrScannerDismissed)
                 }
                 observeQRScannerInputJob?.cancel()
-                if (observeLensInputJob?.isActive == true) {
-                    appStore.dispatch(AppAction.LensAction.LensDismissed)
-                }
-                observeLensInputJob?.cancel()
                 observeVoiceInputJob?.cancel()
             }
 
@@ -586,7 +581,7 @@ class BrowserToolbarSearchMiddleware(
                         onClick = LensButtonClicked,
                     )
                 )
-            } else {
+            } else if (settings.shouldShowQRScanSearch) {
                 add(
                     ActionButtonRes(
                         drawableResId = iconsR.drawable.mozac_ic_qr_code_24,
@@ -616,7 +611,12 @@ class BrowserToolbarSearchMiddleware(
                         )
                         components.useCases.fenixBrowserUseCases.loadUrlOrSearch(
                             searchTermOrURL = it.qrScannerState.lastScanData,
-                            newTab = appStore.state.searchState.sourceTabId == null,
+                            newTab =
+                                if (settings.enableHomepageAsNewTab) {
+                                    false
+                                } else {
+                                    appStore.state.searchState.sourceTabId == null
+                                },
                             flags = EngineSession.LoadUrlFlags.external(),
                             private = browsingModeManager.mode.isPrivate,
                         )
@@ -634,14 +634,10 @@ class BrowserToolbarSearchMiddleware(
                     if (!it.lensState.resultUrl.isNullOrEmpty()) {
                         observeLensInputJob?.cancel()
 
-                        val resultUrl = it.lensState.resultUrl
+                        // LensImageSearch already opened and selected the result tab, so only bring
+                        // the browser to the front. This job dies with the toolbar's view; the tab
+                        // survives that, this navigation doesn't.
                         appStore.dispatch(AppAction.LensAction.LensResultConsumed)
-                        components.useCases.fenixBrowserUseCases.loadUrlOrSearch(
-                            searchTermOrURL = resultUrl,
-                            newTab = appStore.state.searchState.sourceTabId == null,
-                            flags = EngineSession.LoadUrlFlags.external(),
-                            private = browsingModeManager.mode.isPrivate,
-                        )
                         navController.navigate(R.id.action_global_browser)
                     }
                 }

@@ -112,16 +112,8 @@
   <string name="home_screen_shortcut_open_new_private_tab_2">نجی ٹیب کھولھو</string>
   <!-- Shortcut action to open Passwords screen -->
   <string name="home_screen_shortcut_passwords">پاس‌ورڈ</string>
-  <!--
-    Recent Tabs
-
-    Header text for jumping back into the recent tab in the home screen
-  -->
-  <string name="recent_tabs_header">واپس جاؤ</string>
   <!-- Button text for showing all the tabs in the tabs tray -->
   <string name="recent_tabs_show_all">سبھ ویکھو</string>
-  <!-- Content description for the button which navigates the user to show all recent tabs in the tabs tray. -->
-  <string name="recent_tabs_show_all_content_description_2">ساریاں حالیہ ٹیباں دا بٹن ویکھاؤ</string>
   <!-- Text for button in synced tab card that opens synced tabs tray -->
   <string name="recent_tabs_see_all_synced_tabs_button_text">ساریاں جوڑیاں ٹیباں ویکھو</string>
   <!-- Accessibility description for device icon used for recent synced tab -->
@@ -467,8 +459,6 @@
   <string name="customize_addon_collection_user_hint">بھنڈار مالک (ورتونکار ID)</string>
   <!-- Toast shown after confirming the custom extension collection configuration -->
   <string name="toast_customize_extension_collection_done">پھیلاؤ بھنڈار نوں سودھیا گیا۔ تبدیلیاں لاگو کرن لئی ایپلیکیشن نوں بند کیتا جا رہا اے…</string>
-  <!-- Header text for jumping back into the recent tab in customize the home screen -->
-  <string name="customize_toggle_jump_back_in">واپس جاؤ</string>
   <!-- Title for the customize home screen section with bookmarks. -->
   <string name="customize_toggle_bookmarks">اتے پتے</string>
   <!--
@@ -728,8 +718,6 @@
     Title of preference for tabs management
   -->
   <string name="preferences_tabs">ٹیباں</string>
-  <!-- Title of preference that allows a user to specify the tab view -->
-  <string name="preferences_tab_view">ٹیب دا نظارہ</string>
   <!-- Option for a list tab view -->
   <string name="tab_view_list">فہرست</string>
   <!-- Option for a grid tab view -->
@@ -772,13 +760,7 @@
   <string name="opening_screen_last_tab_summary">پچھلی ٹیب اُتے کھولھو</string>
   <!-- Summary for homepage preference indicating opening the homepage when re-opening the app after four hours of inactivity -->
   <string name="opening_screen_after_four_hours_of_inactivity_summary">چار گھنٹیاں بعدے مکھ صفحے اُتے کھولھو</string>
-  <!--
-    Inactive tabs
-
-    Category header of a preference that allows a user to enable or disable the inactive tabs feature
-  -->
-  <string name="preferences_inactive_tabs">پراݨیاں ٹیباں نوں غیرفعال چ بھیجو</string>
-  <!-- Title of inactive tabs preference -->
+  <!-- Summary of the preference that allows a user to enable or disable the inactive tabs feature. -->
   <string name="preferences_inactive_tabs_title">پچھلے دو ہفتیاں وچ تہاڈے ولوں نہ ویکھیاں ٹیباں نوں غیرفعال بھاگ وچ بھیجیا جاندا اے۔</string>
   <!--
     Studies
@@ -847,16 +829,6 @@
     %1$d is the number of bookmarks selected
   -->
   <string name="history_multi_select_title">%1$d چݨیاں</string>
-  <!-- Text for the header that groups the history for today -->
-  <string name="history_today">اج</string>
-  <!-- Text for the header that groups the history for yesterday -->
-  <string name="history_yesterday">کل</string>
-  <!-- Text for the header that groups the history the past 7 days -->
-  <string name="history_7_days">پچھلے ۷ دن</string>
-  <!-- Text for the header that groups the history the past 30 days -->
-  <string name="history_30_days">پچھلے ۳۰ دن</string>
-  <!-- Text for the header that groups the history older than the last month -->
-  <string name="history_older">پراݨے</string>
   <!-- Text shown when no history exists -->
   <string name="history_empty_message">اتھے کوئی تاریخ نہیں اے</string>
   <!--

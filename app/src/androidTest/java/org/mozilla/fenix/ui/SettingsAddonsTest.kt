@@ -140,7 +140,7 @@ class SettingsAddonsTest {
                 verifyUrl(trackingProtectionPage.url.toString())
             }
             .goToHomescreen {}
-            .openTopSiteTabWithTitle("Wikipedia") {}
+            .openFirstTopSiteTab {}
             .openThreeDotMenu {}
             .clickSettingsButton {
                 verifySettingsView()

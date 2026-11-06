@@ -83,14 +83,6 @@ class PinnedTabsUiTest {
     }
 
     @Test
-    fun `GIVEN the Space is full THEN Pin to space is unavailable`() {
-        render(spacePinBlock = PinResult.Full)
-
-        composeRule.onNodeWithTag(SidebarTestTag.TAB_ITEM).performTouchInput { longClick() }
-        composeRule.onNodeWithTag(SidebarTestTag.PIN_SPACE_ITEM).assertIsNotEnabled()
-    }
-
-    @Test
     fun `GIVEN a Space with Pinned Tabs WHEN it is deleted THEN the delete is confirmed first`() {
         render(
             spaces =

@@ -16,6 +16,7 @@ import pt.dweep.sideraven.InMemorySidebarModeStore
 import pt.dweep.sideraven.SidebarMode
 import pt.dweep.sideraven.SidebarSide
 import pt.dweep.sideraven.SidebarTier
+import pt.dweep.sideraven.SpacesShown
 
 /** Sideraven's choices: picture pickers for the big ones, segmented buttons and value rows for the rest. */
 @RunWith(AndroidJUnit4::class)
@@ -52,8 +53,17 @@ class SidebarPreferencesTest {
     }
 
     @Test
-    fun `WHEN the screen is shown again THEN each row shows the stored value without writing it`() {
+    fun `WHEN Spaces are shown as the icon row THEN the store follows, and the Header was the default`() {
         val store = InMemorySidebarModeStore()
+        assertEquals(SpacesShown.Header, store.spacesShown.value)
+
+        SidebarPreferences.bindSpacesShown(context, group, store).choose(SpacesShown.IconRow)
+
+        assertEquals(SpacesShown.IconRow, store.spacesShown.value)
+    }
+
+    @Test
+    fun `WHEN the screen is shown again THEN each row shows the stored value without writing it`() {        val store = InMemorySidebarModeStore()
         val side = SidebarPreferences.bindSide(context, group, store)
         store.sidebarSide.set(SidebarSide.Right)
 

@@ -5,8 +5,10 @@
 package org.mozilla.fenix.tabstray.ui.tabitems
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -22,7 +24,6 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.selected
@@ -32,17 +33,18 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import mozilla.components.browser.tabstray.R as tabstrayR
 import mozilla.components.compose.base.RadioCheckmark
 import mozilla.components.support.base.utils.MAX_URI_LENGTH
 import org.mozilla.fenix.R
-import org.mozilla.fenix.compose.DismissibleItemBackground
+import org.mozilla.fenix.compose.SwipeToDismissBackground
 import org.mozilla.fenix.compose.TabThumbnail
+import org.mozilla.fenix.compose.rememberSwipeToDismissBoxState
+import org.mozilla.fenix.compose.swipeToDismissFade
 import org.mozilla.fenix.ext.toShortUrl
 import org.mozilla.fenix.tabstray.TabsTrayTestTag
-import org.mozilla.fenix.tabstray.browser.compose.TabItemInteractionState
+import org.mozilla.fenix.tabstray.browser.compose.ItemInteractionState
 import org.mozilla.fenix.tabstray.data.TabsTrayItem
 import org.mozilla.fenix.tabstray.data.createTab
 import org.mozilla.fenix.theme.FirefoxTheme
@@ -57,7 +59,7 @@ internal val TabListItemHeight: Dp
  *
  * @param tab The given tab to render as list item.
  * @param modifier [Modifier] to be applied to the tab list item content.
- * @param interactionState: [TabItemInteractionState] holding hovered and dragged status.
+ * @param interactionState: [ItemInteractionState] holding hovered and dragged status.
  * @param selectionState: The tab item's [TabsTrayItemSelectionState]
  * @param shouldClickListen Whether the item should stop listening to click events.
  * @param swipingEnabled Whether the item is swipeable.
@@ -69,7 +71,7 @@ internal val TabListItemHeight: Dp
 fun TabListTabItem(
     tab: TabsTrayItem.Tab,
     modifier: Modifier = Modifier,
-    interactionState: TabItemInteractionState = TabItemInteractionState(),
+    interactionState: ItemInteractionState = ItemInteractionState(),
     selectionState: TabsTrayItemSelectionState = TabsTrayItemSelectionState(),
     shouldClickListen: Boolean = true,
     swipingEnabled: Boolean = true,
@@ -77,8 +79,7 @@ fun TabListTabItem(
     onClick: (TabsTrayItem) -> Unit,
     onLongClick: ((TabsTrayItem) -> Unit)? = null,
 ) {
-    val swipeToDismissBoxState = rememberTabSwipeToDismissBoxState(tabId = tab.id)
-    val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
+    val swipeToDismissBoxState = rememberSwipeToDismissBoxState(id = tab.id)
 
     // SwipeToDismissBox invokes onDismiss from a LaunchedEffect keyed on the callback, so an
     // unstable lambda would re-close the tab on every recomposition that follows the dismissal.
@@ -91,13 +92,7 @@ fun TabListTabItem(
         onDismiss = onDismiss,
         gesturesEnabled = !selectionState.multiSelectEnabled && swipingEnabled,
         backgroundContent = {
-            // dismissDirection comes from the raw offset and is not mirrored for RTL.
-            val contentMovedRight = swipeToDismissBoxState.dismissDirection == SwipeToDismissBoxValue.StartToEnd
-
-            DismissibleItemBackground(
-                isSwipeActive = swipeToDismissBoxState.dismissDirection != SwipeToDismissBoxValue.Settled,
-                isSwipingToStart = if (isRtl) contentMovedRight else !contentMovedRight,
-            )
+            SwipeToDismissBackground(swipeToDismissBoxState)
         },
     ) {
         TabContent(
@@ -108,7 +103,7 @@ fun TabListTabItem(
             // The fade has to wrap the caller's modifier: the focus outline is a border applied
             // there by tabListItemShapeStyling, and it only picks up the alpha if it is drawn
             // inside the layer.
-            modifier = Modifier.fadeOnSwipeToDismiss(swipeToDismissBoxState).then(modifier),
+            modifier = Modifier.swipeToDismissFade(swipeToDismissBoxState).then(modifier),
             onCloseClick = onCloseClick,
             onClick = onClick,
             onLongClick = onLongClick,
@@ -120,7 +115,7 @@ fun TabListTabItem(
 @Composable
 private fun TabContent(
     tab: TabsTrayItem.Tab,
-    interactionState: TabItemInteractionState,
+    interactionState: ItemInteractionState,
     selectionState: TabsTrayItemSelectionState,
     shouldClickListen: Boolean,
     modifier: Modifier = Modifier,
@@ -212,26 +207,31 @@ private fun TabListIcon(
 private fun Thumbnail(tab: TabsTrayItem.Tab) {
     val density = LocalDensity.current
     val thumbnailSize = with(density) { ThumbnailWidth.toPx() }.toInt()
-    TabThumbnail(
-        tabThumbnailImageData = tab.toThumbnailImageData(),
-        thumbnailSizePx = thumbnailSize,
+    Box(
         modifier =
             Modifier.size(
-                    width = ThumbnailWidth,
-                    height = ThumbnailHeight,
-                )
-                .testTag(TabsTrayTestTag.TAB_ITEM_THUMBNAIL),
-        shape = MaterialTheme.shapes.extraSmall,
-        border = tablistItemThumbnailBorder,
-        contentDescription = stringResource(id = tabstrayR.string.mozac_browser_tabstray_open_tab),
-    )
+                width = ThumbnailWidth,
+                height = ThumbnailHeight,
+            )
+    ) {
+        TabThumbnail(
+            tabThumbnailImageData = tab.toThumbnailImageData(),
+            thumbnailSizePx = thumbnailSize,
+            modifier = Modifier.fillMaxSize().testTag(TabsTrayTestTag.TAB_ITEM_THUMBNAIL),
+            shape = MaterialTheme.shapes.extraSmall,
+            border = tablistItemThumbnailBorder,
+            contentDescription = stringResource(id = tabstrayR.string.mozac_browser_tabstray_open_tab),
+        )
+
+        MediaPlaybackIndicator(isMediaActive = tab.isMediaActive)
+    }
 }
 
 private data class TabListItemPreviewState(
     val tabItemSelectionState: TabsTrayItemSelectionState,
     val url: String = "www.mozilla.org",
     val title: String = "Mozilla Domain",
-    val tabItemInteractionState: TabItemInteractionState = TabItemInteractionState(),
+    val itemInteractionState: ItemInteractionState = ItemInteractionState(),
 )
 
 private class TabListItemParameterProvider : PreviewParameterProvider<TabListItemPreviewState> {
@@ -325,8 +325,8 @@ private class TabListItemParameterProvider : PreviewParameterProvider<TabListIte
                             multiSelectEnabled = false,
                             isSelected = false,
                         ),
-                    tabItemInteractionState =
-                        TabItemInteractionState(
+                    itemInteractionState =
+                        ItemInteractionState(
                             isDragged = true,
                             isHoveredByItem = false,
                         ),
@@ -341,8 +341,8 @@ private class TabListItemParameterProvider : PreviewParameterProvider<TabListIte
                             multiSelectEnabled = false,
                             isSelected = false,
                         ),
-                    tabItemInteractionState =
-                        TabItemInteractionState(
+                    itemInteractionState =
+                        ItemInteractionState(
                             isDragged = false,
                             isHoveredByItem = true,
                         ),
@@ -373,7 +373,24 @@ private fun TabListTabItemPreview(
             onCloseClick = {},
             onClick = {},
             selectionState = tabListItemState.tabItemSelectionState,
-            interactionState = tabListItemState.tabItemInteractionState,
+            interactionState = tabListItemState.itemInteractionState,
+        )
+    }
+}
+
+@Composable
+@PreviewLightDark
+private fun TabListTabItemMediaPreview() {
+    FirefoxTheme {
+        TabListTabItem(
+            tab =
+                createTab(
+                    url = "www.mozilla.org",
+                    title = "Mozilla Domain",
+                    isMediaActive = true,
+                ),
+            onCloseClick = {},
+            onClick = {},
         )
     }
 }

@@ -145,16 +145,8 @@
   <string name="home_screen_shortcut_passwords">Ewan taq tzij</string>
   <!-- Shortcut action to open uninstall survey -->
   <string name="home_screen_shortcut_uninstall_survey">Timeyak, ¿aruma?</string>
-  <!--
-    Recent Tabs
-
-    Header text for jumping back into the recent tab in the home screen
-  -->
-  <string name="recent_tabs_header">Titz\'et chik</string>
   <!-- Button text for showing all the tabs in the tabs tray -->
   <string name="recent_tabs_show_all">Tik\'ut ronojel</string>
-  <!-- Content description for the button which navigates the user to show all recent tabs in the tabs tray. -->
-  <string name="recent_tabs_show_all_content_description_2">Pitz\'b\'äl kek\'ut pe ri k\'ak\'a\' taq ruwi\'</string>
   <!-- Text for button in synced tab card that opens synced tabs tray -->
   <string name="recent_tabs_see_all_synced_tabs_button_text">Ketz\'et ri taq ruwi\' eximon</string>
   <!-- Accessibility description for device icon used for recent synced tab -->
@@ -307,8 +299,6 @@
   <string name="browser_menu_default_banner_title">Taya\' %1$s achi\'el ri k\'o wi</string>
   <!-- Label text within the set as default banner -->
   <string name="browser_menu_default_banner_subtitle_2">Aninäq, ichinan chuqa\' b\'anon awuma.</string>
-  <!-- Content description (not visible, for screen readers etc.) for the button that dismisses the set as default banner in the menu -->
-  <string name="browser_menu_default_banner_dismiss_promotion">Timalïx rutaluxik</string>
   <!-- Content description (not visible, for screen readers etc.) for recommended extensions in main menu -->
   <string name="browser_menu_recommended_extensions_content_description">Ch\'aqa\' etamab\'äl</string>
   <!--
@@ -976,8 +966,6 @@
     Title for the customize home screen section with privacy report.
   -->
   <string name="customize_toggle_privacy_report">Rutzijol ichinanem</string>
-  <!-- Header text for jumping back into the recent tab in customize the home screen -->
-  <string name="customize_toggle_jump_back_in">Titz\'et chik</string>
   <!-- Title for the customize home screen section with bookmarks. -->
   <string name="customize_toggle_bookmarks">Taq yaketal</string>
   <!--
@@ -1264,8 +1252,6 @@
   <string name="preference_simple_toolbar">Relik</string>
   <!-- Preference for using expanded toolbar -->
   <string name="preference_expanded_toolbar">Xnimirisäx</string>
-  <!-- Preference description indicating the toolbar location preference is disabled when the tab strip is enabled -->
-  <string name="preference_toolbar_pref_disabled_explanation">Ri rusamajib\'al ochochib\'al k\'o chi k\'o aq\'anij toq niwachin pe ri rusamajib\'al ruwi\'.</string>
   <!-- New tab shortcut in toolbar customization -->
   <string name="toolbar_customize_shortcut_new_tab">Tijaq jun k\'ak\'a\' ruwi\'</string>
   <!-- Share shortcut in toolbar customization -->
@@ -1391,8 +1377,6 @@
     Title of preference for tabs management
   -->
   <string name="preferences_tabs">Taq ruwi\'</string>
-  <!-- Title of preference that allows a user to specify the tab view -->
-  <string name="preferences_tab_view">Kitz\'etik ruwi\'</string>
   <!-- Option for a list tab view -->
   <string name="tab_view_list">Cholajem</string>
   <!-- Option for a grid tab view -->
@@ -1437,16 +1421,8 @@
   <string name="opening_screen_last_tab_summary">Tijaq pa ruk\'isib\'äl ruwi\'</string>
   <!-- Summary for homepage preference indicating opening the homepage when re-opening the app after four hours of inactivity -->
   <string name="opening_screen_after_four_hours_of_inactivity_summary">Tijaq pa tikirib\'äl ruxaq pa kaji\' ramaj</string>
-  <!--
-    Inactive tabs
-
-    Category header of a preference that allows a user to enable or disable the inactive tabs feature
-  -->
-  <string name="preferences_inactive_tabs">Kejal ri ojer taq ruwi\' pa echupun</string>
-  <!-- Title of inactive tabs preference -->
+  <!-- Summary of the preference that allows a user to enable or disable the inactive tabs feature. -->
   <string name="preferences_inactive_tabs_title">Ri taq ruwi\' man e\'atz\'eton ta pa ka\'i\' wuqq\'ij yejal pa ri echupun tanaj.</string>
-  <!-- Title for the preference to enable or disable the tab groups feature -->
-  <string name="preferences_tab_groups_feature">Ketzij molaj taq ruwi\'</string>
   <!--
     Privacy report
 
@@ -1729,16 +1705,6 @@
     %1$d is the number of bookmarks selected
   -->
   <string name="history_multi_select_title">%1$d xcha\'</string>
-  <!-- Text for the header that groups the history for today -->
-  <string name="history_today">Wakami</string>
-  <!-- Text for the header that groups the history for yesterday -->
-  <string name="history_yesterday">Iwir</string>
-  <!-- Text for the header that groups the history the past 7 days -->
-  <string name="history_7_days">Ruk\'isib\'äl 7 q\'ij</string>
-  <!-- Text for the header that groups the history the past 30 days -->
-  <string name="history_30_days">Ruk\'isib\'äl 30 q\'ij</string>
-  <!-- Text for the header that groups the history older than the last month -->
-  <string name="history_older">Ojer</string>
   <!-- Text shown when no history exists -->
   <string name="history_empty_message">Majun natab\'äl wawe\'</string>
   <!--
@@ -2367,10 +2333,6 @@
   <string name="sync_sign_in">Tatikirisaj molojri\'ïl pa Sync</string>
   <!-- An option from the share dialog to send link to all other sync devices -->
   <string name="sync_send_to_all">Titaq pa ronojel okisab\'äl</string>
-  <!-- Text displayed when no other sync devices are available for link sharing -->
-  <string name="sync_no_devices_available">Majun wachel okisaxel</string>
-  <!-- Text displayed when no other sync devices are available for link sharing. -->
-  <string name="sync_no_devices_available_description">Xab\'achike okisan chuqa\' ximon okisaxel rik\'in re rub\'i\' taqoya\'l re\' xtiwachin wawe\'.</string>
   <!-- An option from the share dialog to reconnect to sync -->
   <string name="sync_reconnect">Tokisäx chik pa Sync</string>
   <!-- Text displayed when sync is offline and cannot be accessed -->
@@ -2983,15 +2945,13 @@
   <string name="preferences_ip_protection_title_2">Tz\'aqät VPN</string>
   <!-- Label for the BETA badge for the browser VPN entry in the settings list -->
   <string name="preferences_ip_protection_beta_badge_label">BETA</string>
-  <!-- Title for the browser VPN settings screen (displayed in the app bar) -->
-  <string name="ip_protection_title">VPN</string>
   <!-- Label for the browser VPN toggle on the settings screen -->
   <string name="ip_protection_toggle_label">VPN</string>
   <!-- Content description for the browser VPN settings screen top bar back button -->
   <string name="ip_protection_navigate_back_button_content_description">Katok pa k\'amaya\'l titzolin</string>
   <!-- Headline for the browser VPN promo card. %s is the name of the app (for example "Firefox"). -->
   <string name="ip_protection_promo_headline">Tz\'aqät VPN richin %s</string>
-  <!-- Body text for the browser VPN promo card . %s is a learn more link using ip_protection_learn_more as text. -->
+  <!-- Body text for the browser VPN settings header, shown when no promo is running. %s is a learn more link using ip_protection_learn_more as text. -->
   <string name="ip_protection_promo_body_2">Katok rik\'in nïm chajinïk akuchi\' nawewaj ri ak\'ojlib\'al, achi\'el pa jaqäl Wi-Fi. %s</string>
   <!-- Link text that opens additional information about the browser VPN -->
   <string name="ip_protection_learn_more">Tetamäx ch\'aqa\' chik</string>
@@ -3024,8 +2984,6 @@
   <string name="ip_protection_menu_error">Sachoj</string>
   <!-- Badge label shown in the VPN menu item when the user is eligible for the feature but needs to authenticate / authorize to enable it -->
   <string name="ip_protection_menu_try_vpn_cta">Tatojtob\'ej sipan</string>
-  <!-- Badge label shown in the menu item when the user is eligible to use the browser VPN but should authenticate or authorize it first. -->
-  <string name="ip_protection_menu_auth_required">Tatojtob\'ej</string>
   <!-- Content description for the chevron button that opens the browser VPN settings screen -->
   <string name="ip_protection_navigate_settings">Tijaq runuk\'ulem VPN</string>
   <!--
@@ -3079,8 +3037,6 @@
     %1$d is the total monthly allowance in GB (for example "50").
   -->
   <string name="ip_protection_data_limit_reached_snackbar">%1$d GB rutzij VPN okisan. Ri okem xtichojmirisäx ri jun chik ik\'.</string>
-  <!-- Snackbar (in-app pop-up notification) action button text that takes the user to the VPN settings screen. -->
-  <string name="ip_protection_data_limit_reached_snackbar_action">Taq nuk\'ulem</string>
   <!-- Description shown on the browser VPN settings screen prompting the user to turn the VPN on. -->
   <string name="ip_protection_settings_description" tools:ignore="UnusedResources">Tatzija\' ri VPN richin chi ri awokem yalan ichinan chuqa\' k\'ayew nub\'än richin nilitäj.</string>
   <!-- Title shown on the browser VPN settings screen for location selection section. -->

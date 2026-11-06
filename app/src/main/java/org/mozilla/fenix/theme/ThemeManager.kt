@@ -43,6 +43,7 @@ abstract class ThemeManager {
         frameColors = colors
         applyStatusBarTheme(activity)
     }
+    // SIDERAVEN-HOOK-END
 
     abstract var currentTheme: BrowsingMode
 
@@ -63,10 +64,12 @@ abstract class ThemeManager {
     fun applyStatusBarTheme(activity: Activity) = applyStatusBarTheme(activity.window, activity)
 
     private fun applyStatusBarTheme(window: Window, context: Context) {
+        // SIDERAVEN-HOOK: the frame's colors win over the theme's while the Sidebar shows.
         frameColors?.let { (top, bottom) ->
             window.setSystemBarsBackground(statusBarColor = top, navigationBarColor = bottom, horizontalInsetsColor = top)
             return
         }
+        // SIDERAVEN-HOOK-END
         when (currentTheme) {
             BrowsingMode.Normal -> {
                 when (context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) {

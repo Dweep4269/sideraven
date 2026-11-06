@@ -8,6 +8,7 @@ on:
   pull_request:
     branches:
       - sideraven
+      - main
   workflow_dispatch:
 
 # One run at a time per branch; only the latest waiting push is kept (saves private-repo minutes).

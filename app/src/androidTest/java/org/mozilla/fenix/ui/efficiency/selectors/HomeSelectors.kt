@@ -6,16 +6,31 @@ package org.mozilla.fenix.ui.efficiency.selectors
 
 import org.mozilla.fenix.R
 import org.mozilla.fenix.helpers.DataGenerationHelper.getStringResource
+import org.mozilla.fenix.ui.efficiency.helpers.PageReadinessProfiles
 import org.mozilla.fenix.ui.efficiency.helpers.Selector
+import org.mozilla.fenix.ui.efficiency.helpers.SelectorContainer
+import org.mozilla.fenix.ui.efficiency.helpers.SelectorGroup
 import org.mozilla.fenix.ui.efficiency.helpers.SelectorStrategy
 
-object HomeSelectors {
+object HomeSelectors : SelectorContainer {
+    enum class Group : SelectorGroup {
+        TOP_SITES,
+        TOP_SITES_COMPOSE,
+        PRIVATE_BROWSING,
+        HOME_SCREEN,
+        CONTINUE,
+        RECENT_BOOKMARKS_SECTION,
+        PRIVATE_BROWSING_HOME_SCREEN,
+        TOP_SITE_ITEM,
+        HOME_SCREEN_UI,
+    }
+
     val TOP_SITES_LIST =
         Selector(
             strategy = SelectorStrategy.UIAUTOMATOR_WITH_RES_ID,
             value = "top_sites_list",
             description = "Top Sites List",
-            groups = listOf("topSites"),
+            groups = setOf(Group.TOP_SITES),
         )
 
     val TOP_SITES_LIST_COMPOSE =
@@ -23,7 +38,7 @@ object HomeSelectors {
             strategy = SelectorStrategy.COMPOSE_BY_TAG,
             value = "top_sites_list",
             description = "Top Sites List",
-            groups = listOf("topSitesCompose"),
+            groups = setOf(Group.TOP_SITES_COMPOSE),
         )
 
     val HOMEPAGE_VIEW =
@@ -31,7 +46,7 @@ object HomeSelectors {
             strategy = SelectorStrategy.COMPOSE_BY_TAG,
             value = "homepage.view",
             description = "Homepage view",
-            groups = listOf("requiredForPage"),
+            readiness = PageReadinessProfiles.IDENTITY_ANCHOR,
         )
 
     val MAIN_MENU_BUTTON =
@@ -39,7 +54,7 @@ object HomeSelectors {
             strategy = SelectorStrategy.COMPOSE_BY_CONTENT_DESCRIPTION,
             value = getStringResource(R.string.content_description_menu),
             description = "Three Dot Menu",
-            groups = listOf("requiredForPage"),
+            readiness = PageReadinessProfiles.READY_CONTENT,
         )
 
     // Use UIAutomator when navigating from BrowserPage — avoids Compose sync hanging when GeckoView is active.
@@ -48,7 +63,6 @@ object HomeSelectors {
             strategy = SelectorStrategy.UIAUTOMATOR_WITH_DESCRIPTION_CONTAINS,
             value = getStringResource(R.string.content_description_menu),
             description = "Three Dot Menu",
-            groups = listOf(),
         )
 
     val PRIVATE_BROWSING_BUTTON =
@@ -56,7 +70,17 @@ object HomeSelectors {
             strategy = SelectorStrategy.COMPOSE_BY_CONTENT_DESCRIPTION,
             value = getStringResource(R.string.content_description_private_browsing),
             description = "Private browsing button",
-            groups = listOf("privateBrowsing"),
+            groups = setOf(Group.PRIVATE_BROWSING),
+        )
+
+    // Shown on the private browsing homepage header only under the Private Mode and Stories entry-point
+    // experiment (isPrivateModeAndStoriesEntryPointEnabled); tapping it returns to normal browsing.
+    val PRIVATE_BROWSING_HOME_BUTTON =
+        Selector(
+            strategy = SelectorStrategy.COMPOSE_BY_CONTENT_DESCRIPTION,
+            value = getStringResource(R.string.content_description_normal_browsing),
+            description = "Private browsing homepage Home button",
+            groups = setOf(Group.PRIVATE_BROWSING),
         )
 
     val HOME_WORDMARK_LOGO =
@@ -64,7 +88,7 @@ object HomeSelectors {
             strategy = SelectorStrategy.COMPOSE_BY_TAG,
             value = "homepage.wordmark.logo",
             description = "the home screen wordmark logo",
-            groups = listOf("homeScreen"),
+            groups = setOf(Group.HOME_SCREEN),
         )
 
     val HOME_WORDMARK_TEXT =
@@ -72,7 +96,7 @@ object HomeSelectors {
             strategy = SelectorStrategy.COMPOSE_BY_TAG,
             value = "homepage.wordmark.text",
             description = "the home screen wordmark text",
-            groups = listOf("homeScreen"),
+            groups = setOf(Group.HOME_SCREEN),
         )
 
     val COLLECTIONS_HEADER =
@@ -80,7 +104,7 @@ object HomeSelectors {
             strategy = SelectorStrategy.COMPOSE_BY_TEXT,
             value = getStringResource(R.string.collections_header),
             description = "the Collections header",
-            groups = listOf("homeScreen"),
+            groups = setOf(Group.HOME_SCREEN),
         )
 
     val TAB_COUNTER_ZERO =
@@ -88,7 +112,7 @@ object HomeSelectors {
             strategy = SelectorStrategy.COMPOSE_BY_CONTENT_DESCRIPTION,
             value = "Non-private Tabs Open: 0. Tap to switch tabs.",
             description = "the tab counter showing zero open tabs",
-            groups = listOf("homeScreen"),
+            groups = setOf(Group.HOME_SCREEN),
         )
 
     val CONTINUE_SECTION =
@@ -96,7 +120,7 @@ object HomeSelectors {
             strategy = SelectorStrategy.COMPOSE_BY_TEXT,
             value = getStringResource(R.string.recent_tabs_header_2),
             description = "Continue section header",
-            groups = listOf("continue"),
+            groups = setOf(Group.CONTINUE),
         )
 
     val RECENT_BOOKMARKS_SECTION =
@@ -104,7 +128,7 @@ object HomeSelectors {
             strategy = SelectorStrategy.UIAUTOMATOR_WITH_TEXT,
             value = getStringResource(R.string.home_bookmarks_title),
             description = "Bookmarks section header",
-            groups = listOf("recentBookmarksSection"),
+            groups = setOf(Group.RECENT_BOOKMARKS_SECTION),
         )
 
     val PRIVATE_BROWSING_INFO_CARD_TITLE =
@@ -112,7 +136,24 @@ object HomeSelectors {
             strategy = SelectorStrategy.UIAUTOMATOR_WITH_TEXT_CONTAINS,
             value = getStringResource(R.string.felt_privacy_desc_card_title),
             description = "Private browsing info card title",
-            groups = listOf("privateBrowsingHomeScreen"),
+            groups = setOf(Group.PRIVATE_BROWSING_HOME_SCREEN),
+        )
+
+    val PRIVATE_BROWSING_INFO_CARD_DESCRIPTION =
+        Selector(
+            strategy = SelectorStrategy.UIAUTOMATOR_WITH_TEXT_CONTAINS,
+            value = getStringResource(R.string.felt_privacy_info_card_subtitle_3),
+            description = "Private browsing info card description",
+            groups = setOf(Group.PRIVATE_BROWSING_HOME_SCREEN),
+        )
+
+    // The learn more link is a Compose LinkText wrapped in a Box tagged with this test tag; the tag is the reliable
+    // handle for both asserting the link is shown and clicking it (matching the legacy robot's click by tag).
+    val PRIVATE_BROWSING_LEARN_MORE_LINK =
+        Selector(
+            strategy = SelectorStrategy.COMPOSE_BY_TAG,
+            value = "homepage.private.browsing.learn.more.link",
+            description = "Private browsing 'Who might be able to see my activity?' learn more link",
         )
 
     @Suppress("FunctionName")
@@ -122,7 +163,7 @@ object HomeSelectors {
             value = "top_sites_list.top_site_item",
             secondaryValue = topSiteTitle,
             description = "Top site item with title: $topSiteTitle",
-            groups = listOf("topSiteItem"),
+            groups = setOf(Group.TOP_SITE_ITEM),
         )
 
     // The legacy robot hardcodes the English literal "Recently visited"; this keys off the string resource
@@ -132,7 +173,6 @@ object HomeSelectors {
             strategy = SelectorStrategy.COMPOSE_BY_TEXT,
             value = getStringResource(R.string.history_metadata_header_2),
             description = "Recently visited section header",
-            groups = listOf(),
         )
 
     // A search group in the "Recently visited" section, titled with the search term. Exact text, because the
@@ -145,27 +185,39 @@ object HomeSelectors {
             strategy = SelectorStrategy.COMPOSE_BY_TEXT,
             value = searchTerm,
             description = "'$searchTerm' search group",
-            groups = listOf(),
         )
 
-    val all =
-        listOf(
-            TOP_SITES_LIST,
-            TOP_SITES_LIST_COMPOSE,
-            HOMEPAGE_VIEW,
-            MAIN_MENU_BUTTON,
-            MAIN_MENU_BUTTON_UIAUTOMATOR,
-            PRIVATE_BROWSING_BUTTON,
-            TOP_SITES_LIST,
-            HOME_WORDMARK_LOGO,
-            HOME_WORDMARK_TEXT,
-            COLLECTIONS_HEADER,
-            TAB_COUNTER_ZERO,
-            CONTINUE_SECTION,
-            RECENT_BOOKMARKS_SECTION,
-            PRIVATE_BROWSING_INFO_CARD_TITLE,
-            TOP_SITE_ITEM(),
-            RECENTLY_VISITED_HEADER,
-            RECENTLY_VISITED_SEARCH_GROUP(),
+    // The "blocked trackers" widget pill. We assert this (a COMPOSE_BY_TAG handle) rather than the card's
+    // label text because the label is state-dependent: a fresh homepage reads "Help catch trackers" while a
+    // homepage that has blocked at least one tracker reads "You're protected". The protectionStatusPill tag
+    // (TRACKERS_BLOCKED_CARD) is present in both states, so it is a stable, state-independent presence check;
+    // asserting either label would flake as soon as the tracker count changes.
+    val TRACKERS_BLOCKED_CARD =
+        Selector(
+            strategy = SelectorStrategy.COMPOSE_BY_TAG,
+            value = "trackersBlockedCard.protectionStatusPill",
+            description = "Blocked trackers widget pill",
+            groups = setOf(Group.HOME_SCREEN_UI),
+        )
+
+    // Private-browsing button in the experimental homepage header (left side). Only rendered when
+    // isPrivateModeAndStoriesEntryPointEnabled is on, so it is not a page-identity anchor.
+    val PRIVATE_MODE_BUTTON =
+        Selector(
+            strategy = SelectorStrategy.COMPOSE_BY_TAG,
+            value = "private.browsing.homepage.button",
+            description = "Private browsing homepage button",
+            groups = setOf(Group.HOME_SCREEN_UI),
+        )
+
+    // Stories entry point in the experimental homepage header (right side). Only rendered when
+    // isPrivateModeAndStoriesEntryPointEnabled and showPocketRecommendationsFeature (Pocket) are both on,
+    // so it is not a page-identity anchor.
+    val STORIES_BUTTON =
+        Selector(
+            strategy = SelectorStrategy.COMPOSE_BY_CONTENT_DESCRIPTION,
+            value = getStringResource(R.string.homepage_all_stories),
+            description = "Stories button",
+            groups = setOf(Group.HOME_SCREEN_UI),
         )
 }

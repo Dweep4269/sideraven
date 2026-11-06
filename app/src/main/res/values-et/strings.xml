@@ -120,16 +120,8 @@
   <string name="home_screen_shortcut_open_new_private_tab_2">Uus privaatne kaart</string>
   <!-- Shortcut action to open Passwords screen -->
   <string name="home_screen_shortcut_passwords">Paroolid</string>
-  <!--
-    Recent Tabs
-
-    Header text for jumping back into the recent tab in the home screen
-  -->
-  <string name="recent_tabs_header">Hiljutised kaardid</string>
   <!-- Button text for showing all the tabs in the tabs tray -->
   <string name="recent_tabs_show_all">Kuva kõiki</string>
-  <!-- Content description for the button which navigates the user to show all recent tabs in the tabs tray. -->
-  <string name="recent_tabs_show_all_content_description_2">Kõigi hiljutiste kaartide kuvamise nupp</string>
   <!-- Text for button in synced tab card that opens synced tabs tray -->
   <string name="recent_tabs_see_all_synced_tabs_button_text">Kuva kõiki sünkroniseeritud kaarte</string>
   <!-- Accessibility description for device icon used for recent synced tab -->
@@ -441,8 +433,6 @@
   <string name="customize_addon_collection_hint">Kollektsiooni nimi</string>
   <!-- Hint displayed on input field for custom collection user ID -->
   <string name="customize_addon_collection_user_hint">Kollektsiooni omanik (kasutaja ID)</string>
-  <!-- Header text for jumping back into the recent tab in customize the home screen -->
-  <string name="customize_toggle_jump_back_in">Hiljutised kaardid</string>
   <!-- Title for the customize home screen section with bookmarks. -->
   <string name="customize_toggle_bookmarks">Järjehoidjad</string>
   <!--
@@ -636,8 +626,6 @@
     Title of preference for tabs management
   -->
   <string name="preferences_tabs">Kaardid</string>
-  <!-- Title of preference that allows a user to specify the tab view -->
-  <string name="preferences_tab_view">Kaartide vaade</string>
   <!-- Option for a list tab view -->
   <string name="tab_view_list">Nimekiri</string>
   <!-- Option for a grid tab view -->
@@ -676,13 +664,7 @@
   <string name="close_tabs_after_one_month_summary">Suletakse ühe kuu pärast</string>
   <!-- Summary for homepage preference indicating opening the homepage when re-opening the app after four hours of inactivity -->
   <string name="opening_screen_after_four_hours_of_inactivity_summary">Pärast neljatunnist tegevusetust avatakse avaleht</string>
-  <!--
-    Inactive tabs
-
-    Category header of a preference that allows a user to enable or disable the inactive tabs feature
-  -->
-  <string name="preferences_inactive_tabs">Vanad kaardid liigutatakse mitteaktiivsete alla</string>
-  <!-- Title of inactive tabs preference -->
+  <!-- Summary of the preference that allows a user to enable or disable the inactive tabs feature. -->
   <string name="preferences_inactive_tabs_title">Kaardid, mida sa pole vaadanud 2 nädalat, liigutatakse mitteaktiivsete kaartide alla.</string>
   <!--
     Studies
@@ -753,16 +735,6 @@
     %1$d is the number of bookmarks selected
   -->
   <string name="history_multi_select_title">%1$d valitud</string>
-  <!-- Text for the header that groups the history for today -->
-  <string name="history_today">Täna</string>
-  <!-- Text for the header that groups the history for yesterday -->
-  <string name="history_yesterday">Eile</string>
-  <!-- Text for the header that groups the history the past 7 days -->
-  <string name="history_7_days">Viimased 7 päeva</string>
-  <!-- Text for the header that groups the history the past 30 days -->
-  <string name="history_30_days">Viimased 30 päeva</string>
-  <!-- Text for the header that groups the history older than the last month -->
-  <string name="history_older">Vanemad</string>
   <!-- Text shown when no history exists -->
   <string name="history_empty_message">Ajalugu puudub</string>
   <!-- Text for the snackbar to confirm that a single download item has been removed. %1$s is the name of the download item. -->

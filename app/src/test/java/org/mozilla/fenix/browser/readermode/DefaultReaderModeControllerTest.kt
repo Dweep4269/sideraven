@@ -36,7 +36,6 @@ class DefaultReaderModeControllerTest {
     private lateinit var featureWrapper: ViewBoundFeatureWrapper<ReaderViewFeature>
     private lateinit var readerViewControlsBar: View
     private var onReaderModeChangedCount = 0
-    private val isListenToPageEnabled = false
     private val onReaderModeChanged: () -> Unit = { onReaderModeChangedCount++ }
 
     @Before
@@ -61,7 +60,7 @@ class DefaultReaderModeControllerTest {
 
         every { readerViewFeature.hideReaderView() } just Runs
         every { readerViewFeature.showReaderView() } just Runs
-        every { readerViewFeature.showControls(isListenToPageEnabled) } just Runs
+        every { readerViewFeature.showControls() } just Runs
         every { readerViewFeature.hideControls() } just Runs
     }
 
@@ -93,6 +92,26 @@ class DefaultReaderModeControllerTest {
     }
 
     @Test
+    fun `GIVEN a color scheme override WHEN it is set THEN it is forwarded to the reader view feature`() {
+        every { readerViewFeature.colorSchemeOverride = any() } just Runs
+        val controller = DefaultReaderModeController(featureWrapper, readerViewControlsBar)
+
+        controller.setColorSchemeOverride(ReaderViewFeature.ColorScheme.DARK)
+
+        verify { readerViewFeature.colorSchemeOverride = ReaderViewFeature.ColorScheme.DARK }
+    }
+
+    @Test
+    fun `GIVEN a color scheme override WHEN it is cleared THEN the reader view feature override is cleared`() {
+        every { readerViewFeature.colorSchemeOverride = any() } just Runs
+        val controller = DefaultReaderModeController(featureWrapper, readerViewControlsBar)
+
+        controller.setColorSchemeOverride(null)
+
+        verify { readerViewFeature.colorSchemeOverride = null }
+    }
+
+    @Test
     fun testShowControlsNormalTab() {
         val controller =
             DefaultReaderModeController(
@@ -102,7 +121,7 @@ class DefaultReaderModeControllerTest {
             )
 
         controller.showControls()
-        verify { readerViewFeature.showControls(isListenToPageEnabled) }
+        verify { readerViewFeature.showControls() }
         verify { readerViewControlsBar wasNot Called }
     }
 
@@ -142,7 +161,7 @@ class DefaultReaderModeControllerTest {
         } returns sansSerif
 
         controller.showControls()
-        verify { readerViewFeature.showControls(isListenToPageEnabled) }
+        verify { readerViewFeature.showControls() }
         verifyAll {
             decrease.setTextColor(privateButtonColor)
             increase.setTextColor(privateButtonColor)

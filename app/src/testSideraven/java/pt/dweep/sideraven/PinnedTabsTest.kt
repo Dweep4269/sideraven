@@ -119,16 +119,16 @@ class PinnedTabsTest {
     }
 
     @Test
-    fun `GIVEN the Space has the most pins it can hold THEN Pin to space is refused and explained`() {
-        (1..PINNED_TABS_CAP).forEach { add("t$it") }
-        (1..PINNED_TABS_CAP).forEach { handler.handle(SidebarIntent.PinToSpace("t$it"), state()) }
+    fun `GIVEN a Space with 12 Pinned Tabs THEN a 13th can still be pinned`() {
+        (1..12).forEach { add("t$it") }
+        (1..12).forEach { handler.handle(SidebarIntent.PinToSpace("t$it"), state()) }
         add("extra")
 
-        assertEquals(PinResult.Full, state().spacePinBlock)
+        assertEquals(null, state().spacePinBlock)
         handler.handle(SidebarIntent.PinToSpace("extra"), state())
 
-        assertEquals(listOf(PinResult.Full), refused)
-        assertEquals(PINNED_TABS_CAP, state().pinned.size)
+        assertEquals(emptyList<PinResult>(), refused)
+        assertEquals(13, state().pinned.size)
     }
 
     @Test

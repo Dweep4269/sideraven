@@ -119,7 +119,6 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import pt.dweep.sideraven.AddressBarLayout
-import pt.dweep.sideraven.PINNED_TABS_CAP
 import pt.dweep.sideraven.SidebarSpace
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.ui.layout.layout
@@ -132,11 +131,14 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.Role
@@ -157,6 +159,8 @@ import pt.dweep.sideraven.ESSENTIALS_CAP
 import pt.dweep.sideraven.PinResult
 import pt.dweep.sideraven.SidebarIntent
 import pt.dweep.sideraven.ArrangedShares
+import pt.dweep.sideraven.SpacesShown
+import pt.dweep.sideraven.DEFAULT_SPACE_ACCENT
 import pt.dweep.sideraven.CollapsedSection
 import pt.dweep.sideraven.MAX_ARRANGED_SHARE
 import pt.dweep.sideraven.SectionSizing
@@ -167,6 +171,7 @@ import pt.dweep.sideraven.SidebarDesktopTabs
 import pt.dweep.sideraven.SidebarLook
 import pt.dweep.sideraven.CloseButtons
 import pt.dweep.sideraven.SidebarInactiveSection
+import pt.dweep.sideraven.SidebarPinnedRow
 import pt.dweep.sideraven.SidebarSide
 import pt.dweep.sideraven.SidebarUiState
 import pt.dweep.sideraven.TabListDirection
@@ -408,6 +413,27 @@ private const val DRAG_LIFT_SCALE = 1.03f
 
 /** Sleeping tabs, Essentials and Pinned Tabs: lighter than a Ghost's dimming. */
 internal const val SLEEP_ALPHA = 0.6f
+
+/**
+ * A Sleeping tab's, Essential's or Pinned Tab's favicon, drawn in grey; with the dimming, the one look
+ * for sleep, by hand or by Auto-Sleep.
+ */
+internal fun Modifier.greyWhenSleeping(sleeping: Boolean): Modifier =
+    if (!sleeping) {
+        this
+    } else {
+        drawWithCache {
+            val grey =
+                androidx.compose.ui.graphics.Paint().apply {
+                    colorFilter = androidx.compose.ui.graphics.ColorFilter.colorMatrix(androidx.compose.ui.graphics.ColorMatrix().apply { setToSaturation(0f) })
+                }
+            onDrawWithContent {
+                drawIntoCanvas { it.saveLayer(androidx.compose.ui.geometry.Rect(androidx.compose.ui.geometry.Offset.Zero, size), grey) }
+                drawContent()
+                drawIntoCanvas { it.restore() }
+            }
+        }
+    }
 private val DRAG_LIFT_ELEVATION = 8.dp
 
 /** Titles start fading in once the Sidebar is this far from Collapsed to Persistent. */
@@ -430,6 +456,7 @@ object SidebarTestTag {
     const val PIN_ITEM = "sidebar.pinItem"
     const val MODE_SWITCH = "sidebar.modeSwitch"
     const val SPACE_ROW = "sidebar.spaceRow"
+    const val SPACE_HEADER = "sidebar.spaceHeader"
     const val PIN_TARGET = "sidebar.pinTarget"
     const val ESSENTIALS_TARGET = "sidebar.essentialsTarget"
     const val UNPIN_TARGET = "sidebar.unpinTarget"
@@ -471,6 +498,8 @@ object SidebarTestTag {
     const val SEARCH_FIELD = "sidebar.searchField"
     const val SEARCH_OPEN_HOME = "sidebar.searchOpenHome"
     const val PINNED_TABS = "sidebar.pinnedTabs"
+    const val PINNED_FOLD = "sidebar.pinnedFold"
+    const val PINNED_STACK = "sidebar.pinnedStack"
     const val PINNED_TAB = "sidebar.pinnedTab"
     const val PIN_SPACE_ITEM = "sidebar.pinSpaceItem"
     const val PINNED_CLOSE = "sidebar.pinnedClose"
@@ -1358,6 +1387,8 @@ private fun SidebarPanel(
         fun maxHeightDp(px: Float?) = px?.let { with(density) { it.toDp() } } ?: (panelHeight * ((1f - SectionSizing.TAB_LIST_SHARE) / 2f))
         // An empty section takes no room; during a drag the drag layer draws its target instead.
         val essentialsShown = state.essentials.isNotEmpty()
+        // Dividers take the Space's own colour when it has one; a Space on the default colour keeps the neutral line.
+        val dividerTint = spaceDividerTint(state.currentSpace?.accent)
         // Above the section, so a newly pinned Essential is known across mode and layout changes.
         val newEssentials = rememberNewKeys(state.essentials.map { it.url })
         LaunchedEffect(essentialsShown) { if (!essentialsShown) drag.essentialsSection = Rect.Zero }
@@ -1380,7 +1411,7 @@ private fun SidebarPanel(
                 )
             }
             // The Divider between the Essentials Section and the Tab List; a grab bar in Arrange Mode.
-            if (state.arranging) ArrangeBar(CollapsedSection.Essentials, stringResource(R.string.sideraven_resize_essentials)) else SectionDivider()
+            if (state.arranging) ArrangeBar(CollapsedSection.Essentials, stringResource(R.string.sideraven_resize_essentials)) else SectionDivider(dividerTint)
         }
         val moveTargets = state.spaces.filterNot { it.isCurrent }
         val tabMenuExtras: @Composable (String, () -> Unit) -> Unit = { tabId, dismiss ->
@@ -1426,7 +1457,30 @@ private fun SidebarPanel(
         val spaceEnter = rememberSpaceSwitchMotion(state)
         // The Space's Pinned Tabs, then a Divider, above its Tab List.
         val pinnedShown = state.pinned.isNotEmpty() || state.folders.isNotEmpty()
+        // Pinned Fold: only the Pinned Tab on screen stays (not while arranging, where the Divider is the grab bar).
+        val folded = state.pinnedFolded && !state.arranging
+        val shownPins = if (folded) state.pinned.filter { it.isSelected } else state.pinned
         LaunchedEffect(pinnedShown) { if (!pinnedShown) drag.pinnedSection = Rect.Zero }
+        // Spaces shown as a Header: one row above the Pinned Tabs, as in the prototype, not down by
+        // the controls — the icon row's slot then stays empty and takes no room.
+        val spaceHeader = state.look.spacesShown == SpacesShown.Header && showLabels && state.spaces.isNotEmpty()
+        if (spaceHeader) {
+            SpaceRow(
+                spaces = state.spaces,
+                onIntent = onIntent,
+                syncProblem = state.syncProblem,
+                zenSyncOn = state.zenSyncOn,
+                dropTarget = spaceDropTarget,
+                onIconBounds = { id, bounds -> spaceIconBounds[id] = bounds },
+                header =
+                    SpaceHeaderFold(
+                        folded = folded,
+                        canFold = pinnedShown && !state.arranging,
+                        onToggle = { onIntent(SidebarIntent.TogglePinnedFold) },
+                    ),
+                modifier = Modifier.graphicsLayer { spaceEnter.apply(this) },
+            )
+        }
         if (pinnedShown) {
             Box(
                 Modifier
@@ -1435,18 +1489,23 @@ private fun SidebarPanel(
                     .ignoringTouches(state.arranging),
             ) {
                 PinnedTabsBlock(
-                    pinned = state.pinned,
+                    pinned = shownPins,
                     showLabels = showLabels,
                     maxHeight = if (showLabels) panelHeight / 3 else maxHeightDp(sectionMax?.pinned),
                     scroll = pinnedScroll,
                     onIntent = onIntent,
-                    rows = state.pinnedRows,
-                    folders = state.folders,
+                    rows = if (folded) shownPins.map { SidebarPinnedRow.PinRow(it, 0) } else state.pinnedRows,
+                    folders = if (folded) emptyList() else state.folders,
+                    keepWhenEmpty = folded,
                     dropTarget = pinHighlight,
                     resizing = dragging,
                 )
             }
-            if (state.arranging) ArrangeBar(CollapsedSection.Pinned, stringResource(R.string.sideraven_resize_pinned)) else SectionDivider()
+            if (state.arranging) {
+                ArrangeBar(CollapsedSection.Pinned, stringResource(R.string.sideraven_resize_pinned))
+            } else {
+                PinnedFoldDivider(folded = folded, count = state.pinned.size, showLabels = showLabels, tint = dividerTint) { onIntent(SidebarIntent.TogglePinnedFold) }
+            }
         }
         key(state.currentSpace?.id) {
         val listState = rememberLazyListState()
@@ -1764,7 +1823,8 @@ private fun SidebarPanel(
             if (state.syncProblem) Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) { SyncProblemDot() }
             CollapsedSpaceButton(spaces = state.spaces, onIntent = onIntent)
         }
-        if (showLabels && state.spaces.isNotEmpty()) {
+        // The Header option showed the Space above its Pinned Tabs; the icon row keeps this slot.
+        if (showLabels && state.spaces.isNotEmpty() && !spaceHeader) {
             SpaceRow(
                 spaces = state.spaces,
                 onIntent = onIntent,
@@ -1996,7 +2056,7 @@ private fun SidebarTabItem(
             modifier = Modifier.fillMaxSize().padding(start = 12.dp, end = 4.dp).alpha(fadedAlpha(if (tab.sleeping) SLEEP_ALPHA else 1f)),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Box {
+            Box(Modifier.greyWhenSleeping(tab.sleeping)) {
                 TabFavicon(tab)
                 // Collapsed Mode: a small audio dot on the favicon.
                 if (!showLabels && tab.audio != TabAudio.None) {
@@ -2168,7 +2228,6 @@ private fun PinToSpaceMenuItem(
             Column {
                 Text(stringResource(R.string.sideraven_pin_space))
                 when (block) {
-                    PinResult.Full -> stringResource(R.string.sideraven_space_pins_full, PINNED_TABS_CAP)
                     PinResult.PrivateRefused -> stringResource(R.string.sideraven_space_pin_private)
                     else -> null
                 }?.let { reason -> Text(text = reason, style = MaterialTheme.typography.bodySmall) }
@@ -2379,10 +2438,94 @@ private fun ArrangeControls(onIntent: (SidebarIntent) -> Unit) {
     Spacer(Modifier.height(4.dp))
 }
 
-/** The Divider under the Essentials Section or the Pinned Tabs. */
+/**
+ * The Divider colour: the Space's own colour when it has one (the light or dark variant that belongs
+ * to this theme, which [MaterialTheme.colorScheme] already holds as its primary), else the neutral
+ * outline. A Space on the default colour keeps the Sidebar plain.
+ */
 @Composable
-private fun SectionDivider() {
-    HorizontalDivider(modifier = Modifier.padding(horizontal = 12.dp), color = MaterialTheme.colorScheme.outlineVariant)
+internal fun spaceDividerTint(accent: String?): Color =
+    if (accent != null && accent != DEFAULT_SPACE_ACCENT) {
+        MaterialTheme.colorScheme.primary.copy(alpha = SPACE_DIVIDER_ALPHA)
+    } else {
+        MaterialTheme.colorScheme.outlineVariant
+    }
+
+private const val SPACE_DIVIDER_ALPHA = 0.45f
+
+/**
+ * The Divider under Pinned Tabs, which folds them (Pinned Fold): a short line, inset from the
+ * Sidebar's edges like Zen's adjustable Divider, with a chevron at its end. Folded, a stack mark
+ * and the count say what it holds. Its working area is tall enough to hit without aiming, without
+ * stealing taps from the Pinned Tab above or the tables below.
+ */
+@Composable
+private fun PinnedFoldDivider(
+    folded: Boolean,
+    count: Int,
+    showLabels: Boolean,
+    tint: Color,
+    onToggle: () -> Unit,
+) {
+    val colors = MaterialTheme.colorScheme
+    val label = stringResource(if (folded) R.string.sideraven_unfold_pinned else R.string.sideraven_fold_pinned)
+    val chevronRotation by animateFloatAsState(if (folded) 0f else 180f, label = "pinnedFoldChevron")
+    Row(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .height(PINNED_FOLD_HEIGHT)
+                .clickable(role = Role.Button, onClick = onToggle)
+                .semantics { contentDescription = label }
+                .testTag(SidebarTestTag.PINNED_FOLD)
+                .padding(horizontal = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        HorizontalDivider(modifier = Modifier.weight(1f), color = tint)
+        if (folded) {
+            Box(
+                modifier =
+                    Modifier
+                        .padding(start = 8.dp)
+                        .testTag(SidebarTestTag.PINNED_STACK),
+                contentAlignment = Alignment.Center,
+            ) {
+                PinnedStackMark(tint)
+            }
+        }
+        if (folded && showLabels) {
+            Text(
+                text = pluralStringResource(R.plurals.sideraven_pinned_count, count, count),
+                style = MaterialTheme.typography.labelSmall,
+                color = colors.onSurfaceVariant,
+                modifier = Modifier.padding(horizontal = 6.dp),
+            )
+        }
+        Icon(
+            painter = painterResource(iconsR.drawable.mozac_ic_chevron_down_24),
+            contentDescription = null,
+            modifier = Modifier.padding(start = if (folded) 0.dp else 4.dp).size(14.dp).graphicsLayer { rotationZ = chevronRotation },
+            tint = colors.onSurfaceVariant,
+        )
+    }
+}
+
+/** Folded Pinned Tabs, drawn as a stack: two rules, the shorter under the longer. */
+@Composable
+private fun PinnedStackMark(tint: Color) {
+    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+        Box(Modifier.size(width = 12.dp, height = 2.dp).clip(RoundedCornerShape(1.dp)).background(tint))
+        Box(Modifier.size(width = 8.dp, height = 2.dp).clip(RoundedCornerShape(1.dp)).background(tint))
+    }
+}
+
+/** 32 dp of working area: 8 dp above and below the 16 dp line, and no overlap with its neighbours. */
+private val PINNED_FOLD_HEIGHT = 32.dp
+
+/** The Divider after Essentials: Zen's top Divider, running to the Sidebar's edges. */
+@Composable
+private fun SectionDivider(tint: Color) {
+    HorizontalDivider(color = tint)
 }
 
 /**

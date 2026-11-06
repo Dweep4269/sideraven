@@ -12,6 +12,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mozilla.fenix.R
 import org.mozilla.fenix.customannotations.Converted
+import org.mozilla.fenix.customannotations.Critical
 import org.mozilla.fenix.customannotations.SkipLeaks
 import org.mozilla.fenix.customannotations.SmokeTest
 import org.mozilla.fenix.helpers.AppAndSystemHelper.registerAndCleanupIdlingResources
@@ -314,7 +315,7 @@ class HistoryTest {
                 verifySearchEngineIcon("History")
                 verifySearchBarPlaceholder("Search history")
                 verifySearchBarPosition()
-                tapOutsideToDismissSearchBar(defaultWebPage.url.toString())
+                mDevice.pressBack()
                 verifySearchToolbar(false)
                 exitMenu()
             }
@@ -333,8 +334,10 @@ class HistoryTest {
             .clickSearchButton {
                 verifySearchToolbar(true)
                 verifySearchBarPosition()
-                pressBack()
+                mDevice.pressBack()
+                verifySearchToolbar(false)
             }
+        mDevice.waitForIdle()
         historyMenu(composeTestRule) {
             verifyHistoryMenuView(historyItemExists = true)
         }
@@ -413,6 +416,7 @@ class HistoryTest {
                 verifySponsoredSuggestionsResults(thirdWebPage.url.toString(), searchTerm = "generic")
                 pressBack()
             }
+        mDevice.waitForIdle()
         historyMenu(composeTestRule) {
                 clickDeleteHistoryButton(thirdWebPage.title)
                 verifyHistoryItemExists(false, firstWebPage.title)
@@ -450,6 +454,12 @@ class HistoryTest {
     }
 
     // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/243287
+    @Converted(
+        replacedBy = ["org.mozilla.fenix.ui.efficiency.tests.HistoryTest#openHistoryItemTest"],
+        bug = 2071852,
+        since = "2026-09",
+    )
+    @Critical
     @Test
     fun openHistoryItemTest() {
         val defaultWebPage = mockWebServer.getGenericAsset(1)

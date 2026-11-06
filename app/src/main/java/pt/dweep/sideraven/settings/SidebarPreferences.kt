@@ -28,7 +28,9 @@ import pt.dweep.sideraven.SidebarGate
 import pt.dweep.sideraven.SidebarMode
 import pt.dweep.sideraven.SidebarModeStore
 import pt.dweep.sideraven.SidebarSide
+import pt.dweep.sideraven.SleepTimer
 import pt.dweep.sideraven.SidebarTier
+import pt.dweep.sideraven.SpacesShown
 import pt.dweep.sideraven.SidebarWidth
 import pt.dweep.sideraven.TabListDirection
 import pt.dweep.sideraven.TabRows
@@ -54,6 +56,7 @@ object SidebarPreferences {
     const val SIDE_KEY = "sideraven_sidebar_side"
     const val NEW_TAB_POSITION_KEY = "sideraven_new_tab_position"
     const val TAB_LIST_DIRECTION_KEY = "sideraven_tab_list_direction"
+    const val SPACES_SHOWN_KEY = "sideraven_spaces_shown"
     const val TAB_ROWS_KEY = "sideraven_tab_rows"
     const val HAPTICS_KEY = "sideraven_haptics"
     const val ANIMATIONS_KEY = "sideraven_animations"
@@ -64,8 +67,9 @@ object SidebarPreferences {
     const val CLOSE_BUTTONS_KEY = "sideraven_close_buttons"
     const val ADDRESS_SWIPE_NEW_TAB_KEY = "sideraven_address_swipe_new_tab"
     const val ADDRESS_SWIPE_TABS_KEY = "sideraven_address_swipe_tabs"
+    const val TOOLBAR_TAB_BUTTONS_KEY = "sideraven_toolbar_tab_buttons"
+    const val SLEEP_TIMER_KEY = "sideraven_sleep_timer"
     const val SPACE_THEMES_KEY = "sideraven_space_themes"
-    const val PURE_BLACK_KEY = "sideraven_pure_black"
     const val FULL_SCREEN_KEY = "sideraven_full_screen"
 
     /** Fills the screen of one [category]. Called from Sideraven Settings' onResume. */
@@ -122,7 +126,9 @@ object SidebarPreferences {
                 val place = group("sideraven_group_place", R.string.sideraven_group_place)
                 bindSide(context, place, store)
                 bindWidth(context, place, store)
-                bindControlPlaces(context, group("sideraven_group_buttons", R.string.sideraven_group_buttons), store)
+                val buttons = group("sideraven_group_buttons", R.string.sideraven_group_buttons)
+                bindSpacesShown(context, buttons, store)
+                bindControlPlaces(context, buttons, store)
                 val opening = group("sideraven_group_opening", R.string.sideraven_group_opening)
                 // Phones keep their own Swipe Zone setting (off by default); this shows the one in effect here.
                 switchFor(context, opening, SWIPE_ZONE_KEY, store.swipeZone(tier), R.string.sideraven_settings_swipe_zone, R.string.sideraven_settings_swipe_zone_summary)
@@ -141,10 +147,13 @@ object SidebarPreferences {
                 val closing = group("sideraven_group_closing", R.string.sideraven_group_closing)
                 bindCloseButtons(context, closing, store)
                 switchFor(context, closing, SWIPE_TO_CLOSE_KEY, store.swipeToClose, R.string.sideraven_settings_swipe_close, R.string.sideraven_settings_swipe_close_summary)
+                bindSleepTimer(context, closing, store)
                 bindEssentialsPerRow(context, group("sideraven_group_essentials", R.string.sideraven_essentials), store)
             }
             SettingsCategory.AddressBar -> {
-                bindLayout(context, group("sideraven_group_layout", R.string.sideraven_settings_layout), store)
+                val layout = group("sideraven_group_layout", R.string.sideraven_settings_layout)
+                val tabButtons = bindToolbarTabButtons(context, layout, store)
+                bindLayout(context, layout, store) { tabButtons.isVisible = it == AddressBarLayout.Top }
                 val gestures = group("sideraven_group_gestures", R.string.sideraven_group_gestures)
                 switchFor(context, gestures, ADDRESS_SWIPE_NEW_TAB_KEY, store.addressSwipeNewTab, R.string.sideraven_settings_address_swipe_new_tab, null)
                 switchFor(context, gestures, ADDRESS_SWIPE_TABS_KEY, store.addressSwipeTabs, R.string.sideraven_settings_address_swipe_tabs, null)
@@ -157,7 +166,6 @@ object SidebarPreferences {
                 }
                 val theme = group("sideraven_group_theme", R.string.sideraven_group_theme)
                 switchFor(context, theme, SPACE_THEMES_KEY, store.spaceThemes, R.string.sideraven_settings_space_themes, R.string.sideraven_settings_space_themes_summary)
-                switchFor(context, theme, PURE_BLACK_KEY, store.pureBlack, R.string.sideraven_settings_pure_black, R.string.sideraven_settings_pure_black_summary)
                 switchFor(context, theme, FRAME_KEY, store.roundedFrame, R.string.sideraven_settings_frame, R.string.sideraven_settings_frame_summary)
                 bindFullScreen(context, group("sideraven_group_screen", R.string.sideraven_group_screen), store)
                 val feel = group("sideraven_group_feel", R.string.sideraven_group_feel)
@@ -403,9 +411,28 @@ object SidebarPreferences {
             )
         }
 
-    /** How tall tab rows are. */
-    internal fun bindTabRows(
+    /**
+     * "Spaces shown as": the 1.2 icon row, or the Space Header. The Header is the default; the icon
+     * row stays one choice away, so nothing is taken away.
+     */
+    internal fun bindSpacesShown(
         context: Context,
+        group: PreferenceGroup,
+        store: SidebarModeStore,
+    ) = segmented(
+        context,
+        group,
+        SPACES_SHOWN_KEY,
+        R.string.sideraven_settings_spaces_shown,
+        listOf(
+            Option(SpacesShown.Header, R.string.sideraven_spaces_header),
+            Option(SpacesShown.IconRow, R.string.sideraven_spaces_icon_row),
+        ),
+        store.spacesShown,
+    )
+
+    /** How tall tab rows are. */
+    internal fun bindTabRows(        context: Context,
         group: PreferenceGroup,
         store: SidebarModeStore,
     ) = segmented(
@@ -501,6 +528,26 @@ object SidebarPreferences {
             onChange = { every -> store.closeButtons.set(if (every) CloseButtons.EveryTab else CloseButtons.SelectedTab) },
         )
 
+    /** Auto-Sleep's timer: how long a tab goes unused before it sleeps. */
+    internal fun bindSleepTimer(
+        context: Context,
+        group: PreferenceGroup,
+        store: SidebarModeStore,
+    ) = choiceRow(
+        context,
+        group,
+        SLEEP_TIMER_KEY,
+        R.string.sideraven_settings_sleep_timer,
+        listOf(
+            Option(SleepTimer.Off, R.string.sideraven_sleep_off),
+            Option(SleepTimer.Minutes15, R.string.sideraven_sleep_15m),
+            Option(SleepTimer.Minutes30, R.string.sideraven_sleep_30m),
+            Option(SleepTimer.Hour1, R.string.sideraven_sleep_1h),
+            Option(SleepTimer.Hours6, R.string.sideraven_sleep_6h),
+        ),
+        store.sleepTimer,
+    )
+
     /** "New tab opens": the Search Pop-up, Fenix's home page, or a blank page. */
     internal fun bindNewTab(
         context: Context,
@@ -524,6 +571,7 @@ object SidebarPreferences {
         context: Context,
         group: PreferenceGroup,
         store: SidebarModeStore,
+        onChosen: (AddressBarLayout) -> Unit = {},
     ): PicturePickerPreference<AddressBarLayout> {
         val right = store.sidebarSide.value == SidebarSide.Right
         return picker(
@@ -546,9 +594,23 @@ object SidebarPreferences {
                 ),
             ),
             store.addressBarLayout.value,
-            store.addressBarLayout::set,
-        )
+        ) {
+            store.addressBarLayout.set(it)
+            onChosen(it)
+        }
     }
+
+    /**
+     * Fenix's tab counter and New tab kept in its toolbar beside a Sidebar (issue #7). Only the
+     * Sidebar and toolbar layout has that toolbar, so the switch shows only with it.
+     */
+    internal fun bindToolbarTabButtons(
+        context: Context,
+        group: PreferenceGroup,
+        store: SidebarModeStore,
+    ): SwitchPreferenceCompat =
+        switchFor(context, group, TOOLBAR_TAB_BUTTONS_KEY, store.toolbarTabButtons, R.string.sideraven_settings_toolbar_tab_buttons, R.string.sideraven_settings_toolbar_tab_buttons_summary)
+            .apply { isVisible = store.addressBarLayout.value == AddressBarLayout.Top }
 
     /** A [Setting] as segmented buttons: finds or adds the row and shows the stored value. */
     private fun <T> segmented(

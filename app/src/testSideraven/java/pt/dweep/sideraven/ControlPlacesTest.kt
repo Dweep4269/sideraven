@@ -243,7 +243,7 @@ class ControlPlacesTest {
 
         val groups = (0 until screen.preferenceCount).map { screen.getPreference(it) }.filterIsInstance<PreferenceCategory>()
         val buttons = groups.single { it.title.toString() == "Buttons in the sidebar" }
-        val switches = (0 until buttons.preferenceCount).map { buttons.getPreference(it) as androidx.preference.SwitchPreferenceCompat }.sortedBy { it.order }
+        val switches = (0 until buttons.preferenceCount).map { buttons.getPreference(it) }.filterIsInstance<androidx.preference.SwitchPreferenceCompat>().sortedBy { it.order }
         // Synced Tabs first, then the Toggle, then the layout button; off says where it went.
         assertEquals(listOf("Synced tabs", "Change mode", "Move address bar"), switches.map { it.title.toString() })
         assertEquals(listOf(false, true, true), switches.map { it.isChecked })

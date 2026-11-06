@@ -5,7 +5,11 @@
 package org.mozilla.fenix.pdf
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.v2.createComposeRule
@@ -17,11 +21,8 @@ import androidx.navigationevent.DirectNavigationEventInput
 import androidx.navigationevent.NavigationEvent
 import androidx.navigationevent.compose.LocalNavigationEventDispatcherOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import mozilla.components.browser.state.action.ContentAction
-import mozilla.components.browser.state.action.TabListAction
-import mozilla.components.browser.state.state.BrowserState
-import mozilla.components.browser.state.state.createTab
 import mozilla.components.browser.state.store.BrowserStore
+import mozilla.components.compose.base.theme.Theme
 import mozilla.components.support.test.robolectric.testContext
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -29,8 +30,9 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mozilla.fenix.helpers.FenixGleanTestRule
+import org.mozilla.fenix.pdf.ui.PdfToolsContent
+import org.mozilla.fenix.pdf.ui.SignatureDialogContent
 import org.mozilla.fenix.theme.FirefoxTheme
-import org.mozilla.fenix.theme.Theme
 
 @RunWith(AndroidJUnit4::class)
 class PdfToolsContentTest {
@@ -38,29 +40,15 @@ class PdfToolsContentTest {
 
     @get:Rule val gleanTestRule = FenixGleanTestRule(testContext)
 
-    private val tabId = "1"
-    private val otherTabId = "2"
-
     private val clicked = mutableListOf<String>()
-
-    private val browserStore =
-        BrowserStore(
-            BrowserState(
-                tabs =
-                    listOf(
-                        createTab(url = "https://mozilla.org", id = tabId),
-                        createTab(url = "https://mozilla.org/other", id = otherTabId),
-                    ),
-                selectedTabId = tabId,
-            )
-        )
 
     private val backInput = DirectNavigationEventInput()
     private var backReachedBrowser = false
+    private var isPdfShowing by mutableStateOf(false)
     private val integration =
         PdfToolsIntegration(
             container = CoordinatorLayout(testContext),
-            browserStore = browserStore,
+            browserStore = BrowserStore(),
             isAddressBarAtBottom = true,
         )
 
@@ -75,36 +63,38 @@ class PdfToolsContentTest {
 
                 BackHandler { backReachedBrowser = true }
 
-                PdfToolsContent(
-                    browserStore = browserStore,
-                    isLargeWindow = isLargeWindow,
-                    signatureState = integration.signatureState,
-                    signatureActions = integration.signatureActions,
-                    toolActions =
-                        PdfToolActions(
-                            onSignClick = integration::handleSignClick,
-                            onDownloadClick = { clicked.add("download") },
-                            onPrintClick = { clicked.add("print") },
-                            onShareClick = { clicked.add("share") },
-                        ),
-                )
+                // The app hosts the two overlays in separate views, so they are laid out side by side here.
+                Column {
+                    PdfToolsContent(
+                        isPdfShowing = isPdfShowing,
+                        isLargeWindow = isLargeWindow,
+                        isCoveredBySignatureDialog = integration.signatureState.isSigning && !isLargeWindow,
+                        toolActions =
+                            PdfToolActions(
+                                onSignClick = integration::handleSignClick,
+                                onDownloadClick = { clicked.add("download") },
+                                onPrintClick = { clicked.add("print") },
+                                onShareClick = { clicked.add("share") },
+                            ),
+                    )
+
+                    SignatureDialogContent(
+                        isPdfShowing = isPdfShowing,
+                        signatureState = integration.signatureState,
+                        signatureActions = integration.signatureActions,
+                    )
+                }
             }
         }
     }
 
     private fun enterPdfViewer() {
-        browserStore.dispatch(ContentAction.EnteredPdfViewer(tabId))
+        composeTestRule.runOnUiThread { isPdfShowing = true }
         composeTestRule.waitForIdle()
     }
 
     private fun exitPdfViewer() {
-        browserStore.dispatch(ContentAction.ExitedPdfViewer(tabId))
-        composeTestRule.waitForIdle()
-    }
-
-    private fun selectOtherPdfTab() {
-        browserStore.dispatch(TabListAction.SelectTabAction(otherTabId))
-        browserStore.dispatch(ContentAction.EnteredPdfViewer(otherTabId))
+        composeTestRule.runOnUiThread { isPdfShowing = false }
         composeTestRule.waitForIdle()
     }
 
@@ -142,6 +132,17 @@ class PdfToolsContentTest {
 
         composeTestRule.onNodeWithTag(PdfToolsTestTag.BAR).assertDoesNotExist()
         composeTestRule.onNodeWithTag(PdfToolsTestTag.SIGN_FAB).assertDoesNotExist()
+    }
+
+    @Test
+    fun `GIVEN the signature dialog is shown WHEN the selected tab stops showing a PDF THEN the dialog is hidden`() {
+        setTestContent(isLargeWindow = false)
+
+        enterPdfViewer()
+        startSigning()
+        exitPdfViewer()
+
+        composeTestRule.onNodeWithTag(PdfToolsTestTag.SIGNATURE_DIALOG).assertDoesNotExist()
     }
 
     @Test
@@ -204,7 +205,7 @@ class PdfToolsContentTest {
     }
 
     @Test
-    fun `WHEN the sign button is tapped THEN the signature dialog replaces the tools`() {
+    fun `GIVEN a phone sized window WHEN the sign button is tapped THEN the signature dialog replaces the tools`() {
         setTestContent(isLargeWindow = false)
 
         enterPdfViewer()
@@ -213,6 +214,31 @@ class PdfToolsContentTest {
         composeTestRule.onNodeWithTag(PdfToolsTestTag.SIGNATURE_DIALOG).assertIsDisplayed()
         composeTestRule.onNodeWithTag(PdfToolsTestTag.BAR).assertDoesNotExist()
         composeTestRule.onNodeWithTag(PdfToolsTestTag.SIGN_FAB).assertDoesNotExist()
+    }
+
+    @Test
+    fun `GIVEN a tablet sized window WHEN the sign button is tapped THEN the toolbar stays alongside the dialog`() {
+        // Test for Bug 2067261
+        setTestContent(isLargeWindow = true)
+
+        enterPdfViewer()
+        startSigning(testTag = PdfToolsTestTag.SIGN_BUTTON)
+
+        composeTestRule.onNodeWithTag(PdfToolsTestTag.SIGNATURE_DIALOG).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(PdfToolsTestTag.BAR).assertIsDisplayed()
+    }
+
+    @Test
+    fun `GIVEN a tablet sized window WHEN the signature dialog is closed THEN only the toolbar is left`() {
+        setTestContent(isLargeWindow = true)
+
+        enterPdfViewer()
+        startSigning(testTag = PdfToolsTestTag.SIGN_BUTTON)
+
+        composeTestRule.onNodeWithTag(PdfToolsTestTag.SIGNATURE_CLOSE_BUTTON).performClick()
+
+        composeTestRule.onNodeWithTag(PdfToolsTestTag.SIGNATURE_DIALOG).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(PdfToolsTestTag.BAR).assertIsDisplayed()
     }
 
     @Test
@@ -268,44 +294,5 @@ class PdfToolsContentTest {
         assertFalse(backReachedBrowser)
         composeTestRule.onNodeWithTag(PdfToolsTestTag.SIGNATURE_DIALOG).assertDoesNotExist()
         composeTestRule.onNodeWithTag(PdfToolsTestTag.BAR).assertIsDisplayed()
-    }
-
-    @Test
-    fun `GIVEN the signature dialog is shown WHEN the selected tab stops showing a PDF THEN the signature is abandoned`() {
-        setTestContent(isLargeWindow = false)
-
-        enterPdfViewer()
-        startSigning()
-        exitPdfViewer()
-        enterPdfViewer()
-
-        composeTestRule.onNodeWithTag(PdfToolsTestTag.SIGNATURE_DIALOG).assertDoesNotExist()
-        composeTestRule.onNodeWithTag(PdfToolsTestTag.BAR).assertIsDisplayed()
-    }
-
-    @Test
-    fun `GIVEN the signature dialog is shown WHEN another tab showing a PDF is selected THEN the signature is abandoned`() {
-        setTestContent(isLargeWindow = false)
-
-        enterPdfViewer()
-        startSigning()
-        typeSignature()
-        selectOtherPdfTab()
-
-        composeTestRule.onNodeWithTag(PdfToolsTestTag.SIGNATURE_DIALOG).assertDoesNotExist()
-        composeTestRule.onNodeWithTag(PdfToolsTestTag.BAR).assertIsDisplayed()
-    }
-
-    @Test
-    fun `GIVEN a signature was abandoned WHEN signing the PDF of another tab THEN the previous signature is not carried over`() {
-        setTestContent(isLargeWindow = false)
-
-        enterPdfViewer()
-        startSigning()
-        typeSignature()
-        selectOtherPdfTab()
-        startSigning()
-
-        composeTestRule.onNodeWithTag(PdfToolsTestTag.SIGNATURE_INPUT).assertTextEquals("")
     }
 }

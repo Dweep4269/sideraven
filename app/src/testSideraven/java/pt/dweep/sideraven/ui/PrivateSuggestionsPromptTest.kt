@@ -7,10 +7,8 @@ package pt.dweep.sideraven.ui
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
-import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performTextReplacement
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -27,6 +25,11 @@ class PrivateSuggestionsPromptTest {
     val composeRule = createComposeRule()
 
     private val answers = mutableListOf<Boolean>()
+    private var controller: FieldController? = null
+
+    /** The on-screen control. */
+    private val edit
+        get() = requireNotNull(controller?.edit) { "the field never attached" }
 
     private inner class FakePrompt(
         override val needed: Boolean,
@@ -48,6 +51,7 @@ class PrivateSuggestionsPromptTest {
                     onSuggestion = {},
                     onDismiss = {},
                     options = SearchOptions(privatePrompt = FakePrompt(needed)),
+                    fieldController = { controller = it },
                 )
             }
         }
@@ -57,7 +61,9 @@ class PrivateSuggestionsPromptTest {
         show(needed = true)
         composeRule.onAllNodesWithText("Allow").assertCountEquals(0)
 
-        composeRule.onNodeWithTag(SidebarTestTag.SEARCH_FIELD).performTextReplacement("cats")
+        // Text arrives the control's own way (a plain set runs its autocomplete machinery).
+        composeRule.runOnIdle { edit.setText("cats") }
+        composeRule.waitForIdle()
         composeRule.onNodeWithText("Allow").performClick()
 
         assertEquals(listOf(true), answers)
@@ -68,7 +74,8 @@ class PrivateSuggestionsPromptTest {
     fun `WHEN suggestions aren't allowed THEN that answer is given`() {
         show(needed = true)
 
-        composeRule.onNodeWithTag(SidebarTestTag.SEARCH_FIELD).performTextReplacement("cats")
+        composeRule.runOnIdle { edit.setText("cats") }
+        composeRule.waitForIdle()
         composeRule.onNodeWithText("Don’t allow").performClick()
 
         assertEquals(listOf(false), answers)
@@ -78,7 +85,8 @@ class PrivateSuggestionsPromptTest {
     fun `GIVEN the question isn't due THEN it never shows`() {
         show(needed = false)
 
-        composeRule.onNodeWithTag(SidebarTestTag.SEARCH_FIELD).performTextReplacement("cats")
+        composeRule.runOnIdle { edit.setText("cats") }
+        composeRule.waitForIdle()
 
         composeRule.onAllNodesWithText("Allow").assertCountEquals(0)
     }

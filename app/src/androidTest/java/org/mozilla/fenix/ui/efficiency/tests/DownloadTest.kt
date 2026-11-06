@@ -8,8 +8,10 @@ import mozilla.components.support.ktx.util.PromptAbuserDetector
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import org.mozilla.fenix.customannotations.Critical
 import org.mozilla.fenix.customannotations.SmokeTest
 import org.mozilla.fenix.helpers.Constants
+import org.mozilla.fenix.helpers.TestAssetHelper.downloadPageAsset
 import org.mozilla.fenix.helpers.TestAssetHelper.loremIpsumAsset
 import org.mozilla.fenix.ui.efficiency.helpers.BaseTest
 import org.mozilla.fenix.ui.efficiency.selectors.DownloadsSelectors
@@ -17,9 +19,6 @@ import org.mozilla.fenix.ui.efficiency.selectors.NotificationSelectors
 import org.mozilla.fenix.ui.efficiency.selectors.ShareOverlaySelectors
 
 class DownloadTest : BaseTest() {
-
-    private val mockWebServer
-        get() = fenixTestRule.mockWebServer
 
     // Required for the download prompt: without it the Download button's click is treated as prompt
     // abuse and silently dropped -- the button resolves and the click reports success, but the dialog
@@ -50,7 +49,7 @@ class DownloadTest : BaseTest() {
         // It has no other callers. SAVE_AS_PDF_LABEL matches on text, like the legacy robot did.
         on.shareOverlay.navigateToPage().mozClick(ShareOverlaySelectors.SAVE_AS_PDF_LABEL)
         on.downloads
-            .mozVerifyElementsByGroup("downloadDialog")
+            .mozVerifyElementsByGroup(DownloadsSelectors.Group.DOWNLOAD_DIALOG)
             .mozClick(DownloadsSelectors.DOWNLOAD_DIALOG_CONFIRM_BUTTON)
             .mozVerify(DownloadsSelectors.DOWNLOAD_COMPLETE_SNACKBAR, timeout = 15_000)
             .mozClick(DownloadsSelectors.DOWNLOAD_SNACK_BAR_OPEN_BUTTON)
@@ -94,6 +93,32 @@ class DownloadTest : BaseTest() {
             .verifyNotificationDoesNotExist(NotificationSelectors.SYSTEM_NOTIFICATION(downloadFile))
             .closeNotificationTray()
 
-        on.downloads.navigateToPage().mozVerifyElementsByGroup("emptyDownloads")
+        on.downloads.navigateToPage().mozVerifyElementsByGroup(DownloadsSelectors.Group.EMPTY_DOWNLOADS)
+    }
+
+    // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/1114970
+    @Critical
+    @Test
+    fun deleteDownloadedFileTest() {
+        // Local mockWebServer asset, like the legacy test: zip_small.zip completes instantly, so no
+        // remote network or in-progress snackbar is involved -- the download-list assertions are the check.
+        val downloadTestPage = mockWebServer.downloadPageAsset.url.toString()
+        val downloadFile = "zip_small.zip"
+
+        on.browserPage
+            .navigateToPage(downloadTestPage)
+            .clickDownloadLink(downloadFile, downloadTestPage)
+            .verifyDownloadPrompt()
+            .clickDownloadPromptConfirmButton()
+
+        // Delete once and Undo, confirming the file returns, then delete again and confirm the list empties.
+        on.downloads
+            .navigateToPage()
+            .verifyDownloadedFileExistsInDownloadsList(downloadFile)
+            .deleteDownloadedFile(downloadFile)
+            .clickUndoDeleteSnackbarButton()
+            .verifyDownloadedFileExistsInDownloadsList(downloadFile)
+            .deleteDownloadedFile(downloadFile)
+            .mozVerifyElementsByGroup(DownloadsSelectors.Group.EMPTY_DOWNLOADS)
     }
 }

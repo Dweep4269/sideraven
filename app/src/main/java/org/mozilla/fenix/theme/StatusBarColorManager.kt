@@ -76,9 +76,11 @@ class StatusBarColorManager(
                 (fragment is BrowserFragment || fragment is HomeFragment) -> {
                 tabStripStatusBarView.hide()
             }
+            // SIDERAVEN-HOOK-END
 
-            // Don't show the gradient if tab strip is not enabled or private mode is enabled.
-            !settings.isTabStripEnabled || themeManager.currentTheme.isPrivate -> {
+            // Don't show the status bar gradient if tab strip is not enabled, shown at the bottom
+            // or private mode is enabled.
+            !settings.isTabStripEnabled || settings.shouldUseBottomTabStrip || themeManager.currentTheme.isPrivate -> {
                 tabStripStatusBarView.hide()
             }
 

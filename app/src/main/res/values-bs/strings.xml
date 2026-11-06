@@ -130,16 +130,8 @@
   <string name="home_screen_shortcut_open_new_private_tab_2">Novi privatni tab</string>
   <!-- Shortcut action to open Passwords screen -->
   <string name="home_screen_shortcut_passwords">Lozinke</string>
-  <!--
-    Recent Tabs
-
-    Header text for jumping back into the recent tab in the home screen
-  -->
-  <string name="recent_tabs_header">Vrati se nazad</string>
   <!-- Button text for showing all the tabs in the tabs tray -->
   <string name="recent_tabs_show_all">Prikaži sve</string>
-  <!-- Content description for the button which navigates the user to show all recent tabs in the tabs tray. -->
-  <string name="recent_tabs_show_all_content_description_2">Prikaži dugme za prikaz svih nedavnih tabova</string>
   <!-- Text for button in synced tab card that opens synced tabs tray -->
   <string name="recent_tabs_see_all_synced_tabs_button_text">Pogledajte sve sinhronizovane tabove</string>
   <!-- Accessibility description for device icon used for recent synced tab -->
@@ -284,8 +276,6 @@
   <string name="browser_menu_default_banner_title">Postavi %1$s kao zadanu opciju</string>
   <!-- Label text within the set as default banner -->
   <string name="browser_menu_default_banner_subtitle_2">Brz, privatan i napravljen za vas.</string>
-  <!-- Content description (not visible, for screen readers etc.) for the button that dismisses the set as default banner in the menu -->
-  <string name="browser_menu_default_banner_dismiss_promotion">Odbaci promociju</string>
   <!-- Content description (not visible, for screen readers etc.) for recommended extensions in main menu -->
   <string name="browser_menu_recommended_extensions_content_description">Više informacija</string>
   <!--
@@ -705,8 +695,6 @@
   <string name="customize_addon_collection_user_hint">Vlasnik kolekcije (korisnički ID)</string>
   <!-- Toast shown after confirming the custom extension collection configuration -->
   <string name="toast_customize_extension_collection_done">Kolekcija ekstenzija je izmijenjena. Napuštanje aplikacije radi primjene promjena…</string>
-  <!-- Header text for jumping back into the recent tab in customize the home screen -->
-  <string name="customize_toggle_jump_back_in">Vrati se nazad</string>
   <!-- Title for the customize home screen section with bookmarks. -->
   <string name="customize_toggle_bookmarks">Oznake</string>
   <!--
@@ -983,8 +971,6 @@
   <string name="preference_simple_toolbar">Jednostavno</string>
   <!-- Preference for using expanded toolbar -->
   <string name="preference_expanded_toolbar">Prošireno</string>
-  <!-- Preference description indicating the toolbar location preference is disabled when the tab strip is enabled -->
-  <string name="preference_toolbar_pref_disabled_explanation">Adresna traka mora biti na vrhu kada se prikazuje traka s tabovima.</string>
   <!--
     App icon Preferences
 
@@ -1087,8 +1073,6 @@
     Title of preference for tabs management
   -->
   <string name="preferences_tabs">Tabovi</string>
-  <!-- Title of preference that allows a user to specify the tab view -->
-  <string name="preferences_tab_view">Prikaz taba</string>
   <!-- Option for a list tab view -->
   <string name="tab_view_list">Lista</string>
   <!-- Option for a grid tab view -->
@@ -1133,13 +1117,7 @@
   <string name="opening_screen_last_tab_summary">Otvori u zadnjem tabu</string>
   <!-- Summary for homepage preference indicating opening the homepage when re-opening the app after four hours of inactivity -->
   <string name="opening_screen_after_four_hours_of_inactivity_summary">Otvori na početnoj stranici nakon četiri sata</string>
-  <!--
-    Inactive tabs
-
-    Category header of a preference that allows a user to enable or disable the inactive tabs feature
-  -->
-  <string name="preferences_inactive_tabs">Premjestite stare tabove u neaktivne</string>
-  <!-- Title of inactive tabs preference -->
+  <!-- Summary of the preference that allows a user to enable or disable the inactive tabs feature. -->
   <string name="preferences_inactive_tabs_title">Tabovi koje niste pogledali dvije sedmice se premještaju u neaktivan odjeljak.</string>
   <!--
     Studies
@@ -1235,16 +1213,6 @@
     %1$d is the number of bookmarks selected
   -->
   <string name="history_multi_select_title">%1$d označeno</string>
-  <!-- Text for the header that groups the history for today -->
-  <string name="history_today">Danas</string>
-  <!-- Text for the header that groups the history for yesterday -->
-  <string name="history_yesterday">Jučer</string>
-  <!-- Text for the header that groups the history the past 7 days -->
-  <string name="history_7_days">Zadnjih 7 dana</string>
-  <!-- Text for the header that groups the history the past 30 days -->
-  <string name="history_30_days">Zadnjih 30 dana</string>
-  <!-- Text for the header that groups the history older than the last month -->
-  <string name="history_older">Starije</string>
   <!-- Text shown when no history exists -->
   <string name="history_empty_message">Nema historije</string>
   <!--

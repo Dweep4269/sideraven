@@ -2,6 +2,8 @@ import com.android.build.api.variant.FilterConfiguration
 
 import java.time.format.DateTimeFormatter
 
+import org.mozilla.conventions.WriteRuntimeDependencies
+
 import static org.mozilla.conventions.BuildConfigKt.getBuildId
 
 plugins {
@@ -17,7 +19,6 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.protobuf.plugin)
-    alias(libs.plugins.python.envs.plugin)
 }
 
 // The OSS-licenses plugin is only needed for shipping builds, so skip it during
@@ -259,6 +260,19 @@ android {
             }
         }
         // SIDERAVEN-HOOK-END
+        // Web extensions that only the UI tests install.
+        // WebExtensionController.ensureBuiltIn resolves resource://android/assets
+        // against the app's asset manager, so these have to be packaged in the app under test
+        // rather than the test apk.
+        // Added to the debug and other test builds, so they never reach a shipping build.
+        debug {
+            assets.srcDirs += ['src/androidTest/appAssets']
+        }
+        if (project.hasProperty("testBuildType")) {
+            named(project.property("testBuildType")) {
+                assets.srcDirs += ['src/androidTest/appAssets']
+            }
+        }
         if (project.hasProperty('baselineProfilePath')) {
             main {
                 baselineProfiles.srcDirs(project.property('baselineProfilePath'))
@@ -356,6 +370,16 @@ androidComponents {
             variant.outputs.each { output ->
                 output.versionName.set(versionName)
             }
+        }
+    }
+}
+
+androidComponents {
+    onVariants(selector().all()) { variant ->
+        tasks.register("writeRuntimeDependencies${variant.name.capitalize()}", WriteRuntimeDependencies) {
+            classpath(configurations.named("${variant.name}RuntimeClasspath"))
+            versionName = variant.outputs.first().versionName
+            outputFile = layout.buildDirectory.file("sbom/${variant.name}-runtime-dependencies.json")
         }
     }
 }
@@ -503,6 +527,7 @@ dependencies {
     implementation project(':components:compose-base')
     implementation project(':components:compose-browser-toolbar')
     implementation project(':components:compose-cfr')
+    implementation project(':components:compose-menu')
     implementation project(':components:concept-awesomebar')
     implementation project(':components:concept-base')
     implementation project(':components:concept-engine')
@@ -513,6 +538,7 @@ dependencies {
     implementation project(':components:concept-tabstray')
     implementation project(':components:concept-toolbar')
     implementation project(':components:browser-domains')
+    implementation project(':components:browser-errorpages')
     implementation project(':components:browser-icons')
     implementation project(':components:browser-menu')
     implementation project(':components:browser-session-storage')
@@ -552,9 +578,12 @@ dependencies {
     implementation project(':components:feature-share')
     implementation project(':components:feature-sitepermissions')
     implementation project(':components:feature-summarize')
+    implementation project(':components:feature-listentopage')
     implementation project(':components:feature-syncedtabs')
     implementation project(':components:feature-toolbar')
     implementation project(':components:feature-tab-collections')
+    implementation project(':components:feature-tabdata-coordinator')
+    implementation project(':components:feature-tabgroups-storage')
     implementation project(':components:feature-tabs')
     implementation project(':components:feature-top-sites')
     implementation project(':components:feature-webauthn')
@@ -587,6 +616,10 @@ dependencies {
     implementation project(':components:ui-colors')
     implementation project(':components:ui-tabcounter')
     implementation project(':components:ui-widgets')
+    // SIDERAVEN-HOOK: the sidebar's inline completion is upstream's InlineAutocompleteEditText
+    // (the toolbar's control) hosted in the Search Pop-up and the sidebar-pill editor through a view.
+    implementation project(':components:ui-autocomplete')
+    // SIDERAVEN-HOOK-END
     implementation project(':components:lib-bookmarks-file')
     implementation project(':components:lib-bookmark-parser-jsoup')
     implementation project(':components:lib-passwords-file')
@@ -601,7 +634,6 @@ dependencies {
     implementation project(':components:lib-ai-controls')
 
     implementation ComponentsDependencies.mozilla_appservices_syncmanager
-    implementation ComponentsDependencies.mozilla_appservices_merino
 
     implementation libs.accompanist.drawablepainter
     implementation libs.androidx.activity
@@ -673,11 +705,13 @@ dependencies {
     testImplementation project(':components:support-test-fakes')
     testImplementation project(':components:support-test-libstate')
     testImplementation testFixtures(project(':components:support-utils'))
+    testImplementation testFixtures(project(':components:feature-tabgroups-storage'))
 
     testImplementation ComponentsDependencies.mozilla_appservices_full_megazord_libsForTests
 
     testImplementation libs.androidx.compose.ui.test
     testImplementation libs.androidx.test.core
+    testImplementation libs.androidx.test.espresso.intents
     testImplementation libs.androidx.test.junit
     testImplementation libs.androidx.test.runner
     testImplementation libs.androidx.work.testing
@@ -714,7 +748,6 @@ dependencies {
     androidTestImplementation libs.kotlin.test
     androidTestImplementation libs.androidx.room.testing
     androidTestImplementation libs.leakcanary.instrumentation
-    androidTestImplementation libs.mockk.android
     androidTestImplementation libs.mockwebserver
     androidTestImplementation libs.okhttp
     androidTestRuntimeOnly libs.okio
@@ -726,6 +759,9 @@ dependencies {
         // espresso-contrib pulls hamcrest 2.2 only at runtime; align the test compile classpath to match.
         androidTestImplementation(libs.hamcrest.core)
         androidTestImplementation(libs.hamcrest.library)
+        // espresso-intents does the same on the unit test classpath.
+        testImplementation(libs.hamcrest.core)
+        testImplementation(libs.hamcrest.library)
     }
 
     androidTestUtil libs.androidx.test.orchestrator

@@ -105,6 +105,8 @@ jobs:
             "$apksigner" verify "$out"
           done
           rm -f "$RUNNER_TEMP/sideraven.jks"
+          # Checksums, so a download can be checked for corruption (sha256sum -c SHA256SUMS).
+          (cd dist && sha256sum *.apk > SHA256SUMS)
           ls -la dist
 
       - name: Publish the release
@@ -121,4 +123,4 @@ jobs:
             fi
             echo "Download \`sideraven-$VERSION-arm64-v8a.apk\` for most devices, or \`armeabi-v7a\` for older 32-bit ones."
           } > notes.md
-          gh release create "$GITHUB_REF_NAME" dist/*.apk --title "Sideraven $VERSION" --notes-file notes.md
+          gh release create "$GITHUB_REF_NAME" dist/*.apk dist/SHA256SUMS --title "Sideraven $VERSION" --notes-file notes.md
