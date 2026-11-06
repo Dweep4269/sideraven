@@ -61,7 +61,21 @@ data class ZenSummary(
 class ZenConnection(
     val storage: SyncStorage,
     val keys: KeyBundle,
+    private val prefsKeys: () -> KeyBundle = { keys },
 ) {
+    /** Explicit support and opt-in; an empty desktop tab list is not a capability signal. */
+    fun normalTabsEnabled(): Boolean {
+        val key = prefsKeys()
+        var enabled = false
+        storage.readAll("prefs").records.forEach { record ->
+            val values = runCatching {
+                JSONObject(String(RecordCrypto.decrypt(record.payload, key), Charsets.UTF_8)).optJSONObject("value")
+            }.getOrNull() ?: return@forEach
+            if (values.has("zen.spaces-sync.normal-tabs")) enabled = ZenWire.flag(values.opt("zen.spaces-sync.normal-tabs")) == true
+        }
+        return enabled
+    }
+
     /** Reads and decrypts the whole `spaces` collection. Blocking. */
     fun readSnapshot(): ZenSnapshot {
         val read = storage.readAll(SPACES_COLLECTION)
@@ -131,7 +145,8 @@ class ZenConnection(
             val id = ZenWire.string(token, "id") ?: throw SyncError.Auth("token server response")
             val key = ZenWire.string(token, "key") ?: throw SyncError.Auth("token server response")
             val storage = HttpSyncStorage(endpoint, id, key.toByteArray(Charsets.UTF_8), transport)
-            return ZenConnection(storage, collectionKeys(storage, KeyBundle.fromScopedKey(credentials.scopedKey)))
+            val syncKey = KeyBundle.fromScopedKey(credentials.scopedKey)
+            return ZenConnection(storage, collectionKeys(storage, syncKey)) { collectionKeys(storage, syncKey, "prefs") }
         }
 
         /**
@@ -149,10 +164,11 @@ class ZenConnection(
         internal fun collectionKeys(
             storage: SyncStorage,
             syncKey: KeyBundle,
+            collection: String = SPACES_COLLECTION,
         ): KeyBundle {
             val stored = storage.read("crypto", "keys") ?: throw SyncError.KeysMissing()
             val keys = JSONObject(String(RecordCrypto.decrypt(stored.payload, syncKey), Charsets.UTF_8))
-            val pair = keys.optJSONObject("collections")?.optJSONArray(SPACES_COLLECTION) ?: keys.optJSONArray("default") ?: throw SyncError.KeysMissing()
+            val pair = keys.optJSONObject("collections")?.optJSONArray(collection) ?: keys.optJSONArray("default") ?: throw SyncError.KeysMissing()
             return KeyBundle.fromBase64Pair(pair.getString(0), pair.getString(1))
         }
     }

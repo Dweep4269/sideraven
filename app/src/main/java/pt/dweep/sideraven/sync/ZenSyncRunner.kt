@@ -13,6 +13,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -47,10 +48,76 @@ class ZenSyncRunner(
 ) {
     private val state = MutableStateFlow(ZenSyncRunStatus())
     val status: StateFlow<ZenSyncRunStatus> = state.asStateFlow()
+    private val previews = MutableStateFlow<List<DesktopSendPreview>>(emptyList())
+    val sending: StateFlow<List<DesktopSendPreview>> = previews.asStateFlow()
 
     private val mutex = Mutex()
     private var pending: Job? = null
     private var ticking: Job? = null
+    private val activeSends = java.util.concurrent.ConcurrentHashMap<Pair<String, String>, Job>()
+
+    /** Explicit sends also work with automatic sync off. The phone tab is never modified. */
+    fun sendToDesktop(spaceId: String, url: String, title: String, onResult: (DesktopSendResult) -> Unit): Job {
+        val key = spaceId to url
+        // A repeated tap retries the same operation rather than creating another row or copy.
+        activeSends[key]?.takeIf { it.isActive }?.let { return it }
+        val request = previews.value.firstOrNull { it.spaceId == spaceId && it.url == url }
+            ?: DesktopSendPreview(pt.dweep.sideraven.newPinId(), spaceId, url, title)
+        // Publish synchronously: the UI does not wait for credentials, disk, network, or another sync.
+        previews.update { current -> if (current.any { it.requestId == request.requestId }) current else listOf(request) + current }
+        pending?.cancel()
+        val job = scope.launch {
+            mutex.withLock {
+                state.value = state.value.copy(running = true)
+                var sendId: String? = null
+                var failure: ZenSyncStatus.Reason? = null
+                var result = DesktopSendResult.Unavailable
+                withContext(io) {
+                    try {
+                        val queuedId = zenSync.queueDesktopTab(spaceId, url, title)
+                        sendId = queuedId
+                        previews.update { list -> list.map { if (it.requestId == request.requestId) it.copy(recordId = queuedId) else it } }
+                        if (zenSync.sendDesktopTabNow(queuedId) == SyncOutcome.ReadOnly) {
+                            failure = ZenSyncStatus.Reason.NewerVersion
+                            result = DesktopSendResult.Queued
+                        } else {
+                            result = if (zenSync.isDesktopSendPending(sendId)) DesktopSendResult.Queued else DesktopSendResult.Uploaded
+                        }
+                    } catch (e: SyncError) {
+                        failure = ZenSyncCheck.reasonOf(e)
+                        result = sendId?.let { if (zenSync.isDesktopSendPending(it)) DesktopSendResult.Queued else DesktopSendResult.Uploaded }
+                            ?: DesktopSendResult.Unavailable
+                    } catch (_: IOException) {
+                        failure = ZenSyncStatus.Reason.Network
+                        result = sendId?.let { if (zenSync.isDesktopSendPending(it)) DesktopSendResult.Queued else DesktopSendResult.Uploaded }
+                            ?: DesktopSendResult.Unavailable
+                    } finally {
+                        if (sendId == null) previews.update { list -> list.filterNot { it.requestId == request.requestId } }
+                        refreshSendPreviews()
+                    }
+                }
+                state.value = if (failure == null) {
+                    ZenSyncRunStatus(lastSynced = clock())
+                } else {
+                    state.value.copy(running = false, problem = failure)
+                }
+                onResult(result)
+            }
+            // Explicit sends trigger a full sync immediately, even when automatic sync is off.
+            syncNow()
+        }
+        activeSends[key] = job
+        job.invokeOnCompletion { activeSends.remove(key, job) }
+        return job
+    }
+
+    /** Called on IO under the sync mutex; restore queued rows and clear completed uploads. */
+    private fun refreshSendPreviews() {
+        val queued = zenSync.pendingDesktopSends().asReversed().map {
+            DesktopSendPreview(it.id, it.spaceId, it.url, it.title, recordId = it.id)
+        }
+        previews.update { current -> current.filter { it.recordId == null } + queued }
+    }
 
     private val automatic get() = settings.settings.value.let { it.enabled && it.firstSyncDone && it.syncAutomatically }
 
@@ -90,6 +157,8 @@ class ZenSyncRunner(
                             ZenSyncCheck.reasonOf(e)
                         } catch (_: IOException) {
                             ZenSyncStatus.Reason.Network
+                        } finally {
+                            refreshSendPreviews()
                         }
                     }
                 state.value =
@@ -119,6 +188,8 @@ class ZenSyncRunner(
         const val PERIOD_MS = 5 * 60_000L
     }
 }
+
+enum class DesktopSendResult { Uploaded, Queued, Unavailable }
 
 /** The synced view of the tablet's data, compared to decide whether a local change needs a sync. */
 data class SyncedView(

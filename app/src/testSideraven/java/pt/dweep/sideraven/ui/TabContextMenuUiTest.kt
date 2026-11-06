@@ -23,6 +23,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import pt.dweep.sideraven.SidebarIntent
+import pt.dweep.sideraven.SidebarSpace
 import pt.dweep.sideraven.SidebarTab
 import pt.dweep.sideraven.SidebarUiState
 import pt.dweep.sideraven.theme.SideravenTheme
@@ -35,12 +36,14 @@ class TabContextMenuUiTest {
 
     private val intents = mutableListOf<SidebarIntent>()
 
-    private fun render() {
+    private fun render(sendEnabled: Boolean = false, isPrivate: Boolean = false, isLocal: Boolean = false) {
         val state =
             SidebarUiState(
                 isVisible = true,
-                isPrivate = false,
+                isPrivate = isPrivate,
                 tabs = listOf(SidebarTab("1", "One", "https://one.example", icon = null, isSelected = false)),
+                desktopSendingOn = sendEnabled,
+                spaces = listOf(SidebarSpace("work", "Work", "💼", "ember", isCurrent = true, isLocal = isLocal)),
             )
         composeRule.setContent { SideravenTheme { SidebarContent(state = state, onIntent = { intents += it }) } }
     }
@@ -63,6 +66,28 @@ class TabContextMenuUiTest {
         composeRule.onNodeWithText("Close tab").performClick()
 
         assertEquals(listOf<SidebarIntent>(SidebarIntent.CloseTab("1")), intents)
+    }
+
+    @Test
+    fun `a shared tab menu sends a copy to desktop`() {
+        render(sendEnabled = true)
+        composeRule.onNodeWithContentDescription("One").performTouchInput { longClick() }
+        composeRule.onNodeWithText("Send to desktop").performClick()
+        assertEquals(listOf<SidebarIntent>(SidebarIntent.SendToDesktop("1")), intents)
+    }
+
+    @Test
+    fun `private tab menu never offers sending to desktop`() {
+        render(sendEnabled = true, isPrivate = true)
+        composeRule.onNodeWithContentDescription("One").performTouchInput { longClick() }
+        composeRule.onNodeWithText("Send to desktop").assertDoesNotExist()
+    }
+
+    @Test
+    fun `Local Space tab menu never offers sending to desktop`() {
+        render(sendEnabled = true, isLocal = true)
+        composeRule.onNodeWithContentDescription("One").performTouchInput { longClick() }
+        composeRule.onNodeWithText("Send to desktop").assertDoesNotExist()
     }
 
     @OptIn(ExperimentalTestApi::class)

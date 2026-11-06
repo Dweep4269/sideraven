@@ -22,8 +22,12 @@ class FakeSyncServer(
     /** The `spaces` engine version `meta/global` declares (null: not declared). */
     var engineVersion: Int? = null
 
+    /** Desktop's synced normal-tab preference; null means no capability advertised. */
+    var normalTabsPref: Boolean? = null
+
     val syncKey = KeyBundle(ByteArray(32) { 1 }, ByteArray(32) { 2 })
     val collectionKey = KeyBundle(ByteArray(32) { 3 }, ByteArray(32) { 4 })
+    val prefsKey = KeyBundle(ByteArray(32) { 5 }, ByteArray(32) { 6 })
 
     /** The account credentials Fenix would hand over. */
     val credentials =
@@ -79,12 +83,20 @@ class FakeSyncServer(
                         "default",
                         JSONArray().put(b64(collectionKey.encryptionKey)).put(b64(collectionKey.hmacKey)),
                     )
+                keys.put("collections", JSONObject().put("prefs", JSONArray().put(b64(prefsKey.encryptionKey)).put(b64(prefsKey.hmacKey))))
                 json(200, JSONObject().put("id", "keys").put("payload", RecordCrypto.encrypt(keys.toString().toByteArray(), syncKey)).put("modified", 1.0))
             }
             resource == "/storage/meta/global" && request.method == "GET" -> {
                 val version = engineVersion ?: return SyncHttpResponse(404, emptyMap(), ByteArray(0))
                 val meta = JSONObject().put("engines", JSONObject().put(SPACES_COLLECTION, JSONObject().put("version", version)))
                 json(200, JSONObject().put("id", "global").put("payload", meta.toString()).put("modified", 1.0))
+            }
+            resource == "/storage/prefs" && request.method == "GET" -> {
+                val value = JSONObject().apply { normalTabsPref?.let { put("zen.spaces-sync.normal-tabs", it) } }
+                val prefs = JSONObject().put("id", "preferences").put("value", value)
+                val record = JSONObject().put("id", "preferences").put("modified", 1.0)
+                    .put("payload", RecordCrypto.encrypt(prefs.toString().toByteArray(), prefsKey))
+                SyncHttpResponse(200, emptyMap(), JSONArray().put(record).toString().toByteArray())
             }
             resource == "/storage/$SPACES_COLLECTION" && request.method == "GET" -> page(request.url.query.orEmpty())
             resource.startsWith("/storage/$SPACES_COLLECTION/") && request.method == "PUT" -> write(resource, request)

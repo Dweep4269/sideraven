@@ -93,6 +93,7 @@ data class SidebarUiState(
     val pinned: List<SidebarPinnedTab> = emptyList(),
     val syncProblem: Boolean = false,
     val zenSyncOn: Boolean = false,
+    val desktopSendingOn: Boolean = false,
     val address: SidebarAddress? = null,
     val layout: AddressBarLayout = AddressBarLayout.Top,
     val chosenLayout: AddressBarLayout = AddressBarLayout.Top,
@@ -715,6 +716,8 @@ sealed interface SidebarIntent {
     /** Opens one of the Desktop Tabs here: an open tab of this Space at [url], else a new one. */
     data class OpenDesktopTab(val url: String) : SidebarIntent
 
+    data class SendToDesktop(val tabId: String) : SidebarIntent
+
     /** Collapsed Mode's inactive-tabs icon: reveal the full Sidebar with the section open. */
     data object RevealInactiveSection : SidebarIntent
 
@@ -953,6 +956,7 @@ class SidebarIntentHandler(
     private val setArranging: (Boolean) -> Unit = {},
     private val setArrangedShare: (CollapsedSection, Float?) -> Unit = { _, _ -> },
     private val showBrowser: () -> Unit = {},
+    private val sendToDesktop: (spaceId: String, url: String, title: String) -> Unit = { _, _, _ -> },
 ) {
     /** Handles [intent] for a Sidebar currently showing [state]. */
     fun handle(intent: SidebarIntent, state: SidebarUiState) {
@@ -1029,6 +1033,13 @@ class SidebarIntentHandler(
                 if (open != null) selectTab(open.id) else openUrl(intent.url)
                 showBrowser()
                 dismissIfRevealed(state)
+            }
+            is SidebarIntent.SendToDesktop -> {
+                val space = state.currentSpace
+                val tab = state.allTabs.firstOrNull { it.id == intent.tabId }
+                if (!state.isPrivate && state.desktopSendingOn && space != null && !space.isLocal && tab != null &&
+                    pt.dweep.sideraven.sync.desktopSendableUrl(tab.url)
+                ) sendToDesktop(space.id, tab.url, tab.title)
             }
             SidebarIntent.RevealInactiveSection -> {
                 setInactiveExpanded(true)

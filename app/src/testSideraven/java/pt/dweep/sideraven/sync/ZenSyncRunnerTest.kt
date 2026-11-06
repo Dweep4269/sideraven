@@ -97,6 +97,63 @@ class ZenSyncRunnerTest {
     private fun tokenCalls() = server.requests.count { it.url.host == "token.example.com" }
 
     @Test
+    fun `repeated taps coalesce into one immediate preview and one uploaded copy`() = runTest {
+        server.put(ZenRecords.space("work", "Work"))
+        server.put(ZenRecords.layout(listOf("work")))
+        server.normalTabsPref = true
+        zenSync.firstSync(FirstSyncChoice.Replace)
+        val runner = runner(this)
+        runner.sendToDesktop("work", "https://phone.example", "Phone") { }
+        runner.sendToDesktop("work", "https://phone.example", "Phone") { }
+        assertEquals(1, runner.sending.value.size)
+        advanceUntilIdle()
+        assertEquals(1, server.ids().mapNotNull { server.cleartext(it)?.optJSONObject("data") }.count { it.optString("url") == "https://phone.example" })
+    }
+
+    @Test
+    fun `explicit send works with automatic sync off and reports its own upload`() = runTest {
+        server.put(ZenRecords.space("work", "Work"))
+        server.put(ZenRecords.layout(listOf("work")))
+        server.normalTabsPref = true
+        zenSync.firstSync(FirstSyncChoice.Replace)
+        settings.save(settings.settings.value.copy(syncAutomatically = false))
+        val results = mutableListOf<DesktopSendResult>()
+        val runner = runner(this)
+        val beforeSend = tokenCalls()
+        runner.sendToDesktop("work", "https://phone.example", "Phone") { results += it }
+        assertEquals(listOf("https://phone.example"), runner.sending.value.map { it.url })
+        assertEquals(emptyList<DesktopSendResult>(), results)
+        advanceUntilIdle()
+        assertEquals(listOf(DesktopSendResult.Uploaded), results)
+        assertEquals(emptyList<DesktopSendPreview>(), runner.sending.value)
+        // A direct upload followed by an immediate regular sync, with no debounce/timer advance.
+        assertEquals(2, tokenCalls() - beforeSend)
+        assertEquals(42L, runner.status.value.lastSynced)
+        assertEquals(1, server.ids().mapNotNull { server.cleartext(it)?.optJSONObject("data") }.count { it.optString("url") == "https://phone.example" })
+    }
+
+    @Test
+    fun `offline send reports queued and a later manual sync uploads the copy`() = runTest {
+        server.put(ZenRecords.space("work", "Work"))
+        server.put(ZenRecords.layout(listOf("work")))
+        server.normalTabsPref = true
+        zenSync.firstSync(FirstSyncChoice.Replace)
+        val results = mutableListOf<DesktopSendResult>()
+        val runner = runner(this)
+        online = false
+        runner.sendToDesktop("work", "https://phone.example", "Phone") { results += it }
+        advanceUntilIdle()
+        assertEquals(listOf(DesktopSendResult.Queued), results)
+        assertEquals(listOf("https://phone.example"), runner.sending.value.map { it.url })
+        online = true
+        runner.syncNow()
+        advanceUntilIdle()
+        assertNull(runner.status.value.problem)
+        assertEquals(emptyList<DesktopSendPreview>(), runner.sending.value)
+        assertEquals(1, server.ids().mapNotNull { server.cleartext(it)?.optJSONObject("data") }.count { it.optString("url") == "https://phone.example" })
+    }
+
+    @Test
     fun `GIVEN Sync automatically WHEN the app is in front THEN it syncs at once and every 5 minutes, until it goes to the back`() =
         runTest {
             server.put(ZenRecords.layout(emptyList()))

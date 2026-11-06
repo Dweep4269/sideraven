@@ -32,14 +32,14 @@ class DesktopTabsUiTest {
 
     private val intents = mutableListOf<SidebarIntent>()
 
-    private fun show(expanded: Boolean) {
+    private fun show(expanded: Boolean, sending: Boolean = false) {
         val state =
             SidebarUiState(
                 isVisible = true,
                 isPrivate = false,
                 tabs = emptyList(),
                 mode = SidebarMode.Persistent,
-                desktopTabs = SidebarDesktopTabs(listOf(DesktopTab("https://a.example", "Alpha"), DesktopTab("https://b.example", "Beta")), expanded),
+                desktopTabs = SidebarDesktopTabs(listOf(DesktopTab("https://a.example", "Alpha", isSending = sending), DesktopTab("https://b.example", "Beta")), expanded),
             )
         composeRule.setContent { SideravenTheme { SidebarContent(state = state, onIntent = { intents += it }) } }
     }
@@ -63,5 +63,18 @@ class DesktopTabsUiTest {
         composeRule.onNodeWithText("Alpha").performClick()
 
         assertEquals(listOf<SidebarIntent>(SidebarIntent.OpenDesktopTab("https://a.example")), intents)
+    }
+
+    @Test
+    fun `a pending desktop copy shows its title and a loading indicator`() {
+        show(expanded = true, sending = true)
+        composeRule.onNodeWithText("Alpha").assertExists()
+        composeRule.onNodeWithTag(SidebarTestTag.DESKTOP_TAB_SENDING).assertExists()
+    }
+
+    @Test
+    fun `a confirmed desktop copy has no loading indicator`() {
+        show(expanded = true)
+        composeRule.onNodeWithTag(SidebarTestTag.DESKTOP_TAB_SENDING).assertDoesNotExist()
     }
 }

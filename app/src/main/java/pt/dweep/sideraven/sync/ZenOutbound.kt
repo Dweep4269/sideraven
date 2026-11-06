@@ -53,7 +53,10 @@ object ZenOutbound {
                 data.put("uuid", space.id)
                 if (space.name.isNotBlank() || data.has("name")) set(data, "name", space.name)
                 if (space.icon.isNotBlank()) set(data, "icon", space.icon)
-                data.put("children", JSONArray(ordered(data.optJSONArray("children"), listOf(topFolders, topPins), foreignIds)))
+                // Normal tabs may have been sent since this Space's stored origin was read.
+                // Keep their current desktop placement even when a newer local edit wins.
+                val desktopChildren = origin?.recordId?.let { remoteById[it]?.data?.optJSONArray("children") }
+                data.put("children", JSONArray(ordered(desktopChildren ?: data.optJSONArray("children"), listOf(topFolders, topPins), foreignIds)))
                 // Only a colour the user changed here is sent (never one just adopted from desktop).
                 val syncedAccent = origin?.let { it.accent ?: ZenColours.nearestAccent((ZenWire.decode(ZenWire.cleartext(it.recordId, "space", it.data)) as? ZenSpace)?.theme?.primaryHex) ?: pt.dweep.sideraven.DEFAULT_SPACE_ACCENT }
                 if (settings.shareColours && space.accent != syncedAccent) {
